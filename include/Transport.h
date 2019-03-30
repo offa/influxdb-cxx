@@ -6,6 +6,7 @@
 #define INFLUXDATA_TRANSPORTINTERFACE_H
 
 #include <string>
+#include <stdexcept>
 
 namespace influxdb
 {
