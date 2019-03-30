@@ -1,0 +1,26 @@
+language: cpp
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode10.2
+    - os: linux
+      dist: xenial
+      addons:
+        apt:
+          sources:
+           - ubuntu-toolchain-r-test
+          packages:
+            - gcc-8
+            - g++-8
+            - cmake
+            - libboost-system1.58-dev
+            - libboost-test1.58-dev
+before_script: 
+  - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
+script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake ..;
+    else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8; fi;
+  - make -j
+  - make test
+notifications:
+  email: false
