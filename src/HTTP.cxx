@@ -3,7 +3,6 @@
 ///
 
 #include "HTTP.h"
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 namespace influxdb
