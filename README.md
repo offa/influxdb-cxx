@@ -27,9 +27,9 @@ __Build requirements:__
 
 ```bash
 git clone https://github.com/awegrzyn/influxdb-cxx.git
-cd influxdb-cxx; mkdir build; cd build
-cmake ..
-make -j
+cd influxdb-cxx; mkdir build
+cmake -H. -Bbuild
+cmake --build build
 sudo make install
 ```
 
