@@ -3,6 +3,10 @@
 [![Build Status](https://travis-ci.com/awegrzyn/influxdb-cxx.svg?branch=master)](https://travis-ci.com/awegrzyn/influxdb-cxx)
 
 InfluxDB C++ client library
+ - Writing data
+ - ~~Data exploration~~
+ - Supported transports: HTTP/HTTPS with Basic Auth, UDP and Unix datagram socket
+
 
 ## Quick start
 
@@ -10,7 +14,7 @@ InfluxDB C++ client library
 
 ```cpp
 /// Provide complete URI
-auto influxdb = influxdb::InfluxDBFactory::Get("udp://127.0.0.1:8094");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/write?db=test");
 influxdb->write(Point{"test"}
   .addField("value", 10)
   .addTag("host", "localhost")
@@ -35,8 +39,15 @@ sudo make install
 
 ## Transports
 
+An underlying transport is fully configurable by passing an URI:
+```
+[protocol]://[username:password@]host:port[/write?db=database]
+```
+<br>
+List of supported transport is following:
+
 | Name        | Dependency  | URI protocol | Sample URI                            |
 | ----------- |:-----------:|:------------:| -------------------------------------:|
-| HTTP        | cURL        | `http`       | `http://localhost:8086/write?db=<db>` |
+| HTTP        | cURL        | `http`/`https`       | `http://localhost:8086/write?db=<db>` |
 | UDP         | boost       | `udp`        | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`       | `unix:///tmp/telegraf.sock`           |

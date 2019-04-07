@@ -29,7 +29,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace http {
     struct url {
-        std::string protocol, user, password, host, path, search;
+        std::string protocol, user, password, host, path, search, url;
         int port;
     };
 
@@ -84,8 +84,8 @@ namespace http {
     //--- Public Interface -------------------------------------------------------------~
     static inline url ParseHttpUrl(std::string &in) {
         url ret;
+        ret.url = in;
         ret.port = -1;
-
         ret.protocol = ExtractProtocol(in);
         ret.search = ExtractSearch(in);
         ret.path = ExtractPath(in);

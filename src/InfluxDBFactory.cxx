@@ -19,11 +19,15 @@ std::unique_ptr<Transport> withUdpTransport(const http::url& uri) {
 }
 
 std::unique_ptr<Transport> withHttpTransport(const http::url& uri) {
-  return std::make_unique<transports::HTTP>("http://" + uri.host + ":" + std::to_string(uri.port));
-}
+  auto transport = std::make_unique<transports::HTTP>(uri.url);
+  if (!uri.user.empty()) {
+    transport->enableBasicAuth(uri.user + ":" + uri.password);
+  }
 
-std::unique_ptr<Transport> withHttpsTransport(const http::url& uri) {
-  return std::make_unique<transports::HTTP>("https://" + uri.host + ":" + std::to_string(uri.port));
+  if (uri.protocol == "https") {
+    transport->enableSsl();
+  }
+  return transport;
 }
 
 std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri) {
@@ -34,7 +38,7 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(std::string url) {
   static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url&)>> map = {
     {"udp", withUdpTransport},
     {"http", withHttpTransport},
-    {"http", withHttpsTransport},
+    {"https", withHttpTransport},
     {"unix", withUnixSocketTransport},
   };
 

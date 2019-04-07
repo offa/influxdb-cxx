@@ -35,6 +35,19 @@ CURL* HTTP::initCurl(const std::string& url)
   return curl;
 }
 
+void HTTP::enableBasicAuth(const std::string& auth)
+{
+  CURL *curl = curlHandle.get();
+  curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  curl_easy_setopt(curl, CURLOPT_USERPWD, auth.c_str());
+}
+
+void HTTP::enableSsl()
+{
+  CURL *curl = curlHandle.get();
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+}
+
 void HTTP::deleteCurl(CURL * curl)
 {
   curl_easy_cleanup(curl);

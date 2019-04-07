@@ -27,7 +27,13 @@ class HTTP : public Transport
 
     /// Sends point via HTTP POST
     void send(std::string&& post);
-    
+
+    /// Enable Basic Auth
+    /// \param auth <username>:<password>
+    void enableBasicAuth(const std::string& auth);
+
+    /// Enable SSL
+    void enableSsl();
   private:
     /// Custom deleter of CURL object
     static void deleteCurl(CURL * curl);
