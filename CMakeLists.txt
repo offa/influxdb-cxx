@@ -50,7 +50,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Boost REQUIRED COMPONENTS unit_test_framework system)
+find_package(Boost COMPONENTS unit_test_framework system)
 find_package(CURL REQUIRED MODULE)
 
 
@@ -66,9 +66,9 @@ set(SRCS
   src/InfluxDB.cxx
   src/Point.cxx
   src/InfluxDBFactory.cxx
-  src/UDP.cxx
+  $<$<BOOL:${Boost_FOUND}>:src/UDP.cxx>
+  $<$<BOOL:${Boost_FOUND}>:src/UnixSocket.cxx>
   src/HTTP.cxx
-  src/UnixSocket.cxx
 )
 
 # Create library
@@ -83,39 +83,46 @@ target_include_directories(InfluxDB
 
 # Link targets
 target_link_libraries(InfluxDB
-  PUBLIC
-    Boost::boost
   PRIVATE
-    Boost::system
+    $<$<BOOL:${Boost_FOUND}>:Boost::system>
     CURL::CURL
 )
 
 # Use C++17
 target_compile_features(InfluxDB PUBLIC cxx_std_17)
 
+# Set compile definition if Boost found
+target_compile_definitions(InfluxDB
+  PRIVATE
+    $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
+)
 
 ####################################
 # Tests
 ####################################
 
-enable_testing()
+# Tests require Boost::unit_test_framework
+if (Boost_FOUND)
 
-set(TEST_SRCS
-  test/testFactory.cxx
-)
+  enable_testing()
 
-foreach (test ${TEST_SRCS})
-  get_filename_component(test_name ${test} NAME)
-  string(REGEX REPLACE ".cxx" "" test_name ${test_name})
-
-  add_executable(${test_name} ${test})
-  target_link_libraries(${test_name}
-    PRIVATE 
-      InfluxDB Boost::unit_test_framework
+  set(TEST_SRCS
+    test/testFactory.cxx
   )
-  add_test(NAME ${test_name} COMMAND ${test_name})
-  set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
-endforeach()
+
+  foreach (test ${TEST_SRCS})
+    get_filename_component(test_name ${test} NAME)
+    string(REGEX REPLACE ".cxx" "" test_name ${test_name})
+
+    add_executable(${test_name} ${test})
+    target_link_libraries(${test_name}
+      PRIVATE
+        InfluxDB Boost::unit_test_framework
+    )
+    add_test(NAME ${test_name} COMMAND ${test_name})
+    set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
+  endforeach()
+endif()
 
 
 ####################################

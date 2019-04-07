@@ -8,15 +8,33 @@
 #include <memory>
 #include "UriParser.h"
 #include "HTTP.h"
+#include <map>
+
+#ifdef INFLUXDB_WITH_BOOST
 #include "UDP.h"
 #include "UnixSocket.h"
+#endif
 
 namespace influxdb 
 {
 
+#ifdef INFLUXDB_WITH_BOOST
 std::unique_ptr<Transport> withUdpTransport(const http::url& uri) {
   return std::make_unique<transports::UDP>(uri.host, uri.port);
 }
+
+std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri) {
+  return std::make_unique<transports::UnixSocket>(uri.path);
+}
+#else
+std::unique_ptr<Transport> withUdpTransport(const http::url& /*uri*/) {
+  throw std::runtime_error("UDP transport requires Boost");
+}
+
+std::unique_ptr<Transport> withUnixSocketTransport(const http::url& /*uri*/) {
+  throw std::runtime_error("Unix socket transport requires Boost");
+}
+#endif
 
 std::unique_ptr<Transport> withHttpTransport(const http::url& uri) {
   auto transport = std::make_unique<transports::HTTP>(uri.url);
@@ -28,10 +46,6 @@ std::unique_ptr<Transport> withHttpTransport(const http::url& uri) {
     transport->enableSsl();
   }
   return transport;
-}
-
-std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri) {
-  return std::make_unique<transports::UnixSocket>(uri.path);
 }
 
 std::unique_ptr<Transport> InfluxDBFactory::GetTransport(std::string url) {
