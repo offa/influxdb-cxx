@@ -34,7 +34,7 @@ git clone https://github.com/awegrzyn/influxdb-cxx.git
 cd influxdb-cxx; mkdir build
 cmake -H. -Bbuild
 cmake --build build
-sudo make install
+sudo make -C build install
 ```
 
 ## Transports
