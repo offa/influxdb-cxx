@@ -53,7 +53,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Boost COMPONENTS unit_test_framework system)
+find_package(Boost COMPONENTS unit_test_framework system program_options)
 find_package(CURL REQUIRED MODULE)
 
 
@@ -125,6 +125,9 @@ if (Boost_FOUND)
     add_test(NAME ${test_name} COMMAND ${test_name})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
   endforeach()
+
+  add_executable(benchmark test/benchmark.cxx)
+  target_link_libraries(benchmark PRIVATE InfluxDB Boost::program_options)
 endif()
 
 
