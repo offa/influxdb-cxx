@@ -7,7 +7,7 @@
 #include <memory>
 #include <string>
 
-namespace influxdb 
+namespace influxdb
 {
 
 InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
@@ -25,9 +25,12 @@ void InfluxDB::flushBuffer() {
   if (!mBuffering) {
     return;
   }
-  for (auto&& point : mBuffer) {
-    transmit(std::move(point));
+  std::string stringBuffer{};
+  for (const auto &i : mBuffer) {
+    stringBuffer+= i + "\n";
   }
+  mBuffer.clear();
+  transmit(std::move(stringBuffer));
 }
 
 void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
@@ -54,6 +57,9 @@ void InfluxDB::write(Point&& metric)
 {
   if (mBuffering) {
     mBuffer.emplace_back(metric.toLineProtocol());
+    if (mBuffer.size() >= mBufferSize) {
+      flushBuffer();
+    }
   } else {
     transmit(metric.toLineProtocol());
   }

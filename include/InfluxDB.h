@@ -24,7 +24,7 @@ class InfluxDB
 
     /// Disable copy constructor
     InfluxDB(const InfluxDB&) = delete;
-  
+
     /// Constructor required valid transport
     InfluxDB(std::unique_ptr<Transport> transport);
 
