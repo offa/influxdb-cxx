@@ -10,18 +10,28 @@ matrix:
           sources:
            - ubuntu-toolchain-r-test
           packages:
+            - lcov
             - gcc-8
             - g++-8
             - cmake
             - libboost-system1.58-dev
             - libboost-test1.58-dev
             - libboost-program-options1.58-dev
-before_script: 
+before_script:
   - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake ..;
-    else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8; fi;
+    else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_BUILD_TYPE=Debug; fi;
   - make -j
   - make test
+after_success:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      cd ${TRAVIS_BUILD_DIR}/build
+      lcov --directory . --capture --output-file coverage.info
+      lcov --remove coverage.info '/opt/*' '/usr/*' --output-file coverage.info
+      lcov --list coverage.info
+      bash <(curl -s https://codecov.io/bash) || echo "No coverage reports"
+    fi;
 notifications:
   email: false

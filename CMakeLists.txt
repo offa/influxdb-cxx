@@ -15,7 +15,7 @@ else()
 endif()
 
 # Define project
-project(InfluxDB-Client
+project(influxdb-cxx
   VERSION 0.0.1
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
@@ -77,8 +77,8 @@ set(SRCS
 # Create library
 add_library(InfluxDB SHARED ${SRCS})
 target_include_directories(InfluxDB
-  PUBLIC 
-    $<INSTALL_INTERFACE:include>    
+  PUBLIC
+    $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
