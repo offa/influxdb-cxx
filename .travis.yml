@@ -11,8 +11,8 @@ matrix:
            - ubuntu-toolchain-r-test
           packages:
             - lcov
-            - gcc-8
-            - g++-8
+            - gcc-7
+            - g++-7
             - cmake
             - libboost-system1.58-dev
             - libboost-test1.58-dev
@@ -21,7 +21,7 @@ before_script:
   - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
 script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake ..;
-    else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/bin/g++-8 -DCMAKE_BUILD_TYPE=Debug; fi;
+    else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/bin/g++-7 -DCMAKE_BUILD_TYPE=Debug; fi;
   - make -j
   - make test
 after_success:

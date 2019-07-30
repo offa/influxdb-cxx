@@ -1,6 +1,8 @@
 # influxdb-cxx
 
 [![Build Status](https://travis-ci.com/awegrzyn/influxdb-cxx.svg?branch=master)](https://travis-ci.com/awegrzyn/influxdb-cxx)
+[![codecov](https://codecov.io/gh/awegrzyn/influxdb-cxx/branch/master/graph/badge.svg)](https://codecov.io/gh/awegrzyn/influxdb-cxx)
+
 
 InfluxDB C++ client library
  - Writing data
