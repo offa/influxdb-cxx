@@ -40,7 +40,7 @@ class InfluxDB
 
     /// Enables metric buffering
     /// \param size
-    void enableBuffering(const std::size_t size = 32);
+    void batchOf(const std::size_t size = 32);
 
     /// Adds a global tag
     /// \param name

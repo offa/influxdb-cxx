@@ -5,17 +5,38 @@
 
 
 InfluxDB C++ client library
- - Writing data
+ - Writing points
+ - Batch write
  - ~~Data exploration~~
- - Supported transports: HTTP/HTTPS with Basic Auth, UDP and Unix datagram socket
+ - Supported transports
+   - HTTP/HTTPS with Basic Auth
+   - UDP
+   - Unix datagram socket
 
+
+ ### Installation
+
+ __Build requirements:__
+ g++ 6.0+, CMake 3.12+
+
+__Dependencies:__
+ cURL, boost 1.57+ (optional)
+
+ __Compilation__
+ ```bash
+ git clone https://github.com/awegrzyn/influxdb-cxx.git
+ cd influxdb-cxx; mkdir build
+ cmake -H. -Bbuild
+ cmake --build build
+ sudo make -C build install
+ ```
 
 ## Quick start
 
 ### Basic usage
 
 ```cpp
-/// Provide complete URI
+// Provide complete URI
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/write?db=test");
 influxdb->write(Point{"test"}
   .addField("value", 10)
@@ -23,20 +44,17 @@ influxdb->write(Point{"test"}
 );
 ```
 
-### Installation
+### Batch write
 
-__Build requirements:__
- - g++ 6.0+
- - CMake 3.12+
- - cURL
- - boost 1.57+ (optional for UDP and Unix socket transports)
+```cpp
+// Provide complete URI
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/write?db=test");
+// Write batches of 100 points
+influxdb->batchOf(100);
 
-```bash
-git clone https://github.com/awegrzyn/influxdb-cxx.git
-cd influxdb-cxx; mkdir build
-cmake -H. -Bbuild
-cmake --build build
-sudo make -C build install
+for (;;) {
+  influxdb->write(Point{"test"}.addField("value", 10));
+}
 ```
 
 ## Transports

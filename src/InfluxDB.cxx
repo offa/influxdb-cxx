@@ -15,7 +15,7 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
 {
 }
 
-void InfluxDB::enableBuffering(const std::size_t size)
+void InfluxDB::batchOf(const std::size_t size)
 {
   mBufferSize = size;
   mBuffering = true;

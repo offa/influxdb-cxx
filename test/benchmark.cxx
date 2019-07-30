@@ -14,18 +14,18 @@ int main(int argc, char* argv[]) {
     ("url", boost::program_options::value<std::string>()->required(), "URL to InfluxDB database")
     ("buffer", boost::program_options::value<int>(), "Buffer size");
 
-  boost::program_options::variables_map vm; 
+  boost::program_options::variables_map vm;
   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, desc), vm);
   boost::program_options::notify(vm);
 
   auto db = InfluxDBFactory::Get(vm["url"].as<std::string>());
-  
+
   if (vm.count("count")) {
     count = std::floor(vm["count"].as<int>()/2) + 1;
   }
-  
+
   if (vm.count("buffer")) {
-    db->enableBuffering(vm["buffer"].as<int>());
+    db->batchOf(vm["buffer"].as<int>());
   }
 
   for(int i = 0; i <= count; i++) {
