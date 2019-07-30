@@ -27,12 +27,12 @@ class Point
 
     /// Adds filed
     Point&& addField(std::string_view name, std::variant<int, std::string, double> value);
-    
+
     /// Generetes current timestamp
     static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
 
     /// Converts point to Influx Line Protocol
-    std::string toLineProtocol();
+    std::string toLineProtocol() const;
 
   protected:
     /// A value

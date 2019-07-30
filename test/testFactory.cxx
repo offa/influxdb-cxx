@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(test)
   auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8084");
   influxdb->write(Point{"test"}
     .addField("value", 10)
-    .addTag("host", "pcaldadam")
+    .addTag("host", "adampc")
   );
 }
 

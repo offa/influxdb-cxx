@@ -111,6 +111,7 @@ if (Boost_FOUND)
 
   set(TEST_SRCS
     test/testFactory.cxx
+    test/testPoint.cxx
   )
 
   foreach (test ${TEST_SRCS})

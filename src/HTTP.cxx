@@ -21,7 +21,7 @@ CURL* HTTP::initCurl(const std::string& url)
   if (globalInitResult != CURLE_OK) {
     throw std::runtime_error(std::string("cURL init") + curl_easy_strerror(globalInitResult));
   }
-  
+
   CURL *curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
@@ -56,7 +56,7 @@ void HTTP::deleteCurl(CURL * curl)
 
 void HTTP::send(std::string&& post)
 {
-  CURLcode response;	
+  CURLcode response;
   long responseCode;
   curl_easy_setopt(curlHandle.get(), CURLOPT_POSTFIELDS, post.c_str());
   curl_easy_setopt(curlHandle.get(), CURLOPT_POSTFIELDSIZE, (long) post.length());
