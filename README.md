@@ -24,11 +24,11 @@ __Dependencies:__
 
  __Compilation__
  ```bash
- git clone https://github.com/awegrzyn/influxdb-cxx.git
- cd influxdb-cxx; mkdir build
- cmake -H. -Bbuild
- cmake --build build
- sudo make -C build install
+git clone https://github.com/awegrzyn/influxdb-cxx.git
+cd influxdb-cxx; mkdir build
+cd build
+cmake ..
+sudo make install
  ```
 
 ## Quick start
