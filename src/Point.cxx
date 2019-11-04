@@ -44,6 +44,12 @@ Point&& Point::addTag(std::string_view key, std::string_view value)
   return std::move(*this);
 }
 
+Point&& Point::setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp)
+{
+  mTimestamp = timestamp;
+  return std::move(*this);
+}
+
 auto Point::getCurrentTimestamp() -> decltype(std::chrono::system_clock::now())
 {
   return std::chrono::system_clock::now();

@@ -51,6 +51,15 @@ BOOST_AUTO_TEST_CASE(test3)
   BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
 }
 
+BOOST_AUTO_TEST_CASE(test4)
+{
+  auto point = Point{"test"}
+    .addField("value", 10)
+    .setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::milliseconds(1572830914)));
+
+  auto result = getVector(point);
+  BOOST_CHECK_EQUAL(result[2], "1572830914000000");
+}
 
 } // namespace test
 } // namespace influxdb

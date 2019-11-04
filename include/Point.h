@@ -34,6 +34,9 @@ class Point
     /// Converts point to Influx Line Protocol
     std::string toLineProtocol() const;
 
+    /// Sets custom timestamp
+    Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
+
   protected:
     /// A value
     std::variant<int, std::string, double> mValue;
