@@ -23,7 +23,7 @@ class Transport
     virtual void send(std::string&& message) = 0;
 
     /// Sends s request
-    virtual void query(const std::string& /*query*/) {
+    virtual std::string query(const std::string& /*query*/) {
       throw std::runtime_error("Queries are not supported in the selected transport");
     }
 };

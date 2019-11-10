@@ -37,6 +37,9 @@ class Point
     /// Sets custom timestamp
     Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
 
+    std::string getName() const;
+    std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
+
   protected:
     /// A value
     std::variant<int, std::string, double> mValue;

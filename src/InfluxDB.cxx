@@ -4,8 +4,12 @@
 
 #include "InfluxDB.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
+#include <boost/lexical_cast.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 namespace influxdb
 {
@@ -64,4 +68,44 @@ void InfluxDB::write(Point&& metric)
     transmit(metric.toLineProtocol());
   }
 }
+
+std::vector<Point> InfluxDB::query(const std::string&  query)
+{
+  auto response = mTransport->query(query);
+  std::cout << response << std::endl;
+  std::stringstream ss;
+  ss << response;
+  std::vector<Point> points;
+  boost::property_tree::ptree pt;
+  boost::property_tree::read_json(ss, pt);
+
+  for (auto& result : pt.get_child("results")) {
+    for (auto& series : result.second.get_child("series")) {
+      auto columns = series.second.get_child("columns");
+
+      for (auto& values : series.second.get_child("values")) {
+        Point point{series.second.get<std::string>("name")};
+        auto iColumns = columns.begin();
+        auto iValues = values.second.begin();
+        for (; iColumns != columns.end() && iValues != values.second.end(); iColumns++, iValues++) {
+          auto value = iValues->second.get_value<std::string>();
+          auto column = iColumns->second.get_value<std::string>();
+          if (!column.compare("time")) {
+            std::tm tm = {};
+            std::stringstream ss;
+            ss << value;
+            ss >> std::get_time(&tm, "%FT%TZ");
+            point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
+            continue;
+          }
+          try { point.addField(column, boost::lexical_cast<double>(value)); }
+          catch(...) { point.addTag(column, value); }
+        }
+        points.push_back(std::move(point));
+      }
+    }
+  }
+  return points;
+}
+
 } // namespace influxdb

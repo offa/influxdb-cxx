@@ -8,6 +8,7 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include <vector>
 #include <deque>
 
 #include "Transport.h"
@@ -34,6 +35,9 @@ class InfluxDB
     /// Writes a metric
     /// \param metric
     void write(Point&& metric);
+
+    /// Queries InfluxDB database
+    std::vector<Point> query(const std::string& query);
 
     /// Flushes metric buffer (this can also happens when buffer is full)
     void flushBuffer();

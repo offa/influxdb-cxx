@@ -23,10 +23,13 @@ class HTTP : public Transport
     HTTP(const std::string& url);
 
     /// Default destructor
-    ~HTTP() = default;
+    ~HTTP();
 
     /// Sends point via HTTP POST
-    void send(std::string&& post);
+    void send(std::string&& post) override;
+
+    /// Queries database
+    std::string query(const std::string& query) override;
 
     /// Enable Basic Auth
     /// \param auth <username>:<password>
@@ -35,14 +38,19 @@ class HTTP : public Transport
     /// Enable SSL
     void enableSsl();
   private:
-    /// Custom deleter of CURL object
-    static void deleteCurl(CURL * curl);
 
     /// Initilizes CURL and all common options
-    CURL* initCurl(const std::string& url);
+    void initCurl(const std::string& url);
+    void initCurlRead(const std::string& url);
 
-    /// CURL smart pointer with custom deleter
-    std::unique_ptr<CURL, decltype(&HTTP::deleteCurl)> curlHandle;
+    /// CURL pointer configured for writting points
+    CURL* writeHandle;
+
+    /// CURL poiter confgured for querying
+    CURL* readHandle;
+
+    /// InfluxDB read URL
+    std::string mReadUrl;
 };
 
 } // namespace transports
