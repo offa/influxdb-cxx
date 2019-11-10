@@ -166,7 +166,7 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/InfluxDBConf
 )
 
 # Install headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 # Export targets
 install(EXPORT InfluxDBTargets
