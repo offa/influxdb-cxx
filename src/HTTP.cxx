@@ -24,7 +24,12 @@ void HTTP::initCurl(const std::string& url)
   }
 
   std::string writeUrl = url;
-  writeUrl.insert(url.find("?"), "/write");
+  auto position = writeUrl.find("?");
+  if (writeUrl.at(position - 1) != '/') {
+    writeUrl.insert(position, "/write");
+  } else {
+    writeUrl.insert(position, "write");
+  }
   writeHandle = curl_easy_init();
   curl_easy_setopt(writeHandle, CURLOPT_URL,  writeUrl.c_str());
   curl_easy_setopt(writeHandle, CURLOPT_SSL_VERIFYPEER, 0);
