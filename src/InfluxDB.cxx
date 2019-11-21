@@ -17,6 +17,10 @@ namespace influxdb
 InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
   mTransport(std::move(transport))
 {
+  mBuffer = {};
+  mBuffering = false;
+  mBufferSize = 0;
+  mGlobalTags = {};
 }
 
 void InfluxDB::batchOf(const std::size_t size)

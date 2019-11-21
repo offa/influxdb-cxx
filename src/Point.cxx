@@ -18,6 +18,9 @@ template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 Point::Point(const std::string& measurement) :
   mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp())
 {
+  mValue = {};
+  mTags = {};
+  mFields = {};
 }
 
 Point&& Point::addField(std::string_view name, std::variant<int, std::string, double> value)
