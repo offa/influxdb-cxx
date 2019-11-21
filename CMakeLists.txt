@@ -110,8 +110,10 @@ if (Boost_FOUND)
   enable_testing()
 
   set(TEST_SRCS
-    test/testFactory.cxx
+    test/testUdp.cxx
     test/testPoint.cxx
+    test/testHttp.cxx
+    test/testQuery.cxx
   )
 
   foreach (test ${TEST_SRCS})

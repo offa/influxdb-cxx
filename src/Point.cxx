@@ -65,4 +65,19 @@ std::string Point::toLineProtocol() const
   );
 }
 
+std::string Point::getName() const
+{
+  return mMeasurement;
+}
+
+std::chrono::time_point<std::chrono::system_clock> Point::getTimestamp() const
+{
+  return mTimestamp;
+}
+
+std::string Point::getFields() const
+{
+  return mFields;
+}
+
 } // namespace influxdb

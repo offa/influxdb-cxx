@@ -76,7 +76,6 @@ void InfluxDB::write(Point&& metric)
 std::vector<Point> InfluxDB::query(const std::string&  query)
 {
   auto response = mTransport->query(query);
-  std::cout << response << std::endl;
   std::stringstream ss;
   ss << response;
   std::vector<Point> points;
@@ -84,6 +83,8 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
   boost::property_tree::read_json(ss, pt);
 
   for (auto& result : pt.get_child("results")) {
+    auto isResultEmpty = result.second.find("series");
+    if (isResultEmpty == result.second.not_found()) return {};
     for (auto& series : result.second.get_child("series")) {
       auto columns = series.second.get_child("columns");
 
