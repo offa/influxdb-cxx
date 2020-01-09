@@ -65,7 +65,8 @@ set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
-set(SRCS
+# Create library
+add_library(InfluxDB SHARED
   src/InfluxDB.cxx
   src/Point.cxx
   src/InfluxDBFactory.cxx
@@ -73,9 +74,6 @@ set(SRCS
   $<$<BOOL:${Boost_FOUND}>:src/UnixSocket.cxx>
   src/HTTP.cxx
 )
-
-# Create library
-add_library(InfluxDB SHARED ${SRCS})
 target_include_directories(InfluxDB
   PUBLIC
     $<INSTALL_INTERFACE:include>
