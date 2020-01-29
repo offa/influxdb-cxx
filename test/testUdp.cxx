@@ -12,6 +12,8 @@ BOOST_AUTO_TEST_CASE(test)
   auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8084");
   influxdb->write(Point{"test"}
     .addField("value", 10)
+    .addField("value", 20)
+    .addField("value", 100LL)
     .addTag("host", "adampc")
   );
 }
@@ -23,6 +25,9 @@ BOOST_AUTO_TEST_CASE(test2)
   influxdb->write(Point{"test"}.addField("value", 10));
   influxdb->write(Point{"test"}.addField("value", 10));
   influxdb->write(Point{"test"}.addField("value", 10));
+  influxdb->write(Point{"test"}.addField("value", 100LL));
+  influxdb->write(Point{"test"}.addField("value", 100LL));
+  influxdb->write(Point{"test"}.addField("value", 100LL));
 }
 
 } // namespace test

@@ -18,7 +18,7 @@ std::vector<std::string> getVector(const Point& point)
 BOOST_AUTO_TEST_CASE(test1)
 {
   auto point = Point{"test"}
-    .addField("value", 10);
+    .addField("value", 10LL);
 
   auto result = getVector(point);
 
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(test1)
 BOOST_AUTO_TEST_CASE(test2)
 {
   auto point = Point{"test"}
-    .addField("value", 10)
+    .addField("value", 10LL)
     .addField("dvalue", 10.10);
 
   auto result = getVector(point);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test2)
 BOOST_AUTO_TEST_CASE(test3)
 {
   auto point = Point{"test"}
-    .addField("value", 10)
+    .addField("value", 10LL)
     .addField("dvalue", 10.10)
     .addTag("tag", "tagval");
 
@@ -55,6 +55,7 @@ BOOST_AUTO_TEST_CASE(test4)
 {
   auto point = Point{"test"}
     .addField("value", 10)
+    .addField("value", 100LL)
     .setTimestamp(std::chrono::time_point<std::chrono::system_clock>(std::chrono::milliseconds(1572830914)));
 
   auto result = getVector(point);

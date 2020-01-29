@@ -26,7 +26,7 @@ class Point
     Point&& addTag(std::string_view key, std::string_view value);
 
     /// Adds filed
-    Point&& addField(std::string_view name, std::variant<int, std::string, double> value);
+    Point&& addField(std::string_view name, std::variant<int, long long int, std::string, double> value);
 
     /// Generetes current timestamp
     static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
@@ -48,7 +48,7 @@ class Point
 
   protected:
     /// A value
-    std::variant<int, std::string, double> mValue;
+    std::variant<long long int, std::string, double> mValue;
 
     /// A name
     std::string mMeasurement;

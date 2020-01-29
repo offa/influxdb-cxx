@@ -23,7 +23,7 @@ Point::Point(const std::string& measurement) :
   mFields = {};
 }
 
-Point&& Point::addField(std::string_view name, std::variant<int, std::string, double> value)
+Point&& Point::addField(std::string_view name, std::variant<int, long long int, std::string, double> value)
 {
   std::stringstream convert;
   if (!mFields.empty()) convert << ",";
@@ -31,6 +31,7 @@ Point&& Point::addField(std::string_view name, std::variant<int, std::string, do
   convert << name << "=";
   std::visit(overloaded {
     [&convert](int value) { convert << value << 'i'; },
+    [&convert](long long int value) { convert << value << 'i'; },
     [&convert](double value) { convert << value; },
     [&convert](const std::string& value) { convert << '"' << value << '"'; },
     }, value);

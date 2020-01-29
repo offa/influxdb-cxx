@@ -21,6 +21,10 @@ BOOST_AUTO_TEST_CASE(write1)
     .addField("value", 20)
     .addTag("host", "localhost")
   );
+
+  influxdb->write(Point{"test"}
+    .addField("value", 200LL)
+    .addTag("host", "localhost"));
 }
 
 } // namespace test
