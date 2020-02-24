@@ -6,16 +6,17 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <map>
 #include "UriParser.h"
 #include "HTTP.h"
-#include <map>
+#include "InfluxDBException.h"
 
 #ifdef INFLUXDB_WITH_BOOST
 #include "UDP.h"
 #include "UnixSocket.h"
 #endif
 
-namespace influxdb 
+namespace influxdb
 {
 
 #ifdef INFLUXDB_WITH_BOOST
@@ -28,11 +29,11 @@ std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri) {
 }
 #else
 std::unique_ptr<Transport> withUdpTransport(const http::url& /*uri*/) {
-  throw std::runtime_error("UDP transport requires Boost");
+  throw InfluxDBException("InfluxDBFactory", "UDP transport requires Boost");
 }
 
 std::unique_ptr<Transport> withUnixSocketTransport(const http::url& /*uri*/) {
-  throw std::runtime_error("Unix socket transport requires Boost");
+  throw InfluxDBException("InfluxDBFactory", "Unix socket transport requires Boost");
 }
 #endif
 
@@ -58,12 +59,12 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(std::string url) {
 
   http::url parsedUrl = http::ParseHttpUrl(url);
   if (parsedUrl.protocol.empty()) {
-    throw std::runtime_error("Ill-formed URI");
-  }   
+    throw InfluxDBException("InfluxDBFactory::GetTransport", "Ill-formed URI");
+  }
 
   auto iterator = map.find(parsedUrl.protocol);
   if (iterator == map.end()) {
-    throw std::runtime_error("Unrecognized backend " + parsedUrl.protocol);
+    throw InfluxDBException("InfluxDBFactory::GetTransport", "Unrecognized backend " + parsedUrl.protocol);
   }
 
   return iterator->second(parsedUrl);

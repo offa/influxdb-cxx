@@ -3,6 +3,7 @@
 ///
 
 #include "InfluxDB.h"
+#include "InfluxDBException.h"
 
 #include <iostream>
 #include <memory>
@@ -119,7 +120,7 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
 #else
 std::vector<Point> InfluxDB::query(const std::string& /*query*/)
 {
-  throw std::runtime_error("InfluxDB query() requires boost");
+  throw InfluxDBException("InfluxDB::query", "Boost is required");
 }
 #endif
 

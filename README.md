@@ -5,7 +5,6 @@
 
 
 InfluxDB C++ client library
- - Writing points
  - Batch write
  - Data exploration
  - Supported transports

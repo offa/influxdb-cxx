@@ -3,6 +3,7 @@
 ///
 
 #include "HTTP.h"
+#include "InfluxDBException.h"
 #include <iostream>
 
 namespace influxdb
@@ -20,11 +21,14 @@ void HTTP::initCurl(const std::string& url)
 {
   CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL);
   if (globalInitResult != CURLE_OK) {
-    throw std::runtime_error(std::string("cURL init") + curl_easy_strerror(globalInitResult));
+    throw InfluxDBException("HTTP::initCurl", curl_easy_strerror(globalInitResult));
   }
 
   std::string writeUrl = url;
   auto position = writeUrl.find("?");
+  if (position == std::string::npos) {
+     throw InfluxDBException("HTTP::initCurl", "Database not specified");
+  }
   if (writeUrl.at(position - 1) != '/') {
     writeUrl.insert(position, "/write");
   } else {
@@ -71,7 +75,7 @@ std::string HTTP::query(const std::string& query)
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
   response = curl_easy_perform(readHandle);
   if (response != CURLE_OK) {
-    throw std::runtime_error(curl_easy_strerror(response));
+    throw InfluxDBException("HTTP::query", curl_easy_strerror(response));
   }
   return buffer;
 }
@@ -106,10 +110,10 @@ void HTTP::send(std::string&& post)
   response = curl_easy_perform(writeHandle);
   curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   if (response != CURLE_OK) {
-    throw std::runtime_error(curl_easy_strerror(response));
+    throw InfluxDBException("HTTP::send", curl_easy_strerror(response));
   }
   if (responseCode < 200 || responseCode > 206) {
-    throw std::runtime_error("Response code : " + std::to_string(responseCode));
+    throw InfluxDBException("HTTP::send", "Response code: " + std::to_string(responseCode));
   }
 }
 

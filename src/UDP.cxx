@@ -3,6 +3,7 @@
 ///
 
 #include "UDP.h"
+#include "InfluxDBException.h"
 #include <string>
 
 namespace influxdb
@@ -21,7 +22,11 @@ UDP::UDP(const std::string &hostname, int port) :
 
 void UDP::send(std::string&& message)
 {
-  mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
+  try {
+    mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
+  } catch(const boost::system::system_error& e) {
+    throw InfluxDBException("UDP::send", e.what());
+  }
 }
 
 } // namespace transports

@@ -3,6 +3,7 @@
 ///
 
 #include "UnixSocket.h"
+#include "InfluxDBException.h"
 #include <string>
 
 namespace influxdb
@@ -19,7 +20,11 @@ UnixSocket::UnixSocket(const std::string &socketPath) :
 
 void UnixSocket::send(std::string&& message)
 {
-  mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
+  try {
+    mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
+  } catch(const boost::system::system_error& e) {
+    throw InfluxDBException("UnixSocket::send", e.what());
+  }
 }
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 

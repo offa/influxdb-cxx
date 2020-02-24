@@ -115,6 +115,7 @@ if (Boost_FOUND)
     test/testPoint.cxx
     test/testHttp.cxx
     test/testQuery.cxx
+    test/testFactory.cxx
   )
 
   foreach (test ${TEST_SRCS})

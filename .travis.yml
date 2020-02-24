@@ -28,10 +28,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cmake ..;
     else cmake .. -DCMAKE_C_COMPILER=/usr/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/bin/g++-7 -DCMAKE_BUILD_TYPE=Debug; fi;
   - make -j
-  - influx -database "test" -execute "select * from test"
-  - ./bin/testHttp
-  - influx -database "test" -execute "select * from test"
-  - ./bin/testQuery
+  - make test
 after_success:
   - |
     if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
