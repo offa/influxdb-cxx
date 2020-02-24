@@ -13,13 +13,20 @@ InfluxDB C++ client library
    - Unix datagram socket
 
 
- ### Installation
+## Installation
 
- __Build requirements:__
- g++ 6.0+, CMake 3.12+
+__OS support__
+ - Ubuntu
+ - CentOS
+ - macOS
 
-__Dependencies:__
- cURL, boost 1.57+ (optional)
+ __Build requirements__
+ - CMake 3.12+
+ - C++17 compliler
+
+__Dependencies__
+ - CURL (required)
+ - boost 1.57+ (optional - see [Transports](#transports))
 
  __Compilation__
  ```bash
