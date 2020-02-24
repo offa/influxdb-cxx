@@ -47,6 +47,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
 endif()
 
+# Fixes warning when using boost from brew
+set(Boost_USE_MULTITHREADED TRUE)
+
 ####################################
 # Dependencies
 ####################################
