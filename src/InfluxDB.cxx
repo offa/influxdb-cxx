@@ -34,7 +34,7 @@ void InfluxDB::batchOf(const std::size_t size)
 }
 
 void InfluxDB::flushBuffer() {
-  if (!mBuffering) {
+  if (!mBuffering || mBuffer.empty()) {
     return;
   }
   std::string stringBuffer{};
