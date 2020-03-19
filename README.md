@@ -15,11 +15,6 @@ InfluxDB C++ client library
 
 ## Installation
 
-__OS support__
- - Ubuntu
- - CentOS
- - macOS
-
  __Build requirements__
  - CMake 3.12+
  - C++17 compliler
@@ -28,7 +23,7 @@ __Dependencies__
  - CURL (required)
  - boost 1.57+ (optional - see [Transports](#transports))
 
- __Compilation__
+### Generic
  ```bash
 git clone https://github.com/awegrzyn/influxdb-cxx.git
 cd influxdb-cxx; mkdir build
@@ -36,6 +31,11 @@ cd build
 cmake ..
 sudo make install
  ```
+
+### macOS
+```bash
+brew install awegrzyn/influxdata/influxdb-cxx
+```
 
 ## Quick start
 
