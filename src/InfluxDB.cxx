@@ -108,6 +108,7 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
             point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
             continue;
           }
+          // cast all values to double, if strings add to tags
           try { point.addField(column, boost::lexical_cast<double>(value)); }
           catch(...) { point.addTag(column, value); }
         }
