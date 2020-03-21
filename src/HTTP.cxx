@@ -68,14 +68,19 @@ void HTTP::initCurlRead(const std::string& url)
 std::string HTTP::query(const std::string& query)
 {
   CURLcode response;
+  long responseCode;
   std::string buffer;
   char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), query.size());
   auto fullUrl = mReadUrl + std::string(encodedQuery);
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
   response = curl_easy_perform(readHandle);
+  curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   if (response != CURLE_OK) {
     throw InfluxDBException("HTTP::query", curl_easy_strerror(response));
+  }
+  if (responseCode !=  200) {
+    throw InfluxDBException("HTTP::query", "Status code: " + std::to_string(responseCode));
   }
   return buffer;
 }

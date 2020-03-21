@@ -3,6 +3,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../include/InfluxDBFactory.h"
+#include "../src/InfluxDBException.h"
 
 namespace influxdb {
 namespace test {
@@ -30,6 +31,12 @@ BOOST_AUTO_TEST_CASE(failedQuery1)
   auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
   auto points = influxdb->query("SELECT * from test1 WHERE host = 'localhost' LIMIT 3");
   BOOST_CHECK_EQUAL(points.size(), 0);
+}
+
+BOOST_AUTO_TEST_CASE(failedQuery2)
+{
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  BOOST_CHECK_THROW(influxdb->query("SELECT *from test1 WHEREhost = 'localhost' LIMIT 3"), InfluxDBException);
 }
 
 } // namespace test
