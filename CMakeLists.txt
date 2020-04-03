@@ -4,8 +4,8 @@
 
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5.2 FATAL_ERROR)
 
-# Make boost 1.70 happy
-SET(BUILD_SHARED_LIBS ON)
+option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
+option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 
 # Set cmake policy by version: https://cmake.org/cmake/help/latest/manual/cmake-policies.7.html
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
@@ -69,7 +69,11 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 
 # Create library
-add_library(InfluxDB SHARED
+# note: BUILD_SHARED_LIBS specifies if static or shared
+#       as boost is build without -fPIC, we cannot
+#       statically link against it when building
+#       influxdb as shared object
+add_library(InfluxDB
   src/InfluxDB.cxx
   src/Point.cxx
   src/InfluxDBFactory.cxx
@@ -89,7 +93,7 @@ target_include_directories(InfluxDB
 target_link_libraries(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:Boost::system>
-    CURL::CURL
+    CURL::libcurl
 )
 
 # Use C++17
@@ -106,7 +110,7 @@ target_compile_definitions(InfluxDB
 ####################################
 
 # Tests require Boost::unit_test_framework
-if (Boost_FOUND)
+if (Boost_FOUND AND INFLUXCXX_TESTING)
 
   enable_testing()
 
