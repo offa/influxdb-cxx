@@ -104,7 +104,7 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
             std::tm tm = {};
             std::stringstream ss;
             ss << value;
-            ss >> std::get_time(&tm, "%FT%TZ");
+            ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
             point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
             continue;
           }
