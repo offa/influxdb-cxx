@@ -10,9 +10,7 @@
 #include <boost/asio.hpp>
 #include <string>
 
-namespace influxdb
-{
-namespace transports
+namespace influxdb::transports
 {
 
 /// \brief Unix datagram socket transport
@@ -39,7 +37,6 @@ class UnixSocket : public Transport
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 };
 
-} // namespace transports
 } // namespace influxdb
 
 #endif // INFLUXDATA_TRANSPORTS_UNIX_H

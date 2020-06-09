@@ -6,9 +6,7 @@
 #include "InfluxDBException.h"
 #include <iostream>
 
-namespace influxdb
-{
-namespace transports
+namespace influxdb::transports
 {
 
 HTTP::HTTP(const std::string& url)
@@ -122,5 +120,4 @@ void HTTP::send(std::string&& post)
   }
 }
 
-} // namespace transports
 } // namespace influxdb

@@ -11,9 +11,7 @@
 #include <chrono>
 #include <string>
 
-namespace influxdb
-{
-namespace transports
+namespace influxdb::transports
 {
 
 /// \brief UDP transport
@@ -41,7 +39,6 @@ class UDP : public Transport
 
 };
 
-} // namespace transports
 } // namespace influxdb
 
 #endif // INFLUXDATA_TRANSPORTS_UDP_H

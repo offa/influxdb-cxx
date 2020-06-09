@@ -6,9 +6,7 @@
 #include "InfluxDBException.h"
 #include <string>
 
-namespace influxdb
-{
-namespace transports
+namespace influxdb::transports
 {
 
 UDP::UDP(const std::string &hostname, int port) :
@@ -29,5 +27,4 @@ void UDP::send(std::string&& message)
   }
 }
 
-} // namespace transports
 } // namespace influxdb

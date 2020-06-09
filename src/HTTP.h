@@ -10,9 +10,7 @@
 #include <memory>
 #include <string>
 
-namespace influxdb
-{
-namespace transports
+namespace influxdb::transports
 {
 
 /// \brief HTTP transport
@@ -58,7 +56,6 @@ class HTTP : public Transport
     std::string mReadUrl;
 };
 
-} // namespace transports
 } // namespace influxdb
 
 #endif // INFLUXDATA_TRANSPORTS_HTTP_H

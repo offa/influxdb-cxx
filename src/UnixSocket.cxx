@@ -6,10 +6,7 @@
 #include "InfluxDBException.h"
 #include <string>
 
-namespace influxdb
-{
-
-namespace transports
+namespace influxdb::transports
 {
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 UnixSocket::UnixSocket(const std::string &socketPath) :
@@ -28,5 +25,4 @@ void UnixSocket::send(std::string&& message)
 }
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 
-} // namespace transports
 } // namespace influxdb
