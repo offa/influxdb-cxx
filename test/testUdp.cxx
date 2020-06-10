@@ -2,10 +2,9 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../include/InfluxDBFactory.h"
+#include "InfluxDBFactory.h"
 
-namespace influxdb {
-namespace test {
+namespace influxdb::test {
 
 BOOST_AUTO_TEST_CASE(test)
 {
@@ -30,5 +29,4 @@ BOOST_AUTO_TEST_CASE(test2)
   influxdb->write(Point{"test"}.addField("value", 100LL));
 }
 
-} // namespace test
-} // namespace influxdb
+} // namespace influxdb::test

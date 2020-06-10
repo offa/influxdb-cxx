@@ -2,11 +2,10 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../include/InfluxDBFactory.h"
-#include "../src/InfluxDBException.h"
+#include "InfluxDBFactory.h"
+#include "InfluxDBException.h"
 
-namespace influxdb {
-namespace test {
+namespace influxdb::test {
 
 
 BOOST_AUTO_TEST_CASE(unrecognisedBackend)
@@ -24,5 +23,4 @@ BOOST_AUTO_TEST_CASE(missingDb)
   BOOST_CHECK_THROW(influxdb::InfluxDBFactory::Get("http://localhost:8086"), InfluxDBException);
 }
 
-} // namespace test
-} // namespace influxdb
+} // namespace influxdb::test

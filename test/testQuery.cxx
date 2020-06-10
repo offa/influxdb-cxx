@@ -1,11 +1,10 @@
 #define BOOST_TEST_MODULE Test InfluxDB Query
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
-#include "../include/InfluxDBFactory.h"
-#include "../src/InfluxDBException.h"
+#include "InfluxDBFactory.h"
+#include "InfluxDBException.h"
 
-namespace influxdb {
-namespace test {
+namespace influxdb::test {
 
 
 
@@ -64,5 +63,4 @@ BOOST_AUTO_TEST_CASE(failedQuery2)
   BOOST_CHECK_THROW(influxdb->query("SELECT *from test1 WHEREhost = 'localhost' LIMIT 3"), InfluxDBException);
 }
 
-} // namespace test
-} // namespace influxdb
+} // namespace influxdb::test

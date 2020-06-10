@@ -2,10 +2,9 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 
-#include "../include/InfluxDBFactory.h"
+#include "InfluxDBFactory.h"
 
-namespace influxdb {
-namespace test {
+namespace influxdb::test {
 
 
 std::vector<std::string> getVector(const Point& point)
@@ -62,5 +61,4 @@ BOOST_AUTO_TEST_CASE(test4)
   BOOST_CHECK_EQUAL(result[2], "1572830914000000");
 }
 
-} // namespace test
-} // namespace influxdb
+} // namespace influxdb::test

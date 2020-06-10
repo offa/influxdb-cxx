@@ -131,6 +131,13 @@ if (Boost_FOUND AND INFLUXCXX_TESTING)
       PRIVATE
         InfluxDB Boost::unit_test_framework
     )
+
+    target_include_directories(${test_name}
+            PRIVATE
+              InfluxDB
+              src/
+            )
+
     add_test(NAME ${test_name} COMMAND ${test_name})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
   endforeach()
