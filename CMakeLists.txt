@@ -120,6 +120,7 @@ if (Boost_FOUND AND INFLUXCXX_TESTING)
     test/testHttp.cxx
     test/testQuery.cxx
     test/testFactory.cxx
+    test/testInfluxDB.cxx
   )
 
   foreach (test ${TEST_SRCS})

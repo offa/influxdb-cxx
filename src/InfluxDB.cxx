@@ -118,6 +118,19 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
   }
   return points;
 }
+
+void InfluxDB::createDatabaseIfNotExists()
+{
+  try
+  {
+    mTransport->createDatabase();
+  }
+  catch (const std::runtime_error &error)
+  {
+    throw InfluxDBException("InfluxDB::createDatabaseIfNotExists", "Transport did not allow create database");
+  }
+}
+
 #else
 std::vector<Point> InfluxDB::query(const std::string& /*query*/)
 {

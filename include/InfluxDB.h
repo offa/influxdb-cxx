@@ -39,6 +39,9 @@ class InfluxDB
     /// Queries InfluxDB database
     std::vector<Point> query(const std::string& query);
 
+    /// Create InfluxDB database if does not exists
+    void createDatabaseIfNotExists();
+
     /// Flushes metric buffer (this can also happens when buffer is full)
     void flushBuffer();
 
