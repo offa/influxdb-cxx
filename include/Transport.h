@@ -22,10 +22,11 @@ class Transport
     /// Sends string blob
     virtual void send(std::string&& message) = 0;
 
-    /// Sends s request
-    virtual std::string query(const std::string& /*query*/) {
+    /// Sends request
+    virtual std::string query(const std::string& /*query*/){
       throw std::runtime_error("Queries are not supported in the selected transport");
     }
+
 };
 
 } // namespace influxdb

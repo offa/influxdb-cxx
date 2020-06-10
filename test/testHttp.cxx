@@ -3,10 +3,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include "../include/InfluxDBFactory.h"
+#include "../src/HTTP.h"
 #include "../src/InfluxDBException.h"
 
-namespace influxdb {
-namespace test {
+namespace influxdb::test {
 
 BOOST_AUTO_TEST_CASE(write1)
 {
@@ -36,5 +36,16 @@ BOOST_AUTO_TEST_CASE(writeWrongHost)
   BOOST_CHECK_THROW(influxdb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
 }
 
-} // namespace test
-} // namespace influxdb
+BOOST_AUTO_TEST_CASE(obtainDatabaseNameFromUrl)
+{
+  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
+  BOOST_TEST("test" == httpTransport.databaseName());
+}
+
+BOOST_AUTO_TEST_CASE(obtainInfluxDbServiceFromUrl)
+{
+  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
+  BOOST_TEST("http://localhost:8086" == httpTransport.influxDbServiceUrl());
+}
+
+} // namespace influxdb::test

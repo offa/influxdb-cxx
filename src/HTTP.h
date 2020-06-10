@@ -37,7 +37,20 @@ class HTTP : public Transport
 
     /// Enable SSL
     void enableSsl();
+
+    /// Get the database name managed by this transport
+    std::string databaseName() const;
+
+    /// Get the influx service url which transport connects to
+    std::string influxDbServiceUrl() const;
+
   private:
+
+    /// Obtain InfluxDB service url from the url passed
+    void obtainInfluxServiceUrl(const std::string& url);
+
+    /// Obtain database name from the url passed
+    void obtainDatabaseName(const std::string& url);
 
     /// Initilizes CURL for writting and common options
     /// \throw InfluxDBException	if database (?db=) not specified
@@ -49,11 +62,17 @@ class HTTP : public Transport
     /// CURL pointer configured for writting points
     CURL* writeHandle;
 
-    /// CURL poiter confgured for querying
+    /// CURL pointer configured for querying
     CURL* readHandle;
 
     /// InfluxDB read URL
     std::string mReadUrl;
+
+    /// InfluxDB service URL
+    std::string mInfluxDbServiceUrl;
+
+    /// Database name used
+    std::string mDatabaseName;
 };
 
 } // namespace influxdb

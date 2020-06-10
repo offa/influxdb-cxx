@@ -13,6 +13,8 @@ HTTP::HTTP(const std::string& url)
 {
   initCurl(url);
   initCurlRead(url);
+  obtainInfluxServiceUrl(url);
+  obtainDatabaseName(url);
 }
 
 void HTTP::initCurl(const std::string& url)
@@ -27,9 +29,12 @@ void HTTP::initCurl(const std::string& url)
   if (position == std::string::npos) {
      throw InfluxDBException("HTTP::initCurl", "Database not specified");
   }
-  if (writeUrl.at(position - 1) != '/') {
+  if (writeUrl.at(position - 1) != '/')
+  {
     writeUrl.insert(position, "/write");
-  } else {
+  }
+  else
+  {
     writeUrl.insert(position, "write");
   }
   writeHandle = curl_easy_init();
@@ -118,6 +123,28 @@ void HTTP::send(std::string&& post)
   if (responseCode < 200 || responseCode > 206) {
     throw InfluxDBException("HTTP::send", "Response code: " + std::to_string(responseCode));
   }
+}
+
+void HTTP::obtainInfluxServiceUrl(const std::string &url)
+{
+  auto questionMarkPosition = url.find("?");
+  mInfluxDbServiceUrl = url.substr(0, questionMarkPosition);
+}
+
+void HTTP::obtainDatabaseName(const std::string &url)
+{
+  auto dbParameterPosition = url.find("db=");
+  mDatabaseName = url.substr(dbParameterPosition + 3);
+}
+
+std::string HTTP::databaseName() const
+{
+  return mDatabaseName;
+}
+
+std::string HTTP::influxDbServiceUrl() const
+{
+  return mInfluxDbServiceUrl;
 }
 
 } // namespace influxdb
