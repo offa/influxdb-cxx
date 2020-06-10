@@ -147,4 +147,36 @@ std::string HTTP::influxDbServiceUrl() const
   return mInfluxDbServiceUrl;
 }
 
+void HTTP::createDatabase()
+{
+  std::string createUrl = mInfluxDbServiceUrl + "/query";
+  std::string postFields = "q=CREATE DATABASE " + mDatabaseName;
+
+  CURL* createHandle = curl_easy_init();
+  curl_easy_setopt(createHandle, CURLOPT_URL,  createUrl.c_str());
+  curl_easy_setopt(createHandle, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_easy_setopt(createHandle, CURLOPT_CONNECTTIMEOUT, 10);
+  curl_easy_setopt(createHandle, CURLOPT_TIMEOUT, 10);
+  curl_easy_setopt(createHandle, CURLOPT_POST, 1);
+  curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPIDLE, 120L);
+  curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPINTVL, 60L);
+  FILE *devnull = fopen("/dev/null", "w+");
+  curl_easy_setopt(createHandle, CURLOPT_WRITEDATA, devnull);
+
+  curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
+  curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, (long) postFields.length());
+
+  CURLcode response = curl_easy_perform(createHandle);
+  long responseCode;
+  curl_easy_getinfo(createHandle, CURLINFO_RESPONSE_CODE, &responseCode);
+  if (response != CURLE_OK)
+  {
+    throw InfluxDBException("HTTP::createDatabase", curl_easy_strerror(response));
+  }
+  if (responseCode < 200 || responseCode > 206)
+  {
+    throw InfluxDBException("HTTP::createDatabase", "Response code: " + std::to_string(responseCode));
+  }
+}
+
 } // namespace influxdb

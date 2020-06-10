@@ -31,6 +31,10 @@ class HTTP : public Transport
     /// \throw InfluxDBException	when CURL GET fails
     std::string query(const std::string& query) override;
 
+    /// Creates database used at url if it does not exists
+    /// \throw InfluxDBException	when CURL POST fails
+    void createDatabase();
+
     /// Enable Basic Auth
     /// \param auth <username>:<password>
     void enableBasicAuth(const std::string& auth);

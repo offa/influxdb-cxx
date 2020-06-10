@@ -23,10 +23,14 @@ class Transport
     virtual void send(std::string&& message) = 0;
 
     /// Sends request
-    virtual std::string query(const std::string& /*query*/){
+    virtual std::string query(const std::string& /*query*/) {
       throw std::runtime_error("Queries are not supported in the selected transport");
     }
 
+    /// Sends request
+    virtual void createDatabase() {
+      throw std::runtime_error("Creation of database is not supported by selected transport");
+    }
 };
 
 } // namespace influxdb
