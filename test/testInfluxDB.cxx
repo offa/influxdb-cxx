@@ -14,26 +14,26 @@ namespace influxdb::test
 
 BOOST_AUTO_TEST_CASE(httpServiceCanCreateDatabase)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
   BOOST_CHECK_NO_THROW(influxdb->createDatabaseIfNotExists());
 }
 
 BOOST_AUTO_TEST_CASE(udpServiceCanNotCreateDatabase)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8086/?db=test");
   BOOST_CHECK_THROW(influxdb->createDatabaseIfNotExists(), InfluxDBException);
 }
 
 BOOST_AUTO_TEST_CASE(unixServiceCanNotCreateDatabase)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("unix://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("unix://localhost:8086/?db=test");
   BOOST_CHECK_THROW(influxdb->createDatabaseIfNotExists(), InfluxDBException);
 }
 
 
 BOOST_AUTO_TEST_CASE(pointWithEmptyStringFieldValueAreProperlyInserted)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
 
   BOOST_CHECK_NO_THROW (
     influxdb->write(Point{"empty_string_field"}
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(pointWithEmptyStringFieldValueAreProperlyInserted)
 
 BOOST_AUTO_TEST_CASE(pointWithEmptyTagValueAreProperlyInserted)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
 
   BOOST_CHECK_NO_THROW (
     influxdb->write(Point{"empty_string_tag"}
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(pointWithEmptyTagValueAreProperlyInserted)
 
 BOOST_AUTO_TEST_CASE(pointsCanBeWrittenOneByOne)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
 
   BOOST_CHECK_NO_THROW (
     influxdb->write(Point{"points_one_by_one"}
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(pointsCanBeWrittenInVectorAsOneSingleBatch)
     Point{"points_in_vector"}.addField("str_value", "lorem ipsum").addTag("host", "localhost")
   };
 
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
 
   BOOST_CHECK_NO_THROW (
     influxdb->write(std::move(points))

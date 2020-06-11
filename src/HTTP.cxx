@@ -145,7 +145,14 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
 void HTTP::obtainInfluxServiceUrl(const std::string &url)
 {
   auto questionMarkPosition = url.find("?");
-  mInfluxDbServiceUrl = url.substr(0, questionMarkPosition);
+  if (url.at(questionMarkPosition - 1) == '/')
+  {
+    mInfluxDbServiceUrl = url.substr(0, questionMarkPosition-1);
+  }
+  else
+  {
+    mInfluxDbServiceUrl = url.substr(0, questionMarkPosition);
+  }
 }
 
 void HTTP::obtainDatabaseName(const std::string &url)
@@ -167,6 +174,7 @@ std::string HTTP::influxDbServiceUrl() const
 void HTTP::createDatabase()
 {
   std::string createUrl = mInfluxDbServiceUrl + "/query";
+
   std::string postFields = "q=CREATE DATABASE " + mDatabaseName;
 
   CURL *createHandle = curl_easy_init();

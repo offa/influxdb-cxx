@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(write1)
 
 BOOST_AUTO_TEST_CASE(writeWrongHost)
 {
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost2:8086?db=test");
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost2:8086/?db=test");
   BOOST_CHECK_THROW(influxdb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
 }
 
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(obtainDatabaseNameFromUrl)
 
 BOOST_AUTO_TEST_CASE(obtainInfluxDbServiceFromUrl)
 {
-  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
+  influxdb::transports::HTTP httpTransport("http://localhost:8086/?db=test");
   BOOST_TEST("http://localhost:8086" == httpTransport.influxDbServiceUrl());
 }
 
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(createsDatabaseAndSendPointProperly)
 
 BOOST_AUTO_TEST_CASE(sendingToNonexistentInfluxServerThrowsConectionError)
 {
-  influxdb::transports::HTTP httpTransport("http://unexistentServer:12345?db=nonexistent_db");
+  influxdb::transports::HTTP httpTransport("http://unexistentServer:12345/?db=nonexistent_db");
   BOOST_CHECK_THROW( httpTransport.send("test_measurement,tag1=one,tag2=two value1=0.64"), ConnectionError );
 }
 
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(sendingToNonExistentDatabaseThrowsNonExistentDatabase)
 
 BOOST_AUTO_TEST_CASE(sendingAnIllFormedLineProtocolThrowsBadRequest)
 {
-  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
+  influxdb::transports::HTTP httpTransport("http://localhost:8086/?db=test");
   httpTransport.createDatabase();
 
   BOOST_CHECK_THROW( httpTransport.send("ill-formed line protocol"), BadRequest );
