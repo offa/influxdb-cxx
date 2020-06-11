@@ -88,12 +88,12 @@ BOOST_AUTO_TEST_CASE(sendingToNonExistentDatabaseThrowsNonExistentDatabase)
 }
 
 
-BOOST_AUTO_TEST_CASE(sendingABadFormedLineProtocolThrowsBadRequest)
+BOOST_AUTO_TEST_CASE(sendingAnIllFormedLineProtocolThrowsBadRequest)
 {
   influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
   httpTransport.createDatabase();
 
-  BOOST_CHECK_THROW( httpTransport.send("badformed line protocol"), BadRequest );
+  BOOST_CHECK_THROW( httpTransport.send("ill-formed line protocol"), BadRequest );
 }
 
 } // namespace influxdb::test

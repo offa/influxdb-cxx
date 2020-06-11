@@ -15,6 +15,15 @@ HTTP::HTTP(const std::string &url)
   initCurlRead(url);
   obtainInfluxServiceUrl(url);
   obtainDatabaseName(url);
+
+}
+
+HTTP::~HTTP()
+{
+  curl_easy_cleanup(writeHandle);
+  curl_easy_cleanup(readHandle);
+  curl_global_cleanup();
+  fclose(mDevNull);
 }
 
 void HTTP::initCurl(const std::string &url)
@@ -47,8 +56,8 @@ void HTTP::initCurl(const std::string &url)
   curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
   curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPIDLE, 120L);
   curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  FILE *devnull = fopen("/dev/null", "w+");
-  curl_easy_setopt(writeHandle, CURLOPT_WRITEDATA, devnull);
+  mDevNull = fopen("/dev/null", "w+");
+  curl_easy_setopt(writeHandle, CURLOPT_WRITEDATA, mDevNull);
 }
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -97,13 +106,6 @@ void HTTP::enableSsl()
 {
   curl_easy_setopt(readHandle, CURLOPT_SSL_VERIFYPEER, 0L);
   curl_easy_setopt(writeHandle, CURLOPT_SSL_VERIFYPEER, 0L);
-}
-
-HTTP::~HTTP()
-{
-  curl_easy_cleanup(writeHandle);
-  curl_easy_cleanup(readHandle);
-  curl_global_cleanup();
 }
 
 void HTTP::send(std::string &&lineprotocol)
