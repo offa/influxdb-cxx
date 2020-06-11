@@ -37,6 +37,6 @@ class UnixSocket : public Transport
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 };
 
-} // namespace influxdb
+} // namespace influxdb::transports
 
 #endif // INFLUXDATA_TRANSPORTS_UNIX_H

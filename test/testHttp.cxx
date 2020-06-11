@@ -74,4 +74,26 @@ BOOST_AUTO_TEST_CASE(createsDatabaseAndSendPointProperly)
   BOOST_CHECK_NO_THROW( httpTransport.send("test_measurement,tag1=one,tag2=two value1=0.64") );
 }
 
+BOOST_AUTO_TEST_CASE(sendingToNonexistentInfluxServerThrowsConectionError)
+{
+  influxdb::transports::HTTP httpTransport("http://unexistentServer:12345?db=nonexistent_db");
+  BOOST_CHECK_THROW( httpTransport.send("test_measurement,tag1=one,tag2=two value1=0.64"), ConnectionError );
+}
+
+
+BOOST_AUTO_TEST_CASE(sendingToNonExistentDatabaseThrowsNonExistentDatabase)
+{
+  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=nonexistent_db");
+  BOOST_CHECK_THROW( httpTransport.send("test_measurement,tag1=one,tag2=two value1=0.64"), NonExistentDatabase );
+}
+
+
+BOOST_AUTO_TEST_CASE(sendingABadFormedLineProtocolThrowsBadRequest)
+{
+  influxdb::transports::HTTP httpTransport("http://localhost:8086?db=test");
+  httpTransport.createDatabase();
+
+  BOOST_CHECK_THROW( httpTransport.send("badformed line protocol"), BadRequest );
+}
+
 } // namespace influxdb::test

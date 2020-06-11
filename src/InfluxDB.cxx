@@ -10,9 +10,11 @@
 #include <string>
 
 #ifdef INFLUXDB_WITH_BOOST
+
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+
 #endif
 
 namespace influxdb
@@ -33,13 +35,16 @@ void InfluxDB::batchOf(const std::size_t size)
   mBuffering = true;
 }
 
-void InfluxDB::flushBuffer() {
-  if (!mBuffering || mBuffer.empty()) {
+void InfluxDB::flushBuffer()
+{
+  if (!mBuffering || mBuffer.empty())
+  {
     return;
   }
   std::string stringBuffer{};
-  for (const auto &i : mBuffer) {
-    stringBuffer+= i + "\n";
+  for (const auto &i : mBuffer)
+  {
+    stringBuffer += i + "\n";
   }
   mBuffer.clear();
   transmit(std::move(stringBuffer));
@@ -47,7 +52,8 @@ void InfluxDB::flushBuffer() {
 
 void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
 {
-  if (!mGlobalTags.empty()) mGlobalTags += ",";
+  if (!mGlobalTags.empty())
+  { mGlobalTags += ","; }
   mGlobalTags += key;
   mGlobalTags += "=";
   mGlobalTags += value;
@@ -55,30 +61,36 @@ void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
 
 InfluxDB::~InfluxDB()
 {
-  if (mBuffering) {
+  if (mBuffering)
+  {
     flushBuffer();
   }
 }
 
-void InfluxDB::transmit(std::string&& point)
+void InfluxDB::transmit(std::string &&point)
 {
   mTransport->send(std::move(point));
 }
 
-void InfluxDB::write(Point&& metric)
+void InfluxDB::write(Point &&metric)
 {
-  if (mBuffering) {
+  if (mBuffering)
+  {
     mBuffer.emplace_back(metric.toLineProtocol());
-    if (mBuffer.size() >= mBufferSize) {
+    if (mBuffer.size() >= mBufferSize)
+    {
       flushBuffer();
     }
-  } else {
+  }
+  else
+  {
     transmit(metric.toLineProtocol());
   }
 }
 
 #ifdef INFLUXDB_WITH_BOOST
-std::vector<Point> InfluxDB::query(const std::string&  query)
+
+std::vector<Point> InfluxDB::query(const std::string &query)
 {
   auto response = mTransport->query(query);
   std::stringstream ss;
@@ -87,20 +99,26 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
   boost::property_tree::ptree pt;
   boost::property_tree::read_json(ss, pt);
 
-  for (auto& result : pt.get_child("results")) {
+  for (auto &result : pt.get_child("results"))
+  {
     auto isResultEmpty = result.second.find("series");
-    if (isResultEmpty == result.second.not_found()) return {};
-    for (auto& series : result.second.get_child("series")) {
+    if (isResultEmpty == result.second.not_found())
+    { return {}; }
+    for (auto &series : result.second.get_child("series"))
+    {
       auto columns = series.second.get_child("columns");
 
-      for (auto& values : series.second.get_child("values")) {
+      for (auto &values : series.second.get_child("values"))
+      {
         Point point{series.second.get<std::string>("name")};
         auto iColumns = columns.begin();
         auto iValues = values.second.begin();
-        for (; iColumns != columns.end() && iValues != values.second.end(); iColumns++, iValues++) {
+        for (; iColumns != columns.end() && iValues != values.second.end(); iColumns++, iValues++)
+        {
           auto value = iValues->second.get_value<std::string>();
           auto column = iColumns->second.get_value<std::string>();
-          if (!column.compare("time")) {
+          if (!column.compare("time"))
+          {
             std::tm tm = {};
             std::stringstream ss;
             ss << value;
@@ -109,8 +127,10 @@ std::vector<Point> InfluxDB::query(const std::string&  query)
             continue;
           }
           // cast all values to double, if strings add to tags
-          try { point.addField(column, boost::lexical_cast<double>(value)); }
-          catch(...) { point.addTag(column, value); }
+          try
+          { point.addField(column, boost::lexical_cast<double>(value)); }
+          catch (...)
+          { point.addTag(column, value); }
         }
         points.push_back(std::move(point));
       }
@@ -127,7 +147,7 @@ void InfluxDB::createDatabaseIfNotExists()
   }
   catch (const std::runtime_error &error)
   {
-    throw InfluxDBException("InfluxDB::createDatabaseIfNotExists", "Transport did not allow create database");
+    throw InfluxDBException(__PRETTY_FUNCTION__, "Transport did not allow create database");
   }
 }
 

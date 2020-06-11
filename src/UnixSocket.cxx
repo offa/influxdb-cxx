@@ -9,20 +9,25 @@
 namespace influxdb::transports
 {
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+
 UnixSocket::UnixSocket(const std::string &socketPath) :
   mSocket(mIoService), mEndpoint(socketPath)
 {
   mSocket.open();
 }
 
-void UnixSocket::send(std::string&& message)
+void UnixSocket::send(std::string &&message)
 {
-  try {
+  try
+  {
     mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
-  } catch(const boost::system::system_error& e) {
-    throw InfluxDBException("UnixSocket::send", e.what());
+  }
+  catch (const boost::system::system_error &e)
+  {
+    throw InfluxDBException(__PRETTY_FUNCTION__, e.what());
   }
 }
+
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 
-} // namespace influxdb
+} // namespace influxdb::transports

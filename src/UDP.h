@@ -39,6 +39,6 @@ class UDP : public Transport
 
 };
 
-} // namespace influxdb
+} // namespace influxdb::transports
 
 #endif // INFLUXDATA_TRANSPORTS_UDP_H

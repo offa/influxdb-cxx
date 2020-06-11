@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(queryPerformance)
   auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
   auto t1 = std::chrono::high_resolution_clock::now();
   auto points = influxdb->query("SELECT * from test WHERE host = 'localhost'");
-  BOOST_CHECK(points.size() >= 3);
   auto t2 = std::chrono::high_resolution_clock::now();
+  BOOST_CHECK(points.size() >= 3);
   double duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
   BOOST_CHECK(duration < 20000);
 }
