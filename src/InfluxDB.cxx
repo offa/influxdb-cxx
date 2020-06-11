@@ -21,34 +21,50 @@ namespace influxdb
 {
 
 InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
-  mTransport(std::move(transport))
+  mLineProtocolBatch{},
+  mIsBatchingActivated{false},
+  mBatchSize{0},
+  mTransport(std::move(transport)),
+  mGlobalTags{}
 {
-  mBuffer = {};
-  mBuffering = false;
-  mBufferSize = 0;
-  mGlobalTags = {};
+}
+
+InfluxDB::~InfluxDB()
+{
+  if (!mIsBatchingActivated)
+  {
+    return;
+  }
+  flushBatch();
 }
 
 void InfluxDB::batchOf(const std::size_t size)
 {
-  mBufferSize = size;
-  mBuffering = true;
+  mBatchSize = size;
+  mIsBatchingActivated = true;
 }
 
-void InfluxDB::flushBuffer()
+void InfluxDB::flushBatch()
 {
-  if (!mBuffering || mBuffer.empty())
+  if (!mIsBatchingActivated || mLineProtocolBatch.empty())
   {
     return;
   }
-  std::string stringBuffer{};
-  for (const auto &i : mBuffer)
-  {
-    stringBuffer += i + "\n";
-  }
-  mBuffer.clear();
-  transmit(std::move(stringBuffer));
+
+  transmit(joinLineProtocolBatch());
 }
+
+
+std::string InfluxDB::joinLineProtocolBatch() const
+{
+  std::string joinedBatch;
+  for (const auto &line : mLineProtocolBatch)
+  {
+    joinedBatch += line + "\n";
+  }
+  return joinedBatch;
+}
+
 
 void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
 {
@@ -59,32 +75,49 @@ void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
   mGlobalTags += value;
 }
 
-InfluxDB::~InfluxDB()
-{
-  if (mBuffering)
-  {
-    flushBuffer();
-  }
-}
-
 void InfluxDB::transmit(std::string &&point)
 {
   mTransport->send(std::move(point));
 }
 
-void InfluxDB::write(Point &&metric)
+void InfluxDB::write(Point &&point)
 {
-  if (mBuffering)
+  if (mIsBatchingActivated)
   {
-    mBuffer.emplace_back(metric.toLineProtocol());
-    if (mBuffer.size() >= mBufferSize)
+    addPointToBatch(point);
+  }
+  else
+  {
+    transmit(point.toLineProtocol());
+  }
+}
+
+void InfluxDB::write(std::vector<Point> &&points)
+{
+  if (mIsBatchingActivated)
+  {
+    for (const auto &point : points)
     {
-      flushBuffer();
+      addPointToBatch(point);
     }
   }
   else
   {
-    transmit(metric.toLineProtocol());
+    std::string lineProtocol;
+    for (const auto &point : points)
+    {
+      lineProtocol += point.toLineProtocol() + "\n";
+    }
+    transmit(std::move(lineProtocol));
+  }
+}
+
+void InfluxDB::addPointToBatch(const Point &point)
+{
+  mLineProtocolBatch.emplace_back(point.toLineProtocol());
+  if (mLineProtocolBatch.size() >= mBatchSize)
+  {
+    flushBatch();
   }
 }
 

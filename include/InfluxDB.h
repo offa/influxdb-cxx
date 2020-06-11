@@ -32,9 +32,13 @@ class InfluxDB
     /// Flushes buffer
     ~InfluxDB();
 
-    /// Writes a metric
-    /// \param metric
-    void write(Point&& metric);
+    /// Writes a point
+    /// \param point
+    void write(Point&& point);
+
+    /// Writes a vector of point
+    /// \param point
+    void write(std::vector<Point> &&points);
 
     /// Queries InfluxDB database
     std::vector<Point> query(const std::string& query);
@@ -42,10 +46,10 @@ class InfluxDB
     /// Create InfluxDB database if does not exists
     void createDatabaseIfNotExists();
 
-    /// Flushes metric buffer (this can also happens when buffer is full)
-    void flushBuffer();
+    /// Flushes points batched (this can also happens when buffer is full)
+    void flushBatch();
 
-    /// Enables metric buffering
+    /// Enables points batching
     /// \param size
     void batchOf(const std::size_t size = 32);
 
@@ -54,15 +58,18 @@ class InfluxDB
     /// \param value
     void addGlobalTag(std::string_view name, std::string_view value);
 
+private:
+    void addPointToBatch(const Point &point);
+
   private:
-    /// Buffer for points
-    std::deque<std::string> mBuffer;
+    /// line protocol batch to be writen
+    std::deque<std::string> mLineProtocolBatch;
 
     /// Flag stating whether point buffering is enabled
-    bool mBuffering;
+    bool mIsBatchingActivated;
 
-    /// Buffer size
-    std::size_t mBufferSize;
+    /// Points batch size
+    std::size_t mBatchSize;
 
     /// Underlying transport UDP/HTTP/Unix socket
     std::unique_ptr<Transport> mTransport;
@@ -72,6 +79,9 @@ class InfluxDB
 
     /// List of global tags
     std::string mGlobalTags;
+
+
+  std::string joinLineProtocolBatch() const;
 };
 
 } // namespace influxdb
