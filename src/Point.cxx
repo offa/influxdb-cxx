@@ -43,8 +43,9 @@ Point&& Point::addTag(std::string_view key, std::string_view value)
 {
   mTags += ",";
   mTags += key;
-  mTags += "=";
+  mTags += "=\"";
   mTags += value;
+  mTags += '"';
   return std::move(*this);
 }
 

@@ -30,6 +30,28 @@ BOOST_AUTO_TEST_CASE(unixServiceCanNotCreateDatabase)
   BOOST_CHECK_THROW(influxdb->createDatabaseIfNotExists(), InfluxDBException);
 }
 
+
+BOOST_AUTO_TEST_CASE(pointWithEmptyStringFieldValueAreProperlyInserted)
+{
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+
+  BOOST_CHECK_NO_THROW (
+    influxdb->write(Point{"empty_string_field"}
+                      .addField("str_value", ""))
+  );
+}
+
+BOOST_AUTO_TEST_CASE(pointWithEmptyTagValueAreProperlyInserted)
+{
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+
+  BOOST_CHECK_NO_THROW (
+    influxdb->write(Point{"empty_string_tag"}
+                      .addField("str_value", "")
+                      .addTag("tag",""))
+  );
+}
+
 BOOST_AUTO_TEST_CASE(pointsCanBeWrittenOneByOne)
 {
   auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");

@@ -15,7 +15,6 @@ HTTP::HTTP(const std::string &url)
   initCurlRead(url);
   obtainInfluxServiceUrl(url);
   obtainDatabaseName(url);
-
 }
 
 HTTP::~HTTP()
