@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(test3)
 
   auto result = getVector(point);
 
-  BOOST_CHECK_EQUAL(result[0], "test,tag=tagval");
+  BOOST_CHECK_EQUAL(result[0], "test,tag=\"tagval\"");
   BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
 }
 
