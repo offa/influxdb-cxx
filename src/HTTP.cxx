@@ -177,8 +177,7 @@ void HTTP::createDatabase()
   curl_easy_setopt(createHandle, CURLOPT_POST, 1);
   curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPIDLE, 120L);
   curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  FILE *devnull = fopen("/dev/null", "w+");
-  curl_easy_setopt(createHandle, CURLOPT_WRITEDATA, devnull);
+  curl_easy_setopt(createHandle, CURLOPT_WRITEDATA, mDevNull);
 
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, (long) postFields.length());
