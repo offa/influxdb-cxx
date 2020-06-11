@@ -41,11 +41,14 @@ Point&& Point::addField(std::string_view name, std::variant<int, long long int, 
 
 Point&& Point::addTag(std::string_view key, std::string_view value)
 {
+  if (value.empty())
+  {
+    return std::move(*this);
+  }
   mTags += ",";
   mTags += key;
-  mTags += "=\"";
+  mTags += "=";
   mTags += value;
-  mTags += '"';
   return std::move(*this);
 }
 
