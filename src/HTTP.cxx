@@ -186,6 +186,7 @@ void HTTP::createDatabase()
   long responseCode;
   curl_easy_getinfo(createHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response,responseCode);
+  curl_easy_cleanup(createHandle);
 }
 
 } // namespace influxdb
