@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <chrono>
+#include <memory>
+#include <sstream>
 #include <iomanip>
 
 namespace influxdb
