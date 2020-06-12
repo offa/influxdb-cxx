@@ -12,6 +12,8 @@
 namespace influxdb
 {
 
+const float DefaultFloatsPrecision = 18;
+
 /// \brief Represents a point
 class Point
 {
@@ -49,7 +51,10 @@ class Point
     /// Tags getter
     std::string getTags() const;
 
-  protected:
+    /// Precision for float fields
+    static int floatsPrecision;
+
+protected:
     /// A value
     std::variant<long long int, std::string, double> mValue;
 
@@ -64,6 +69,7 @@ class Point
 
     /// Fields
     std::string mFields;
+
 };
 
 } // namespace influxdb

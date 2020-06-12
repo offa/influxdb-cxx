@@ -6,7 +6,6 @@
 
 namespace influxdb::test {
 
-
 std::vector<std::string> getVector(const Point& point)
 {
   std::istringstream result(point.toLineProtocol());
@@ -27,9 +26,10 @@ BOOST_AUTO_TEST_CASE(test1)
 
 BOOST_AUTO_TEST_CASE(test2)
 {
+  Point::floatsPrecision = 1;
   auto point = Point{"test"}
     .addField("value", 10LL)
-    .addField("dvalue", 10.10);
+    .addField("dvalue", 10.1);
 
   auto result = getVector(point);
 
@@ -39,9 +39,10 @@ BOOST_AUTO_TEST_CASE(test2)
 
 BOOST_AUTO_TEST_CASE(test3)
 {
+  Point::floatsPrecision = 1;
   auto point = Point{"test"}
     .addField("value", 10LL)
-    .addField("dvalue", 10.10)
+    .addField("dvalue", 10.1)
     .addTag("tag", "tagval");
 
   auto result = getVector(point);
@@ -66,6 +67,36 @@ BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
   auto point = Point{"test"}.addField("", 10);
 
   BOOST_CHECK_EQUAL(point.getFields().empty(), true);
+}
+
+BOOST_AUTO_TEST_CASE(floatFieldsPrecisionCanBeAdjusted)
+{
+  Point::floatsPrecision = 3;
+  auto pointPrecision3 = Point{"test"}.addField("float_field", 3.123456789);
+  BOOST_CHECK_EQUAL(pointPrecision3.getFields(), "float_field=3.123");
+
+  Point::floatsPrecision = 1;
+  auto pointPrecision1 = Point{"test"}.addField("float_field", 50.123456789);
+  BOOST_CHECK_EQUAL(pointPrecision1.getFields(), "float_field=50.1");
+
+  pointPrecision1 = Point{"test"}.addField("float_field", 5.99);
+  BOOST_CHECK_EQUAL(pointPrecision1.getFields(), "float_field=6.0");
+}
+
+BOOST_AUTO_TEST_CASE(floatFieldsPrecisionWithScientificValues)
+{
+  Point::floatsPrecision = 5;
+  auto pointPrecision5 = Point{"test"}.addField("float_field", 123456789.0);
+  BOOST_CHECK_EQUAL(pointPrecision5.getFields(), "float_field=123456789.00000");
+
+  pointPrecision5 = Point{"test"}.addField("float_field", 1.23456789E+8);
+  BOOST_CHECK_EQUAL(pointPrecision5.getFields(), "float_field=123456789.00000");
+
+  pointPrecision5 = Point{"test"}.addField("float_field", 1.23456789E-3);
+  BOOST_CHECK_EQUAL(pointPrecision5.getFields(), "float_field=0.00123");
+
+  pointPrecision5 = Point{"test"}.addField("float_field", 1.23456789E-6);
+  BOOST_CHECK_EQUAL(pointPrecision5.getFields(), "float_field=0.00000");
 }
 
 } // namespace influxdb::test

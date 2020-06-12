@@ -6,14 +6,15 @@
 
 #include <iostream>
 #include <chrono>
-#include <memory>
-#include <sstream>
+#include <iomanip>
 
 namespace influxdb
 {
 
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
+
+int Point::floatsPrecision = DefaultFloatsPrecision;
 
 Point::Point(const std::string& measurement) :
   mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp())
@@ -31,13 +32,14 @@ Point&& Point::addField(std::string_view name, std::variant<int, long long int, 
   }
 
   std::stringstream convert;
+  convert << std::setprecision(floatsPrecision);
   if (!mFields.empty()) convert << ",";
 
   convert << name << "=";
   std::visit(overloaded {
     [&convert](int value) { convert << value << 'i'; },
     [&convert](long long int value) { convert << value << 'i'; },
-    [&convert](double value) { convert << value; },
+    [&convert](double value) { convert  << std::fixed << value; },
     [&convert](const std::string& value) { convert << '"' << value << '"'; },
     }, value);
   mFields += convert.str();
