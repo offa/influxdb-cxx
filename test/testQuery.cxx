@@ -22,13 +22,17 @@ BOOST_AUTO_TEST_CASE(query1)
   influxdb->write(std::move(pointsWritten));
 
   auto points = influxdb->query("SELECT * from query1 WHERE host = 'localhost' ORDER BY time DESC LIMIT 3");
+
+  //ufortunately no typoe checking is done at query. It converts every value in double
+  //so all point fields are treated as double fields. It makes neecessary to adapt Point precision of float fields
+  //or consider default number of decimal digits at the checking
   BOOST_CHECK_EQUAL(points.size(), 3);
   BOOST_CHECK_EQUAL(points[0].getName(), "query1");
   BOOST_CHECK_EQUAL(points[1].getName(), "query1");
   BOOST_CHECK_EQUAL(points[2].getName(), "query1");
-  BOOST_CHECK_EQUAL(points[0].getFields(), "value=200");
-  BOOST_CHECK_EQUAL(points[1].getFields(), "value=20");
-  BOOST_CHECK_EQUAL(points[2].getFields(), "value=10");
+  BOOST_CHECK_EQUAL(points[0].getFields(), "value=200.000000000000000000");
+  BOOST_CHECK_EQUAL(points[1].getFields(), "value=20.000000000000000000");
+  BOOST_CHECK_EQUAL(points[2].getFields(), "value=10.000000000000000000");
   BOOST_CHECK_EQUAL(points[0].getTags(), "host=localhost");
   BOOST_CHECK_EQUAL(points[1].getTags(), "host=localhost");
   BOOST_CHECK_EQUAL(points[2].getTags(), "host=localhost");
@@ -38,12 +42,14 @@ BOOST_AUTO_TEST_CASE(timeStampVerify)
 {
   double timeZone = 3600; //+1h
 
-  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
-  Point point = Point{"timestampCheck"}.addField("value", 10);
+  auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=testQuery");
+  influxdb->createDatabaseIfNotExists();
+
+  Point point = Point{"timeStampVerify"}.addField("value", 10);
   auto timestamp = point.getTimestamp();
   influxdb->write(std::move(point));
 
-  auto points = influxdb->query("SELECT * from timestampCheck ORDER BY DESC LIMIT 1");
+  auto points = influxdb->query("SELECT * from timeStampVerify ORDER BY DESC LIMIT 1");
   std::chrono::duration<double> diff = timestamp - points[0].getTimestamp();
   double diffZone = diff.count() - timeZone;
   BOOST_CHECK(diffZone < 1); // 1s
