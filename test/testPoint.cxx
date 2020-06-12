@@ -61,4 +61,11 @@ BOOST_AUTO_TEST_CASE(test4)
   BOOST_CHECK_EQUAL(result[2], "1572830914000000");
 }
 
+BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
+{
+  auto point = Point{"test"}.addField("", 10);
+
+  BOOST_CHECK_EQUAL(point.getFields().empty(), true);
+}
+
 } // namespace influxdb::test
