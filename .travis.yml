@@ -38,5 +38,3 @@ after_success:
       lcov --list coverage.info
       bash <(curl -s https://codecov.io/bash) || echo "No coverage reports"
     fi;
-notifications:
-  email: false
