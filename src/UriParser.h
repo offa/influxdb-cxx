@@ -83,17 +83,18 @@ namespace http {
 
     //--- Public Interface -------------------------------------------------------------~
     static inline url ParseHttpUrl(std::string &in) {
-        auto userpass = ExtractUserpass(in);
+        url ret{};
+        ret.url = in;
+        ret.protocol = ExtractProtocol(in);
+        ret.search = ExtractSearch(in);
+        ret.path = ExtractPath(in);
+        std::string userpass = ExtractUserpass(in);
+        ret.password = ExtractPassword(userpass);
+        ret.user = userpass;
+        ret.port = ExtractPort(in);
+        ret.host = in;
 
-        return url{ExtractProtocol(in),
-            userpass,
-            ExtractPassword(userpass),
-            in,
-            ExtractPath(in),
-            ExtractSearch(in),
-            in,
-            ExtractPort(in)
-        };
+        return ret;
     }
 }
 #endif
