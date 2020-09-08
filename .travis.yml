@@ -9,7 +9,7 @@ jobs:
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -q update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install lcov libboost-system1.65-dev libboost-test1.65-dev libboost-program-options1.65-dev libcurl4-openssl-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install lcov libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev libcurl4-openssl-dev; fi
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://dl.influxdata.com/influxdb/releases/influxdb_1.7.4_amd64.deb; fi;
