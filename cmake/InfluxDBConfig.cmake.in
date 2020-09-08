@@ -5,7 +5,9 @@ set(InfluxDB_VERSION @PROJECT_VERSION@)
 get_filename_component(InfluxDB_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(CMakeFindDependencyMacro)
 
-find_dependency(Boost)
+if(@Boost_FOUND@)
+  find_dependency(Boost)
+endif()
 find_dependency(CURL)
 
 if(NOT TARGET InfluxData::InfluxDB)
