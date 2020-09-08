@@ -2,7 +2,7 @@
 # General project definition
 ####################################
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5.2)
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
@@ -16,16 +16,16 @@ endif()
 
 # Define project
 project(influxdb-cxx
-  VERSION 0.0.1
+  VERSION 0.5.1
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
 )
 
-# Documentation dir
-#add_subdirectory(doc)
-
 # Add compiler flags for warnings and debug symbols
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
+add_compile_options(-Wall
+  -pedantic
+  -Wextra
+  )
 
 # Set fPIC for all targets
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
