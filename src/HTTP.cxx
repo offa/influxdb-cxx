@@ -83,7 +83,7 @@ std::string HTTP::query(const std::string &query)
   CURLcode response;
   long responseCode;
   std::string buffer;
-  char *encodedQuery = curl_easy_escape(readHandle, query.c_str(), query.size());
+  char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), static_cast<int>(query.size()));
   auto fullUrl = mReadUrl + std::string(encodedQuery);
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);

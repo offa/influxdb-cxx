@@ -70,7 +70,7 @@ namespace http {
         int port;
         std::string portstring = TailSlice(hostport, ":");
         try { port = atoi(portstring.c_str()); }
-        catch (std::exception &e) { port = -1; }
+        catch (const std::exception&) { port = -1; }
         return port;
     }
 
@@ -83,19 +83,17 @@ namespace http {
 
     //--- Public Interface -------------------------------------------------------------~
     static inline url ParseHttpUrl(std::string &in) {
-        url ret;
-        ret.url = in;
-        ret.port = -1;
-        ret.protocol = ExtractProtocol(in);
-        ret.search = ExtractSearch(in);
-        ret.path = ExtractPath(in);
-        std::string userpass = ExtractUserpass(in);
-        ret.password = ExtractPassword(userpass);
-        ret.user = userpass;
-        ret.port = ExtractPort(in);
-        ret.host = in;
+        auto userpass = ExtractUserpass(in);
 
-        return ret;
+        return url{ExtractProtocol(in),
+            userpass,
+            ExtractPassword(userpass),
+            in,
+            ExtractPath(in),
+            ExtractSearch(in),
+            in,
+            ExtractPort(in)
+        };
     }
 }
 #endif
