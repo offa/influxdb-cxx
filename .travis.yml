@@ -1,6 +1,6 @@
 language: cpp
-sudo: true
-matrix:
+
+jobs:
   include:
     - os: osx
       osx_image: xcode11.2
