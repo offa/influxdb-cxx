@@ -23,13 +23,11 @@ InfluxDB C++ client library
 
 __Dependencies__
  - CURL (required)
- - boost 1.57+ (optional - see [Transports](#transports))
+ - boost 1.57+ (optional – see [Transports](#transports))
 
 ### Generic
  ```bash
-git clone https://github.com/awegrzyn/influxdb-cxx.git
-cd influxdb-cxx; mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 sudo make install
  ```
