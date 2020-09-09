@@ -29,6 +29,11 @@ if(NOT MSVC)
       )
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+
 # Set fPIC for all targets
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -99,7 +104,7 @@ target_link_libraries(InfluxDB
 )
 
 # Use C++17
-target_compile_features(InfluxDB PUBLIC cxx_std_17)
+target_compile_features(InfluxDB PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
 
 # Set compile definition if Boost found
 target_compile_definitions(InfluxDB
