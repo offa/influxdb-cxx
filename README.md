@@ -19,7 +19,7 @@ InfluxDB C++ client library
 
  __Build requirements__
  - CMake 3.12+
- - C++17 compliler
+ - C++17 compiler
 
 __Dependencies__
  - CURL (required)
