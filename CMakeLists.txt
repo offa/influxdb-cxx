@@ -24,8 +24,15 @@ project(influxdb-cxx
 # Add compiler flags for warnings and debug symbols
 if(NOT MSVC)
     add_compile_options(-Wall
-      -pedantic
       -Wextra
+      -pedantic
+      -pedantic-errors
+      -Werror
+      -Wshadow
+      -Wold-style-cast
+      -Wnull-dereference
+      -Wnon-virtual-dtor
+      -Woverloaded-virtual
       )
 endif()
 
