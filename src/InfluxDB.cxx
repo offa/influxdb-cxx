@@ -180,7 +180,7 @@ void InfluxDB::createDatabaseIfNotExists()
   }
   catch (const std::runtime_error &error)
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, "Transport did not allow create database");
+    throw InfluxDBException(__func__, "Transport did not allow create database");
   }
 }
 

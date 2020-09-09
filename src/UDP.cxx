@@ -26,7 +26,7 @@ void UDP::send(std::string &&message)
   }
   catch (const boost::system::system_error &e)
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, e.what());
+    throw InfluxDBException(__func__, e.what());
   }
 }
 

@@ -71,13 +71,13 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
   http::url parsedUrl = http::ParseHttpUrl(urlCopy);
   if (parsedUrl.protocol.empty())
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, "Ill-formed URI");
+    throw InfluxDBException(__func__, "Ill-formed URI");
   }
 
   auto iterator = map.find(parsedUrl.protocol);
   if (iterator == map.end())
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, "Unrecognized backend " + parsedUrl.protocol);
+    throw InfluxDBException(__func__, "Unrecognized backend " + parsedUrl.protocol);
   }
 
   return iterator->second(parsedUrl);

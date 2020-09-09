@@ -30,14 +30,14 @@ void HTTP::initCurl(const std::string &url)
   CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL);
   if (globalInitResult != CURLE_OK)
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, curl_easy_strerror(globalInitResult));
+    throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
   }
 
   std::string writeUrl = url;
   auto position = writeUrl.find("?");
   if (position == std::string::npos)
   {
-    throw InfluxDBException(__PRETTY_FUNCTION__, "Database not specified");
+    throw InfluxDBException(__func__, "Database not specified");
   }
   if (writeUrl.at(position - 1) != '/')
   {
@@ -122,7 +122,7 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
 {
   if (response != CURLE_OK)
   {
-    throw ConnectionError(__PRETTY_FUNCTION__, curl_easy_strerror(response));
+    throw ConnectionError(__func__, curl_easy_strerror(response));
   }
   //
   // Influx API response codes:
@@ -130,15 +130,15 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
   //
   if (responseCode == 404)
   {
-    throw NonExistentDatabase(__PRETTY_FUNCTION__, "Nonexistent database: " + std::to_string(responseCode));
+    throw NonExistentDatabase(__func__, "Nonexistent database: " + std::to_string(responseCode));
   }
   else if ((responseCode >= 400) && (responseCode < 500))
   {
-    throw BadRequest(__PRETTY_FUNCTION__, "Bad request: " + std::to_string(responseCode));
+    throw BadRequest(__func__, "Bad request: " + std::to_string(responseCode));
   }
   else if (responseCode > 500)
   {
-    throw ServerError(__PRETTY_FUNCTION__, "Influx server error:" + std::to_string(responseCode));
+    throw ServerError(__func__, "Influx server error:" + std::to_string(responseCode));
   }
 }
 
