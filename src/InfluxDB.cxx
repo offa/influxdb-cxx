@@ -126,11 +126,11 @@ void InfluxDB::addPointToBatch(const Point &point)
 std::vector<Point> InfluxDB::query(const std::string &query)
 {
   auto response = mTransport->query(query);
-  std::stringstream ss;
-  ss << response;
+  std::stringstream responseString;
+  responseString << response;
   std::vector<Point> points;
   boost::property_tree::ptree pt;
-  boost::property_tree::read_json(ss, pt);
+  boost::property_tree::read_json(responseString, pt);
 
   for (auto &result : pt.get_child("results"))
   {
@@ -153,9 +153,9 @@ std::vector<Point> InfluxDB::query(const std::string &query)
           if (!column.compare("time"))
           {
             std::tm tm = {};
-            std::stringstream ss;
-            ss << value;
-            ss >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
+            std::stringstream timeString;
+            timeString << value;
+            timeString >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
             point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
             continue;
           }

@@ -61,7 +61,7 @@ void HTTP::initCurl(const std::string &url)
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-  ((std::string *) userp)->append((char *) contents, size * nmemb);
+  static_cast<std::string *>(userp)->append(static_cast<char *>(contents), size * nmemb);
   return size * nmemb;
 }
 
@@ -112,7 +112,7 @@ void HTTP::send(std::string &&lineprotocol)
   CURLcode response;
   long responseCode;
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.c_str());
-  curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, (long) lineprotocol.length());
+  curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(lineprotocol.length()));
   response = curl_easy_perform(writeHandle);
   curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response, responseCode);
@@ -188,7 +188,7 @@ void HTTP::createDatabase()
   curl_easy_setopt(createHandle, CURLOPT_WRITEDATA, mDevNull);
 
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
-  curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, (long) postFields.length());
+  curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(postFields.length()));
 
   CURLcode response = curl_easy_perform(createHandle);
   long responseCode;

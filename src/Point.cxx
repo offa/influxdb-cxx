@@ -39,10 +39,10 @@ Point&& Point::addField(std::string_view name, std::variant<int, long long int, 
 
   convert << name << "=";
   std::visit(overloaded {
-    [&convert](int value) { convert << value << 'i'; },
-    [&convert](long long int value) { convert << value << 'i'; },
-    [&convert](double value) { convert  << std::fixed << value; },
-    [&convert](const std::string& value) { convert << '"' << value << '"'; },
+    [&convert](int v) { convert << v << 'i'; },
+    [&convert](long long int v) { convert << v << 'i'; },
+    [&convert](double v) { convert  << std::fixed << v; },
+    [&convert](const std::string& v) { convert << '"' << v << '"'; },
     }, value);
   mFields += convert.str();
   return std::move(*this);
