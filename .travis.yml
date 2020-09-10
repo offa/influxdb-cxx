@@ -6,6 +6,7 @@ jobs:
       osx_image: xcode11.7
     - os: linux
       dist: focal
+      env: CODECOV=true
       addons:
         apt:
           packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
@@ -23,11 +24,4 @@ script:
   - ctest -V
 
 after_success:
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      cd ${TRAVIS_BUILD_DIR}/build
-      lcov --directory . --capture --output-file coverage.info
-      lcov --remove coverage.info '/opt/*' '/usr/*' --output-file coverage.info
-      lcov --list coverage.info
-      bash <(curl -s https://codecov.io/bash) || echo "No coverage reports"
-    fi;
+  - if [[ -z ${CODECOV+x} ]]; then script/travis_codecov_post.sh; fi
