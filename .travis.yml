@@ -6,10 +6,9 @@ jobs:
       osx_image: xcode11.7
     - os: linux
       dist: focal
-
-before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -q update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get -y install lcov libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev libcurl4-openssl-dev; fi
+      addons:
+        apt:
+          packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
 
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.2_amd64.deb; fi;
