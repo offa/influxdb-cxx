@@ -56,6 +56,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   )
 endif()
 
+message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
+
 # Add coverage flags to Debug build
 if(NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
