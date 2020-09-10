@@ -18,10 +18,10 @@ before_script:
   - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
 
 script:
-  - if [[ -z ${CODECOV+x} ]]; then cmake -DCMAKE_BUILD_TYPE=Debug ..;
+  - if [[ -n ${CODECOV+x} ]]; then cmake -DCMAKE_BUILD_TYPE=Debug ..;
     else cmake ..; fi;
   - make -j
   - ctest -V
 
 after_success:
-  - if [[ -z ${CODECOV+x} ]]; then script/travis_codecov_post.sh; fi
+  - if [[ -n ${CODECOV+x} ]]; then script/travis_codecov_post.sh; fi
