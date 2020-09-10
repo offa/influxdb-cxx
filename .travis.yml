@@ -10,6 +10,9 @@ jobs:
       addons:
         apt:
           packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
+    - os: linux
+      dist: focal
+      env: NO_BOOST=true
 
 install:
   - script/travis_ci_setup.sh
@@ -21,7 +24,7 @@ script:
   - if [[ -n ${CODECOV+x} ]]; then cmake -DCMAKE_BUILD_TYPE=Debug ..;
     else cmake ..; fi;
   - make -j
-  - ctest -V
+  - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi
 
 after_success:
   - if [[ -n ${CODECOV+x} ]]; then ${TRAVIS_BUILD_DIR}/script/travis_codecov_post.sh; fi
