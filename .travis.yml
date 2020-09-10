@@ -11,15 +11,7 @@ jobs:
           packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.2_amd64.deb; fi;
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg -i influxdb_1.8.2_amd64.deb; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo systemctl unmask influxdb.service; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo systemctl start influxdb; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then HOMEBREW_NO_AUTO_UPDATE=1 brew install influxdb; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ln -sfv /usr/local/opt/influxdb/*.plist ~/Library/LaunchAgents; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then launchctl load ~/Library/LaunchAgents/homebrew.mxcl.influxdb.plist; fi
-  - sleep 10
-  - influx -execute 'CREATE DATABASE test'
+  - script/travis_ci_setup.sh
 
 before_script:
   - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
