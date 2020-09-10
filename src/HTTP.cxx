@@ -6,6 +6,13 @@
 #include "InfluxDBException.h"
 #include <iostream>
 
+extern "C" size_t noopWriteCallBack([[maybe_unused]] char* ptr, size_t size,
+    size_t nmemb, [[maybe_unused]] void* userdata)
+{
+  return size * nmemb;
+}
+
+
 namespace influxdb::transports
 {
 
@@ -22,7 +29,6 @@ HTTP::~HTTP()
   curl_easy_cleanup(writeHandle);
   curl_easy_cleanup(readHandle);
   curl_global_cleanup();
-  fclose(mDevNull);
 }
 
 void HTTP::initCurl(const std::string &url)
@@ -55,8 +61,7 @@ void HTTP::initCurl(const std::string &url)
   curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
   curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPIDLE, 120L);
   curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  mDevNull = fopen("/dev/null", "w+");
-  curl_easy_setopt(writeHandle, CURLOPT_WRITEDATA, mDevNull);
+  curl_easy_setopt(writeHandle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
 }
 
 static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
@@ -185,7 +190,7 @@ void HTTP::createDatabase()
   curl_easy_setopt(createHandle, CURLOPT_POST, 1);
   curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPIDLE, 120L);
   curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  curl_easy_setopt(createHandle, CURLOPT_WRITEDATA, mDevNull);
+  curl_easy_setopt(createHandle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
 
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(postFields.length()));

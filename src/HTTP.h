@@ -80,10 +80,6 @@ private:
 
   /// Database name used
   std::string mDatabaseName;
-
-  /// Dev null file to stop libcURL output
-  FILE *mDevNull;
-
 };
 
 } // namespace influxdb
