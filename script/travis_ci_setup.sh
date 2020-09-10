@@ -1,5 +1,7 @@
 #/bin/bash
 
+set -ex
+
 if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
     wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.2_amd64.deb
     sudo dpkg -i influxdb_1.8.2_amd64.deb
