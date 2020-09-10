@@ -40,6 +40,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include("${CMAKE_BINARY_DIR}/conan_paths.cmake" OPTIONAL)
 
 # Set fPIC for all targets
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -127,7 +128,6 @@ target_compile_definitions(InfluxDB
 
 # Tests require Boost::unit_test_framework
 if (Boost_FOUND AND INFLUXCXX_TESTING)
-
   enable_testing()
 
   set(TEST_SRCS
