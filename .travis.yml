@@ -15,7 +15,7 @@ install:
   - script/travis_ci_setup.sh
 
 before_script:
-  - cd $TRAVIS_BUILD_DIR; mkdir build; cd build
+  - cd ${TRAVIS_BUILD_DIR}; mkdir build; cd build
 
 script:
   - if [[ -n ${CODECOV+x} ]]; then cmake -DCMAKE_BUILD_TYPE=Debug ..;
@@ -24,4 +24,4 @@ script:
   - ctest -V
 
 after_success:
-  - if [[ -n ${CODECOV+x} ]]; then script/travis_codecov_post.sh; fi
+  - if [[ -n ${CODECOV+x} ]]; then ${TRAVIS_BUILD_DIR}/script/travis_codecov_post.sh; fi
