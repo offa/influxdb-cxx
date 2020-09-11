@@ -62,7 +62,7 @@ void HTTP::initCurl(const std::string &url)
   }
 
   std::string writeUrl = url;
-  auto position = writeUrl.find("?");
+  auto position = writeUrl.find('?');
   if (position == std::string::npos)
   {
     throw InfluxDBException(__func__, "Database not specified");
@@ -95,7 +95,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 void HTTP::initCurlRead(const std::string &url)
 {
   mReadUrl = url + "&q=";
-  mReadUrl.insert(mReadUrl.find("?"), "/query");
+  mReadUrl.insert(mReadUrl.find('?'), "/query");
   readHandle = curl_easy_init();
   curl_easy_setopt(readHandle, CURLOPT_SSL_VERIFYPEER, 0);
   curl_easy_setopt(readHandle, CURLOPT_CONNECTTIMEOUT, 10);
@@ -171,7 +171,7 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
 
 void HTTP::obtainInfluxServiceUrl(const std::string &url)
 {
-  auto questionMarkPosition = url.find("?");
+  auto questionMarkPosition = url.find('?');
   if (url.at(questionMarkPosition - 1) == '/')
   {
     mInfluxDbServiceUrl = url.substr(0, questionMarkPosition-1);
