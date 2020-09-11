@@ -48,7 +48,7 @@ Point::Point(const std::string& measurement) :
   mFields = {};
 }
 
-Point&& Point::addField(std::string_view name, std::variant<int, long long int, std::string, double> value)
+Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value)
 {
   if (name.empty())
   {
