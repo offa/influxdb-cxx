@@ -12,13 +12,15 @@ class InfluxdbCxxConan(ConanFile):
     description = "InfluxDB C++ client library."
     topics = ("influxdb", "influxdb-client")
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
+    options = {"shared": [True, False],
+               "tests": [True, False]}
     default_options = {"shared": False,
-                       "boost:shared":True,
+                       "tests": False,
+                       "boost:shared": True,
                        "libcurl:with_openssl": True,
                        "libcurl:shared": True}
     exports = ["LICENSE"]
-    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "cmake/*")
+    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*")
     requires = (
         "boost/1.71.0",
         "libcurl/7.72.0 "
@@ -43,13 +45,16 @@ class InfluxdbCxxConan(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["INFLUXCXX_TESTING"] = "OFF"
+        cmake.definitions["INFLUXCXX_TESTING"] = self.options.tests
         cmake.configure(build_folder="build")
         return cmake
 
     def build(self):
         cmake = self._configure_cmake()
         cmake.build()
+
+        if self.options.tests:
+            cmake.test()
 
     def package(self):
         cmake = self._configure_cmake()

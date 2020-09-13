@@ -74,6 +74,7 @@ set(Boost_USE_MULTITHREADED TRUE)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(Boost COMPONENTS unit_test_framework system program_options)
+find_package(Threads REQUIRED)
 find_package(CURL REQUIRED MODULE)
 
 
@@ -147,6 +148,7 @@ if (Boost_FOUND AND INFLUXCXX_TESTING)
     target_link_libraries(${test_name}
       PRIVATE
         InfluxDB Boost::unit_test_framework
+        Threads::Threads
     )
 
     target_include_directories(${test_name}
@@ -160,7 +162,7 @@ if (Boost_FOUND AND INFLUXCXX_TESTING)
   endforeach()
 
   add_executable(benchmark test/benchmark.cxx)
-  target_link_libraries(benchmark PRIVATE InfluxDB Boost::program_options)
+  target_link_libraries(benchmark PRIVATE InfluxDB Boost::program_options Threads::Threads)
 endif()
 
 
