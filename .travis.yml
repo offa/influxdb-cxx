@@ -23,7 +23,7 @@ jobs:
         - conan create -o influxdb-cxx:tests=True ${TRAVIS_BUILD_DIR}
 
 install:
-  - script/travis_ci_setup.sh
+  - script/travis_ci_setup_influxdb.sh
 
 before_script:
   - cd ${TRAVIS_BUILD_DIR}; mkdir build; cd build
@@ -35,4 +35,4 @@ script:
   - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi
 
 after_success:
-  - if [[ -n ${CODECOV+x} ]]; then ${TRAVIS_BUILD_DIR}/script/travis_codecov_post.sh; fi
+  - if [[ -n ${CODECOV+x} ]]; then ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh; fi
