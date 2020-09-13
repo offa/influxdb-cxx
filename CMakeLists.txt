@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.5.2)
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
+option(INFLUXCXX_BENCHMARK "Build benchmark" OFF)
 
 # Set cmake policy by version: https://cmake.org/cmake/help/latest/manual/cmake-policies.7.html
 if(${CMAKE_VERSION} VERSION_LESS 3.12)
@@ -160,7 +161,9 @@ if (Boost_FOUND AND INFLUXCXX_TESTING)
     add_test(NAME ${test_name} COMMAND ${test_name})
     set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
   endforeach()
+endif()
 
+if (Boost_FOUND AND INFLUXCXX_BENCHMARK)
   add_executable(benchmark test/benchmark.cxx)
   target_link_libraries(benchmark PRIVATE InfluxDB Boost::program_options Threads::Threads)
 endif()
