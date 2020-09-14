@@ -1,0 +1,29 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler:
+          - gcc-10
+          - gcc-9
+          - clang-10
+          - clang-9
+        boost:
+          - true
+          - false
+    container:
+      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
+    name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
+    steps:
+      - uses: actions/checkout@master
+      - name: Install dependencies
+        run: apt-get install -y libcurl4-openssl-dev
+      - name: Install Boost
+        if: ${{ matrix.boost == true }}
+        run: apt-get install -y libboost-system1.65-dev libboost-test1.65-dev libboost-program-options1.65-dev
+      - name: Build
+        run: script/ci_build.sh
