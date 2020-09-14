@@ -34,7 +34,7 @@
 namespace influxdb
 {
 
-const float DefaultFloatsPrecision = 18;
+static inline constexpr int defaultFloatsPrecision{18};
 
 /// \brief Represents a point
 class Point
@@ -74,7 +74,7 @@ class Point
     std::string getTags() const;
 
     /// Precision for float fields
-    static int floatsPrecision;
+    static inline int floatsPrecision{defaultFloatsPrecision};
 
 protected:
     /// A value

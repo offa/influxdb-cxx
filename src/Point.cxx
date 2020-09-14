@@ -38,8 +38,6 @@ namespace influxdb
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-int Point::floatsPrecision = DefaultFloatsPrecision;
-
 Point::Point(const std::string& measurement) : mValue({}),
   mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp()), mTags({}), mFields({})
 {
