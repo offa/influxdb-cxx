@@ -1,5 +1,6 @@
 # influxdb-cxx
 
+![CI](https://github.com/offa/influxdb-cxx/workflows/ci/badge.svg)
 [![Build Status](https://travis-ci.com/offa/influxdb-cxx.svg?branch=master)](https://travis-ci.com/offa/influxdb-cxx)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-17-green.svg)
