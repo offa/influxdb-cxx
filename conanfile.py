@@ -23,7 +23,7 @@ class InfluxdbCxxConan(ConanFile):
     exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*")
     requires = (
         "boost/1.74.0",
-        "libcurl/7.72.0 "
+        "libcurl/7.72.0"
     )
 
 
