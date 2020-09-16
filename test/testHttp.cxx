@@ -24,6 +24,7 @@
 #define BOOST_TEST_DYN_LINK
 #include <boost/test/unit_test.hpp>
 #include <random>
+#include <numeric>
 
 #include "HTTP.h"
 #include "InfluxDBFactory.h"
