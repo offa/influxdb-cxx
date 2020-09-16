@@ -200,7 +200,7 @@ void InfluxDB::createDatabaseIfNotExists()
   {
     mTransport->createDatabase();
   }
-  catch (const std::runtime_error &error)
+  catch (const std::runtime_error &)
   {
     throw InfluxDBException(__func__, "Transport did not allow create database");
   }
