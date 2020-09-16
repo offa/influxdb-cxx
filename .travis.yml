@@ -4,15 +4,20 @@ jobs:
   include:
     - os: osx
       osx_image: xcode11.7
+
     - os: linux
       dist: focal
       env: CODECOV=true
       addons:
         apt:
           packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
+      after_success:
+        ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh
+
     - os: linux
       dist: focal
       env: NO_BOOST=true
+
     - os: linux
       dist: focal
       env: CONAN=true
@@ -33,6 +38,3 @@ script:
     else cmake ..; fi;
   - make -j
   - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi
-
-after_success:
-  - if [[ -n ${CODECOV+x} ]]; then ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh; fi
