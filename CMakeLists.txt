@@ -17,7 +17,7 @@ endif()
 
 # Define project
 project(influxdb-cxx
-  VERSION 0.5.1
+  VERSION 0.6.0
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
 )
