@@ -50,6 +50,18 @@ void UnixSocket::send(std::string &&message)
   }
 }
 
+#else
+
+UnixSocket::UnixSocket(const std::string&)
+{
+  throw InfluxDBException{__func__, "Unix socket not supported on this system"};
+}
+
+void UnixSocket::send(std::string&&)
+{
+  throw InfluxDBException{__func__, "Unix socket not supported on this system"};
+}
+
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 
 } // namespace influxdb::transports
