@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/offa/influxdb-cxx/workflows/ci/badge.svg)](https://github.com/offa/influxdb-cxx/actions)
 [![Build Status](https://travis-ci.com/offa/influxdb-cxx.svg?branch=master)](https://travis-ci.com/offa/influxdb-cxx)
+[![GitHub release](https://img.shields.io/github/release/offa/influxdb-cxx.svg)](https://github.com/offa/influxdb-cxx/releases)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-17-green.svg)
 [![codecov](https://codecov.io/gh/offa/influxdb-cxx/branch/master/graph/badge.svg)](https://codecov.io/gh/offa/influxdb-cxx)
