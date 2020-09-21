@@ -74,10 +74,6 @@ find_package(CURL REQUIRED MODULE)
 # Library
 ####################################
 
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
-set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
-
 # Create library
 # note: BUILD_SHARED_LIBS specifies if static or shared
 #       as boost is build without -fPIC, we cannot
