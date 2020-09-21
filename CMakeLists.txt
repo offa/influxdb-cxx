@@ -93,36 +93,7 @@ add_subdirectory("src")
 # Tests require Boost::unit_test_framework
 if (Boost_FOUND AND INFLUXCXX_TESTING)
   enable_testing()
-
-  set(TEST_SRCS
-    test/testUdp.cxx
-    test/testPoint.cxx
-    test/testHttp.cxx
-    test/testQuery.cxx
-    test/testFactory.cxx
-    test/testInfluxDB.cxx
-  )
-
-  foreach (test ${TEST_SRCS})
-    get_filename_component(test_name ${test} NAME)
-    string(REGEX REPLACE ".cxx" "" test_name ${test_name})
-
-    add_executable(${test_name} ${test})
-    target_link_libraries(${test_name}
-      PRIVATE
-        InfluxDB Boost::unit_test_framework
-        Threads::Threads
-    )
-
-    target_include_directories(${test_name}
-            PRIVATE
-              InfluxDB
-              src/
-            )
-
-    add_test(NAME ${test_name} COMMAND ${test_name})
-    set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
-  endforeach()
+  add_subdirectory("test")
 endif()
 
 if (Boost_FOUND AND INFLUXCXX_BENCHMARK)
