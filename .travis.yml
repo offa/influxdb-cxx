@@ -4,9 +4,11 @@ jobs:
   include:
     - os: osx
       osx_image: xcode12
+      name: "osx xcode 12"
 
     - os: linux
       dist: focal
+      name: "linux with boost"
       env: CODECOV=true
       addons:
         apt:
@@ -16,15 +18,18 @@ jobs:
 
     - os: linux
       dist: focal
+      name: "linux without boost"
       env: NO_BOOST=true
 
     - os: linux
       dist: focal
+      name: "conan with boost"
       script:
         - script/travis_ci_conan_build.sh
 
     - os: linux
       dist: focal
+      name: "conan without boost"
       env: NO_BOOST=true
       script:
         - script/travis_ci_conan_build.sh
