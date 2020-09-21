@@ -3,7 +3,7 @@ language: cpp
 jobs:
   include:
     - os: osx
-      osx_image: xcode11.7
+      osx_image: xcode12
 
     - os: linux
       dist: focal
