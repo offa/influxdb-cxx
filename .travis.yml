@@ -9,10 +9,9 @@ jobs:
     - os: linux
       dist: focal
       name: "linux with boost"
-      env: CODECOV=true
       addons:
         apt:
-          packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
+          packages: ['libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
       after_success:
         ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh
 
@@ -34,11 +33,23 @@ jobs:
       script:
         - script/travis_ci_conan_build.sh
 
+    - os: linux
+      dist: focal
+      name: "coverage"
+      env: CODECOV=true
+      addons:
+        apt:
+          packages: ['lcov', 'libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
+      script:
+        - mkdir build && cd build
+        - cmake -DINFLUXCXX_COVERAGE=ON ..
+        - make -j
+        - ctest -V
+      after_success:
+        ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh
+
 install:
   - script/travis_ci_setup_influxdb.sh
 
 script:
-  - mkdir build && cd build
-  - if [[ -n ${CODECOV+x} ]]; then cmake -DINFLUXCXX_COVERAGE=ON ..; else cmake ..; fi;
-  - make -j
-  - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi
+  - script/ci_build.sh
