@@ -12,8 +12,6 @@ jobs:
       addons:
         apt:
           packages: ['libboost-system1.71-dev', 'libboost-test1.71-dev', 'libboost-program-options1.71-dev', 'libcurl4-openssl-dev']
-      after_success:
-        ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh
 
     - os: linux
       dist: focal
@@ -53,3 +51,4 @@ install:
 
 script:
   - script/ci_build.sh
+  - if [[ -z ${NO_BOOST+x} ]]; then cmake --build build --target test; fi
