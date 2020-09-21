@@ -2,18 +2,11 @@
 # General project definition
 ####################################
 
-cmake_minimum_required(VERSION 3.5.2)
+cmake_minimum_required(VERSION 3.12.0)
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 option(INFLUXCXX_BENCHMARK "Build benchmark" OFF)
-
-# Set cmake policy by version: https://cmake.org/cmake/help/latest/manual/cmake-policies.7.html
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-else()
-    cmake_policy(VERSION 3.12)
-endif()
 
 # Define project
 project(influxdb-cxx
