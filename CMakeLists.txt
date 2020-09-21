@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.12.0)
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
-option(INFLUXCXX_BENCHMARK "Build benchmark" OFF)
 
 # Define project
 project(influxdb-cxx
@@ -65,7 +64,7 @@ set(Boost_USE_MULTITHREADED TRUE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Boost COMPONENTS unit_test_framework system program_options)
+find_package(Boost COMPONENTS unit_test_framework system)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED MODULE)
 
@@ -90,11 +89,6 @@ add_subdirectory("src")
 if (Boost_FOUND AND INFLUXCXX_TESTING)
   enable_testing()
   add_subdirectory("test")
-endif()
-
-if (Boost_FOUND AND INFLUXCXX_BENCHMARK)
-  add_executable(benchmark test/benchmark.cxx)
-  target_link_libraries(benchmark PRIVATE InfluxDB Boost::program_options Threads::Threads)
 endif()
 
 
