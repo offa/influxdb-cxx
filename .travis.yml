@@ -20,29 +20,20 @@ jobs:
 
     - os: linux
       dist: focal
-      env: CONAN=true
       script:
-        - pip install -U --user conan
-        - conan profile new default --detect
-        - conan profile update settings.compiler.libcxx=libstdc++11 default
-        - conan create -o influxdb-cxx:tests=True ${TRAVIS_BUILD_DIR}
+        - script/travis_ci_conan_build.sh
 
     - os: linux
       dist: focal
-      env: CONAN=true NO_BOOST=true
+      env: NO_BOOST=true
       script:
-        - pip install -U --user conan
-        - conan profile new default --detect
-        - conan profile update settings.compiler.libcxx=libstdc++11 default
-        - conan create -o influxdb-cxx:boost=False ${TRAVIS_BUILD_DIR}
+        - script/travis_ci_conan_build.sh
 
 install:
   - script/travis_ci_setup_influxdb.sh
 
-before_script:
-  - cd ${TRAVIS_BUILD_DIR}; mkdir build; cd build
-
 script:
+  - mkdir build && cd build
   - if [[ -n ${CODECOV+x} ]]; then cmake -DINFLUXCXX_COVERAGE=ON ..; else cmake ..; fi;
   - make -j
   - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi
