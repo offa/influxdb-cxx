@@ -29,7 +29,7 @@ jobs:
 
     - os: linux
       dist: focal
-      env: CONAN=true
+      env: CONAN=true NO_BOOST=true
       script:
         - pip install -U --user conan
         - conan profile new default --detect
@@ -43,7 +43,6 @@ before_script:
   - cd ${TRAVIS_BUILD_DIR}; mkdir build; cd build
 
 script:
-  - if [[ -n ${CODECOV+x} ]]; then cmake -DCMAKE_BUILD_TYPE=Debug ..;
-    else cmake ..; fi;
+  - if [[ -n ${CODECOV+x} ]]; then cmake -DINFLUXCXX_COVERAGE=ON ..; else cmake ..; fi;
   - make -j
   - if [[ -z ${NO_BOOST+x} ]]; then ctest -V; fi

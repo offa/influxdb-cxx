@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.12.0)
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
+option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)
 
 # Define project
 project(influxdb-cxx
@@ -43,16 +44,16 @@ set(CMAKE_INSTALL_LIBDIR lib)
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "RelWithDebInfo"
     CACHE
-    STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel Coverage."
+    STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
     FORCE
   )
 endif()
 
 message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
 
-# Add coverage flags to Debug build
-if(NOT MSVC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 --coverage")
+# Add coverage flags
+if(INFLUXCXX_COVERAGE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif()
 
 # Fixes warning when using boost from brew
