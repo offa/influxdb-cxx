@@ -83,37 +83,8 @@ set(INCLUDE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/include")
 #       as boost is build without -fPIC, we cannot
 #       statically link against it when building
 #       influxdb as shared object
-add_library(InfluxDB
-  src/InfluxDB.cxx
-  src/Point.cxx
-  src/InfluxDBFactory.cxx
-  $<$<BOOL:${Boost_FOUND}>:src/UDP.cxx>
-  $<$<BOOL:${Boost_FOUND}>:src/UnixSocket.cxx>
-  src/HTTP.cxx
-)
-target_include_directories(InfluxDB
-  PUBLIC
-    $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+add_subdirectory("src")
 
-# Link targets
-target_link_libraries(InfluxDB
-  PRIVATE
-    $<$<BOOL:${Boost_FOUND}>:Boost::system>
-    CURL::libcurl
-)
-
-# Use C++17
-target_compile_features(InfluxDB PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
-
-# Set compile definition if Boost found
-target_compile_definitions(InfluxDB
-  PRIVATE
-    $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
-)
 
 ####################################
 # Tests
