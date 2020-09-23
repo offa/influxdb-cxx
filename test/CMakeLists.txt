@@ -17,6 +17,7 @@
         InfluxDB
         Boost::unit_test_framework
         Threads::Threads
+        CURL::libcurl
     )
 
     target_include_directories(${test_name}
