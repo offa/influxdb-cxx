@@ -33,3 +33,8 @@ target_compile_definitions(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
 )
+
+
+if(MSVC)
+  set_target_properties(InfluxDB PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
