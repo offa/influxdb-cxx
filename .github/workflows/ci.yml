@@ -3,7 +3,7 @@ name: ci
 on: [push, pull_request]
 
 jobs:
-  build:
+  build_linux:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -27,3 +27,37 @@ jobs:
         run: apt-get install -y libboost-system1.65-dev libboost-test1.65-dev libboost-program-options1.65-dev
       - name: Build
         run: script/ci_build.sh
+
+
+  build_windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        compiler:
+          - msvc
+        boost:
+          - true
+          - false
+    name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Ninja
+        uses: ashutoshvarma/setup-ninja@master
+      - name: Setup MSVC
+        uses: seanmiddleditch/gha-setup-vsdevenv@master
+      - name: Install dependencies
+        run: |
+          pip install -U conan
+          conan install -g cmake_paths -o libcurl:shared=True libcurl/7.72.0@
+      - name: Build
+        env:
+          CC: cl
+          CXX: cl
+        run: |
+          if [[ "${{ matrix.boost }}" == "true" ]]; then
+            export BOOST_ROOT="${BOOST_ROOT_1_72_0}"
+          fi
+          mkdir build && cd build
+          cmake -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake -G Ninja ..
+          cmake --build . -j
+        shell: bash
