@@ -71,6 +71,12 @@ class InfluxDB
     /// Flushes points batched (this can also happens when buffer is full)
     void flushBatch();
 
+    /// \deprecated use \ref flushBatch() instead
+    inline void flushBuffer()
+    {
+        flushBatch();
+    }
+
     /// Enables points batching
     /// \param size
     void batchOf(const std::size_t size = 32);
