@@ -44,7 +44,7 @@ jobs:
         - make -j
         - ctest -V
       after_success:
-        ${TRAVIS_BUILD_DIR}/script/travis_post_codecov.sh
+        ${TRAVIS_BUILD_DIR}/script/travis_ci_post_codecov.sh
 
 install:
   - script/travis_ci_setup_influxdb.sh
