@@ -77,7 +77,6 @@ void HTTP::initCurl(const std::string &url)
   }
   writeHandle = curl_easy_init();
   curl_easy_setopt(writeHandle, CURLOPT_URL, writeUrl.c_str());
-  curl_easy_setopt(writeHandle, CURLOPT_SSL_VERIFYPEER, 0);
   curl_easy_setopt(writeHandle, CURLOPT_CONNECTTIMEOUT, 10);
   curl_easy_setopt(writeHandle, CURLOPT_TIMEOUT, 10);
   curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
@@ -97,7 +96,6 @@ void HTTP::initCurlRead(const std::string &url)
   mReadUrl = url + "&q=";
   mReadUrl.insert(mReadUrl.find('?'), "/query");
   readHandle = curl_easy_init();
-  curl_easy_setopt(readHandle, CURLOPT_SSL_VERIFYPEER, 0);
   curl_easy_setopt(readHandle, CURLOPT_CONNECTTIMEOUT, 10);
   curl_easy_setopt(readHandle, CURLOPT_TIMEOUT, 10);
   curl_easy_setopt(readHandle, CURLOPT_TCP_KEEPIDLE, 120L);
@@ -126,12 +124,6 @@ void HTTP::enableBasicAuth(const std::string &auth)
   curl_easy_setopt(writeHandle, CURLOPT_USERPWD, auth.c_str());
   curl_easy_setopt(readHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
   curl_easy_setopt(readHandle, CURLOPT_USERPWD, auth.c_str());
-}
-
-void HTTP::enableSsl()
-{
-  curl_easy_setopt(readHandle, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(writeHandle, CURLOPT_SSL_VERIFYPEER, 0L);
 }
 
 void HTTP::send(std::string &&lineprotocol)
@@ -206,7 +198,6 @@ void HTTP::createDatabase()
 
   CURL *createHandle = curl_easy_init();
   curl_easy_setopt(createHandle, CURLOPT_URL, createUrl.c_str());
-  curl_easy_setopt(createHandle, CURLOPT_SSL_VERIFYPEER, 0);
   curl_easy_setopt(createHandle, CURLOPT_CONNECTTIMEOUT, 10);
   curl_easy_setopt(createHandle, CURLOPT_TIMEOUT, 10);
   curl_easy_setopt(createHandle, CURLOPT_POST, 1);

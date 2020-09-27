@@ -72,11 +72,6 @@ std::unique_ptr<Transport> withHttpTransport(const http::url &uri)
   {
     transport->enableBasicAuth(uri.user + ":" + uri.password);
   }
-
-  if (uri.protocol == "https")
-  {
-    transport->enableSsl();
-  }
   return transport;
 }
 

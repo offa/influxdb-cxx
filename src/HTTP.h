@@ -61,9 +61,6 @@ public:
   /// \param auth <username>:<password>
   void enableBasicAuth(const std::string &auth);
 
-  /// Enable SSL
-  void enableSsl();
-
   /// Get the database name managed by this transport
   [[nodiscard]] std::string databaseName() const;
 
