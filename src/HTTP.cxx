@@ -28,15 +28,50 @@
 #include "InfluxDBException.h"
 #include <iostream>
 
-extern "C" size_t noopWriteCallBack([[maybe_unused]] char* ptr, size_t size,
-    size_t nmemb, [[maybe_unused]] void* userdata)
-{
-  return size * nmemb;
-}
 
 
 namespace influxdb::transports
 {
+    namespace
+    {
+        size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
+        {
+            static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
+            return size * nmemb;
+        }
+
+        size_t noopWriteCallBack([[maybe_unused]] char* ptr, size_t size,
+                                 size_t nmemb, [[maybe_unused]] void* userdata)
+        {
+            return size * nmemb;
+        }
+
+        void setConnectionOptions(CURL* handle)
+        {
+            curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_easy_setopt(handle, CURLOPT_TIMEOUT, 10);
+            curl_easy_setopt(handle, CURLOPT_TCP_KEEPIDLE, 120L);
+            curl_easy_setopt(handle, CURLOPT_TCP_KEEPINTVL, 60L);
+            curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
+        }
+
+        CURL* createReadHandle()
+        {
+            CURL* readHandle = curl_easy_init();
+            setConnectionOptions(readHandle);
+            curl_easy_setopt(readHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
+            return readHandle;
+        }
+
+        CURL* createWriteHandle(const std::string& url)
+        {
+            CURL* writeHandle = curl_easy_init();
+            setConnectionOptions(writeHandle);
+            curl_easy_setopt(writeHandle, CURLOPT_URL, url.c_str());
+            curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
+            return writeHandle;
+        }
+    }
 
 HTTP::HTTP(const std::string &url)
 {
@@ -75,32 +110,14 @@ void HTTP::initCurl(const std::string &url)
   {
     writeUrl.insert(position, "write");
   }
-  writeHandle = curl_easy_init();
-  curl_easy_setopt(writeHandle, CURLOPT_URL, writeUrl.c_str());
-  curl_easy_setopt(writeHandle, CURLOPT_CONNECTTIMEOUT, 10);
-  curl_easy_setopt(writeHandle, CURLOPT_TIMEOUT, 10);
-  curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
-  curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPIDLE, 120L);
-  curl_easy_setopt(writeHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  curl_easy_setopt(writeHandle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
-}
-
-static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
-{
-  static_cast<std::string *>(userp)->append(static_cast<char *>(contents), size * nmemb);
-  return size * nmemb;
+  writeHandle = createWriteHandle(writeUrl);
 }
 
 void HTTP::initCurlRead(const std::string &url)
 {
   mReadUrl = url + "&q=";
   mReadUrl.insert(mReadUrl.find('?'), "/query");
-  readHandle = curl_easy_init();
-  curl_easy_setopt(readHandle, CURLOPT_CONNECTTIMEOUT, 10);
-  curl_easy_setopt(readHandle, CURLOPT_TIMEOUT, 10);
-  curl_easy_setopt(readHandle, CURLOPT_TCP_KEEPIDLE, 120L);
-  curl_easy_setopt(readHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  curl_easy_setopt(readHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
+  readHandle = createReadHandle();
 }
 
 std::string HTTP::query(const std::string &query)
@@ -192,18 +209,10 @@ std::string HTTP::influxDbServiceUrl() const
 
 void HTTP::createDatabase()
 {
-  std::string createUrl = mInfluxDbServiceUrl + "/query";
+  const std::string createUrl = mInfluxDbServiceUrl + "/query";
+  const std::string postFields = "q=CREATE DATABASE " + mDatabaseName;
 
-  std::string postFields = "q=CREATE DATABASE " + mDatabaseName;
-
-  CURL *createHandle = curl_easy_init();
-  curl_easy_setopt(createHandle, CURLOPT_URL, createUrl.c_str());
-  curl_easy_setopt(createHandle, CURLOPT_CONNECTTIMEOUT, 10);
-  curl_easy_setopt(createHandle, CURLOPT_TIMEOUT, 10);
-  curl_easy_setopt(createHandle, CURLOPT_POST, 1);
-  curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPIDLE, 120L);
-  curl_easy_setopt(createHandle, CURLOPT_TCP_KEEPINTVL, 60L);
-  curl_easy_setopt(createHandle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
+  CURL* createHandle = createWriteHandle(createUrl);
 
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(postFields.length()));
