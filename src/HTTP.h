@@ -40,7 +40,7 @@ class HTTP : public Transport
 {
 public:
   /// Constructor
-  HTTP(const std::string &url);
+  explicit HTTP(const std::string &url);
 
   /// Default destructor
   ~HTTP() override;

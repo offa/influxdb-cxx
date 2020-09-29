@@ -39,10 +39,7 @@ namespace influxdb::transports
 class UnixSocket : public Transport
 {
   public:
-    UnixSocket(const std::string &socketPath);
-
-    /// Default destructor
-    ~UnixSocket() = default;
+    explicit UnixSocket(const std::string &socketPath);
 
     /// \param message   r-value string formated
     void send(std::string&& message) override;

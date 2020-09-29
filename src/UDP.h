@@ -43,9 +43,6 @@ class UDP : public Transport
     /// Constructor
     UDP(const std::string &hostname, int port);
 
-    /// Default destructor
-    ~UDP() = default;
-
     /// Sends blob via UDP
     void send(std::string&& message) override;
 
