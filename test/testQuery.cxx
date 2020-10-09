@@ -45,9 +45,9 @@ BOOST_AUTO_TEST_CASE(query1)
 
   auto points = influxdb->query("SELECT * from query1 WHERE host = 'localhost' ORDER BY time DESC LIMIT 3");
 
-  //ufortunately no typoe checking is done at query. It converts every value in double
-  //so all point fields are treated as double fields. It makes neecessary to adapt Point precision of float fields
-  //or consider default number of decimal digits at the checking
+  // unfortunately no type checking is done at query. It converts every value in double
+  // so all point fields are treated as double fields. It makes necessary to adapt Point precision of float fields
+  // or consider default number of decimal digits at the checking
   BOOST_CHECK_EQUAL(points.size(), 3);
   BOOST_CHECK_EQUAL(points[0].getName(), "query1");
   BOOST_CHECK_EQUAL(points[1].getName(), "query1");
