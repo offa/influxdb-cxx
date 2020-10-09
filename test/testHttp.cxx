@@ -100,7 +100,6 @@ BOOST_AUTO_TEST_CASE(sendingToNonexistentInfluxServerThrowsConectionError)
   BOOST_CHECK_THROW( httpTransport.send("test_measurement,tag1=one,tag2=two value1=0.64"), ConnectionError );
 }
 
-
 BOOST_AUTO_TEST_CASE(sendingToNonExistentDatabaseThrowsNonExistentDatabase)
 {
   influxdb::transports::HTTP httpTransport("http://localhost:8086?db=nonexistent_db");
@@ -114,6 +113,17 @@ BOOST_AUTO_TEST_CASE(sendingAnIllFormedLineProtocolThrowsBadRequest)
   httpTransport.createDatabase();
 
   BOOST_CHECK_THROW( httpTransport.send("ill-formed line protocol"), BadRequest );
+}
+
+BOOST_AUTO_TEST_CASE(queryUrlFormat)
+{
+    auto queryUrl = [](const auto& url) {
+        influxdb::transports::HTTP transport{url};
+        transport.query("SELECT * FROM notexisting");
+    };
+
+    BOOST_CHECK_NO_THROW(queryUrl("http://localhost:8086?db=test"));
+    BOOST_CHECK_NO_THROW(queryUrl("http://localhost:8086/?db=test"));
 }
 
 } // namespace influxdb::test

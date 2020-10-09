@@ -116,7 +116,15 @@ void HTTP::initCurl(const std::string &url)
 void HTTP::initCurlRead(const std::string &url)
 {
   mReadUrl = url + "&q=";
-  mReadUrl.insert(mReadUrl.find('?'), "/query");
+  const auto pos = mReadUrl.find('?');
+  std::string cmd{"query"};
+
+  if (mReadUrl[pos - 1] != '/')
+  {
+      cmd.insert(0, 1, '/');
+  }
+
+  mReadUrl.insert(pos, cmd);
   readHandle = createReadHandle();
 }
 
