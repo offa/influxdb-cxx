@@ -74,6 +74,7 @@ void InfluxDB::flushBatch()
   }
 
   transmit(joinLineProtocolBatch());
+  mLineProtocolBatch.clear();
 }
 
 
