@@ -92,6 +92,11 @@ BOOST_AUTO_TEST_CASE(fieldsWithEmptyNameAreNotAdded)
   BOOST_CHECK_EQUAL(point.getFields().empty(), true);
 }
 
+BOOST_AUTO_TEST_CASE(emptyTagReturnsEmpty)
+{
+    BOOST_CHECK_EQUAL(Point{"x"}.getTags(), "");
+}
+
 BOOST_AUTO_TEST_CASE(floatFieldsPrecisionCanBeAdjusted)
 {
   Point::floatsPrecision = 3;

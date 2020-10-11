@@ -113,7 +113,11 @@ std::string Point::getFields() const
 
 std::string Point::getTags() const
 {
-  return mTags.substr(1, mTags.size());
+    if (mTags.empty())
+    {
+        return "";
+    }
+    return mTags.substr(1, mTags.size());
 }
 
 } // namespace influxdb
