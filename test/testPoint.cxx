@@ -36,7 +36,7 @@ std::vector<std::string> getVector(const Point& point)
                       std::istream_iterator<std::string>{}};
 }
 
-BOOST_AUTO_TEST_CASE(test1)
+BOOST_AUTO_TEST_CASE(measurementWithValue)
 {
   auto point = Point{"test"}
     .addField("value", 10LL);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(test1)
   BOOST_CHECK_EQUAL(result[1], "value=10i");
 }
 
-BOOST_AUTO_TEST_CASE(test2)
+BOOST_AUTO_TEST_CASE(multipleFields)
 {
   Point::floatsPrecision = 1;
   auto point = Point{"test"}
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(test2)
   BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
 }
 
-BOOST_AUTO_TEST_CASE(test3)
+BOOST_AUTO_TEST_CASE(multipleFieldsWithTag)
 {
   Point::floatsPrecision = 1;
   auto point = Point{"test"}
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(test3)
   BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
 }
 
-BOOST_AUTO_TEST_CASE(test4)
+BOOST_AUTO_TEST_CASE(timestamp)
 {
   auto point = Point{"test"}
     .addField("value", 10)
