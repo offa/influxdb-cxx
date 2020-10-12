@@ -90,7 +90,7 @@ private:
     void addPointToBatch(const Point &point);
 
   private:
-    /// line protocol batch to be writen
+    /// line protocol batch to be written
     std::deque<std::string> mLineProtocolBatch;
 
     /// Flag stating whether point buffering is enabled
