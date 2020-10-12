@@ -67,7 +67,7 @@ Point&& Point::addField(std::string_view name, const std::variant<int, long long
 
 Point&& Point::addTag(std::string_view key, std::string_view value)
 {
-  if (value.empty())
+  if (key.empty() || value.empty())
   {
     return std::move(*this);
   }

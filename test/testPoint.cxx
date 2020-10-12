@@ -74,6 +74,30 @@ BOOST_AUTO_TEST_CASE(multipleFieldsWithTag)
   BOOST_CHECK_EQUAL(result[1], "value=10i,dvalue=10.1");
 }
 
+BOOST_AUTO_TEST_CASE(emptyTagValueIsNotAdded)
+{
+  auto point = Point{"test"}
+    .addField("value", 2)
+    .addTag("tag", "");
+
+  auto result = getVector(point);
+
+  BOOST_CHECK_EQUAL(result[0], "test");
+  BOOST_CHECK_EQUAL(result[1], "value=2i");
+}
+
+BOOST_AUTO_TEST_CASE(emptyTagKeyIsNotAdded)
+{
+  auto point = Point{"test"}
+    .addField("value", 2)
+    .addTag("", "xyz");
+
+  auto result = getVector(point);
+
+  BOOST_CHECK_EQUAL(result[0], "test");
+  BOOST_CHECK_EQUAL(result[1], "value=2i");
+}
+
 BOOST_AUTO_TEST_CASE(timestamp)
 {
   auto point = Point{"test"}
