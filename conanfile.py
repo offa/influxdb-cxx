@@ -12,6 +12,7 @@ class InfluxdbCxxConan(ConanFile):
     description = "InfluxDB C++ client library."
     topics = ("influxdb", "influxdb-client")
     settings = "os", "compiler", "build_type", "arch"
+    generators = "cmake_find_package"
     options = {"shared": [True, False],
                "tests": [True, False],
                "boost": [True, False]}
