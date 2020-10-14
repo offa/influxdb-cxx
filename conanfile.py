@@ -1,5 +1,6 @@
 import re
 import os
+import shutil
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanInvalidConfiguration
 
@@ -12,7 +13,7 @@ class InfluxdbCxxConan(ConanFile):
     description = "InfluxDB C++ client library."
     topics = ("influxdb", "influxdb-client")
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake_find_package"
+    generators = "cmake"
     options = {"shared": [True, False],
                "tests": [True, False],
                "boost": [True, False]}
@@ -23,7 +24,7 @@ class InfluxdbCxxConan(ConanFile):
                        "libcurl:with_openssl": True,
                        "libcurl:shared": True}
     exports = ["LICENSE"]
-    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*")
+    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*", "conan/CMakeLists.txt")
     requires = (
         "libcurl/7.72.0"
     )
@@ -48,6 +49,11 @@ class InfluxdbCxxConan(ConanFile):
     def requirements(self):
         if self.options.boost:
             self.requires("boost/1.74.0")
+
+    def source(self):
+        # Wrap the original CMake file to call conan_basic_setup
+        shutil.move("CMakeLists.txt", "CMakeListsOriginal.txt")
+        shutil.move(os.path.join("conan", "CMakeLists.txt"), "CMakeLists.txt")
 
     def build(self):
         cmake = self._configure_cmake()
