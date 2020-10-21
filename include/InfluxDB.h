@@ -49,7 +49,7 @@ class InfluxDB
     InfluxDB(const InfluxDB&) = delete;
 
     /// Constructor required valid transport
-    InfluxDB(std::unique_ptr<Transport> transport);
+    explicit InfluxDB(std::unique_ptr<Transport> transport);
 
     /// Flushes buffer
     ~InfluxDB();

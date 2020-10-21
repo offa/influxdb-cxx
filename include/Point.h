@@ -41,7 +41,7 @@ class Point
 {
   public:
     /// Constructs point based on measurement name
-    Point(const std::string& measurement);
+    explicit Point(const std::string& measurement);
 
     /// Default destructor
     ~Point() = default;
