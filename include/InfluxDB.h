@@ -72,6 +72,7 @@ class InfluxDB
     void flushBatch();
 
     /// \deprecated use \ref flushBatch() instead
+    [[deprecated("Use flushBatch() instead")]]
     inline void flushBuffer()
     {
         flushBatch();
