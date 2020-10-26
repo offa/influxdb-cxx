@@ -1,11 +1,12 @@
 @PACKAGE_INIT@
 
 set(InfluxDB_VERSION @PROJECT_VERSION@)
+set(InfluxDB_WITH_BOOST @Boost_FOUND@)
 
 get_filename_component(InfluxDB_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include(CMakeFindDependencyMacro)
 
-if(@Boost_FOUND@)
+if(InfluxDB_WITH_BOOST)
   find_dependency(Boost)
 endif()
 find_dependency(CURL)
