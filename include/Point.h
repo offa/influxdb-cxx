@@ -31,13 +31,15 @@
 #include <chrono>
 #include <variant>
 
+#include "influxdb_export.h"
+
 namespace influxdb
 {
 
 static inline constexpr int defaultFloatsPrecision{18};
 
 /// \brief Represents a point
-class Point
+class INFLUXDB_EXPORT Point
 {
   public:
     /// Constructs point based on measurement name

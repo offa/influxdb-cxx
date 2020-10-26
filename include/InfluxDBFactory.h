@@ -29,12 +29,13 @@
 
 #include "InfluxDB.h"
 #include "Transport.h"
+#include "influxdb_export.h"
 
 namespace influxdb
 {
 
 /// \brief InfluxDB factory
-class InfluxDBFactory
+class INFLUXDB_EXPORT InfluxDBFactory
 {
  public:
    /// Disables copy constructor
