@@ -29,7 +29,8 @@ jobs:
         run: apt-get install -y libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev
       - name: Build
         run: script/ci_build.sh
-
+      - name: Install
+        run: cmake --build build --target install
 
   build_windows:
     runs-on: windows-latest
@@ -63,3 +64,5 @@ jobs:
           cmake -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake -G Ninja ..
           cmake --build . -j
         shell: bash
+      - name: Install
+        run: cmake --build build --target install
