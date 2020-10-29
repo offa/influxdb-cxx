@@ -3,5 +3,5 @@
 set -ex
 
 mkdir build && cd build
-cmake ..
-make -j
+cmake "$@" ..
+cmake --build . -j

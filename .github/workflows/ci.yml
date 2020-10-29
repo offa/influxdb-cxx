@@ -60,9 +60,7 @@ jobs:
           if [[ "${{ matrix.boost }}" == "true" ]]; then
             export BOOST_ROOT="${BOOST_ROOT_1_72_0}"
           fi
-          mkdir build && cd build
-          cmake -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake -G Ninja ..
-          cmake --build . -j
+          script/ci_build.sh -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake -G Ninja
         shell: bash
       - name: Install
         run: cmake --build build --target install
