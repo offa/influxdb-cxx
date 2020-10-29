@@ -41,12 +41,25 @@ brew install awegrzyn/influxdata/influxdb-cxx
 
 ## Quick start
 
+### Include in CMake project
+
+The InfluxDB library is exported as target `InfluxData::InfluxDB`.
+
+```cmake
+project(example)
+
+find_package(InfluxDB)
+
+add_executable(example-influx main.cpp)
+target_link_libraries(example-influx PRIVATE InfluxData::InfluxDB)
+```
+
 ### Basic write
 
 ```cpp
 // Provide complete URI
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
-influxdb->write(Point{"test"}
+influxdb->write(influxdb::Point{"test"}
   .addField("value", 10)
   .addTag("host", "localhost")
 );
@@ -61,7 +74,7 @@ auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test")
 influxdb->batchOf(100);
 
 for (;;) {
-  influxdb->write(Point{"test"}.addField("value", 10));
+  influxdb->write(influxdb::Point{"test"}.addField("value", 10));
 }
 ```
 
@@ -71,7 +84,7 @@ for (;;) {
 // Available over HTTP only
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
 /// Pass an IFQL to get list of points
-std::vector<Point> points = idb->query("SELECT * FROM test");
+std::vector<influxdb::Point> points = idb->query("SELECT * FROM test");
 ```
 
 ## Transports
