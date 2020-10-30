@@ -23,12 +23,14 @@ jobs:
       - name: update package list
         run: apt-get update
       - name: Install dependencies
-        run: apt-get install -y libcurl4-openssl-dev
+        run: apt-get install -y libcurl4-openssl-dev influxdb
       - name: Install Boost
         if: ${{ matrix.boost == true }}
         run: apt-get install -y libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev
       - name: Build
-        run: script/ci_build.sh
+        run: script/ci_build.sh -DINFLUXCXX_TESTING=ON
+      - name: Test
+        run: script/ci_test.sh
       - name: Install
         run: cmake --build build --target install
 
