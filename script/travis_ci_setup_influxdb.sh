@@ -3,8 +3,9 @@
 set -ex
 
 if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-    wget https://dl.influxdata.com/influxdb/releases/influxdb_1.8.2_amd64.deb
-    sudo dpkg -i influxdb_1.8.2_amd64.deb
+    INFLUXDB_VERSION="1.8.2"
+    wget https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_amd64.deb
+    sudo dpkg -i influxdb_${INFLUXDB_VERSION}_amd64.deb
     sudo systemctl unmask influxdb.service
     sudo systemctl start influxdb
 fi
