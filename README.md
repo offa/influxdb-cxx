@@ -58,7 +58,7 @@ target_link_libraries(example-influx PRIVATE InfluxData::InfluxDB)
 
 ```cpp
 // Provide complete URI
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 influxdb->write(influxdb::Point{"test"}
   .addField("value", 10)
   .addTag("host", "localhost")
@@ -69,7 +69,7 @@ influxdb->write(influxdb::Point{"test"}
 
 ```cpp
 // Provide complete URI
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 // Write batches of 100 points
 influxdb->batchOf(100);
 
@@ -82,7 +82,7 @@ for (;;) {
 
 ```cpp
 // Available over HTTP only
-auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086/?db=test");
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 /// Pass an IFQL to get list of points
 std::vector<influxdb::Point> points = idb->query("SELECT * FROM test");
 ```
@@ -91,13 +91,13 @@ std::vector<influxdb::Point> points = idb->query("SELECT * FROM test");
 
 An underlying transport is fully configurable by passing an URI:
 ```
-[protocol]://[username:password@]host:port[/?db=database]
+[protocol]://[username:password@]host:port[?db=database]
 ```
 <br>
 List of supported transport is following:
 
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
-| HTTP        | cURL        | `http`/`https` | `http://localhost:8086/?db=<db>`      |
+| HTTP        | cURL        | `http`/`https` | `http://localhost:8086?db=<db>`      |
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
