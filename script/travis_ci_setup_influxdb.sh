@@ -3,7 +3,7 @@
 set -ex
 
 if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-    INFLUXDB_VERSION="1.8.2"
+    INFLUXDB_VERSION="1.8.3"
     wget https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_amd64.deb
     sudo dpkg -i influxdb_${INFLUXDB_VERSION}_amd64.deb
     sudo systemctl unmask influxdb.service
