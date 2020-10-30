@@ -87,10 +87,9 @@ class InfluxDB
     /// \param value
     void addGlobalTag(std::string_view name, std::string_view value);
 
-private:
+  private:
     void addPointToBatch(const Point &point);
 
-  private:
     /// line protocol batch to be written
     std::deque<std::string> mLineProtocolBatch;
 
