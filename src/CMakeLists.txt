@@ -23,6 +23,7 @@ target_link_libraries(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:Boost::system>
     CURL::libcurl
+    Threads::Threads
 )
 
 
