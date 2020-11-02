@@ -1,3 +1,12 @@
+# Workaround until Catch can be integrated through conan.
+Include(FetchContent)
+
+FetchContent_Declare(Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG v2.13.3)
+FetchContent_MakeAvailable(Catch2)
+
+
   set(TEST_SRCS
     testUdp.cxx
     testPoint.cxx
