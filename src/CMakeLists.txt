@@ -6,6 +6,8 @@ add_library(InfluxDB
   $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
   HTTP.cxx
 )
+add_library(InfluxData::InfluxDB ALIAS InfluxDB)
+
 generate_export_header(InfluxDB)
 
 target_include_directories(InfluxDB
