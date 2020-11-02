@@ -99,7 +99,7 @@ add_subdirectory("src")
 ####################################
 
 # Tests require Boost::unit_test_framework
-if (Boost_FOUND AND INFLUXCXX_TESTING)
+if (INFLUXCXX_TESTING)
   enable_testing()
   add_subdirectory("test")
 endif()
