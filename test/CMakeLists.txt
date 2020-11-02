@@ -23,6 +23,7 @@ function(add_unittest name)
 endfunction()
 
 add_unittest(PointTest)
+add_unittest(InfluxDBTest)
 
 
 if (Boost_FOUND)

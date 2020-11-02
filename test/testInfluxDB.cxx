@@ -34,7 +34,9 @@ namespace influxdb::test
 {
     namespace
     {
-
+        /**
+         * \deprecated related test has been moved to unit test
+         */
         class WriteRecorder
         {
         public:
@@ -52,6 +54,9 @@ namespace influxdb::test
             std::size_t calls{0};
         };
 
+        /**
+         * \deprecated related test has been moved to unit test
+         */
         class TransportAdapter : public Transport
         {
         public:
@@ -161,6 +166,9 @@ namespace influxdb::test
         BOOST_CHECK_NO_THROW(influxdb->write(Point{"batch_point"}.addField("value", 3).addTag("host", "localhost")));
     }
 
+    /**
+     * \deprecated Moved to unit test
+     */
     BOOST_AUTO_TEST_CASE(pointsWrittenAsBatchAreTransmittedInBatchesSpecified)
     {
         auto recorder = std::make_shared<WriteRecorder>();
