@@ -6,8 +6,13 @@ FetchContent_Declare(Catch2
     GIT_TAG v2.13.3)
 FetchContent_MakeAvailable(Catch2)
 
+FetchContent_Declare(trompeloeil
+    GIT_REPOSITORY https://github.com/rollbear/trompeloeil.git
+    GIT_TAG v39)
+FetchContent_MakeAvailable(trompeloeil)
+
 add_library(TestMain STATIC TestMain.cpp)
-target_link_libraries(TestMain PUBLIC Catch2::Catch2)
+target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil)
 
 
 function(add_unittest name)
@@ -17,8 +22,8 @@ function(add_unittest name)
     add_test(${name} ${name})
 endfunction()
 
-
 add_unittest(PointTest)
+
 
 if (Boost_FOUND)
     set(TEST_SRCS
