@@ -27,6 +27,10 @@
 #include "InfluxDBFactory.h"
 #include <iterator>
 
+/*
+ * \deprecated Tests moved to PointTest
+ */
+
 namespace influxdb::test {
 
 std::vector<std::string> getVector(const Point& point)
