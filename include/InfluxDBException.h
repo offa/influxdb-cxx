@@ -30,9 +30,11 @@
 #include <stdexcept>
 #include <string>
 
+#include "influxdb_export.h"
+
 namespace influxdb {
 
-class InfluxDBException : public std::runtime_error {
+class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error {
 public:
   InfluxDBException(const std::string &source, const std::string &message) : std::runtime_error::runtime_error(
           "influx-cxx [" + source + "]: " + message) {}

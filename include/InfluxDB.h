@@ -35,11 +35,12 @@
 
 #include "Transport.h"
 #include "Point.h"
+#include "influxdb_export.h"
 
 namespace influxdb
 {
 
-class InfluxDB
+class INFLUXDB_EXPORT InfluxDB
 {
   public:
     /// Disable copy constructor

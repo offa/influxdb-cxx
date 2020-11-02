@@ -6,7 +6,7 @@ add_library(InfluxDB
   $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
   HTTP.cxx
 )
-
+generate_export_header(InfluxDB)
 
 target_include_directories(InfluxDB
   PUBLIC
@@ -14,14 +14,16 @@ target_include_directories(InfluxDB
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    # for export header
+    ${PROJECT_BINARY_DIR}/src
 )
-
 
 # Link targets
 target_link_libraries(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:Boost::system>
     CURL::libcurl
+    Threads::Threads
 )
 
 
@@ -33,8 +35,3 @@ target_compile_definitions(InfluxDB
   PRIVATE
     $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
 )
-
-
-if(MSVC)
-  set_target_properties(InfluxDB PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif()

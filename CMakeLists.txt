@@ -33,6 +33,10 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+# We explicitly export the public interface
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+include(GenerateExportHeader)
 
 # Set fPIC for all targets
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -128,6 +132,7 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/InfluxDBConf
 
 # Install headers
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+install(FILES ${PROJECT_BINARY_DIR}/src/influxdb_export.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
 
 # Export targets
 install(EXPORT InfluxDBTargets

@@ -29,12 +29,13 @@
 
 #include <string>
 #include <stdexcept>
+#include "influxdb_export.h"
 
 namespace influxdb
 {
 
 /// \brief Transport interface
-class Transport
+class INFLUXDB_EXPORT Transport
 {
   public:
     Transport() = default;
