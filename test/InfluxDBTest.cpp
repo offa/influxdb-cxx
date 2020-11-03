@@ -178,15 +178,4 @@ namespace influxdb::test
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.createDatabaseIfNotExists();
     }
-
-    TEST_CASE("Query throws if unsupported by transport", "[InfluxDBTest]")
-    {
-        using trompeloeil::_;
-
-        auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, query(_)).THROW(InfluxDBException{"test", "Intentional"});
-
-        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
-        CHECK_THROWS_AS(db.query("SELECT * from xyz"), InfluxDBException);
-    }
 }
