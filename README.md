@@ -56,7 +56,7 @@ target_link_libraries(example-influx PRIVATE InfluxData::InfluxDB)
 
 This target is also provided when the project is included as a subdirectory.
 
-```
+```cmake
 project(example)
 add_subdirectory(influxdb-cxx)
 add_executable(example-influx main.cpp)
