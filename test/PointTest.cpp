@@ -50,7 +50,7 @@ namespace influxdb::test
     {
         const auto point = Point{"test"}
                                .addField("int_field", 3)
-                               .addField("longlong_field", 1234ll)
+                               .addField("longlong_field", 1234LL)
                                .addField("string_field", "string value")
                                .addField("double_field", 3.859);
 
@@ -146,7 +146,7 @@ namespace influxdb::test
     {
         const auto point = Point{"test"}
                                .addField("int_field", 12)
-                               .addField("longlong_field", 123456790l)
+                               .addField("longlong_field", 123456790LL)
                                .addField("string_field", "str")
                                .addField("double_field", 1.81)
                                .setTimestamp(ignoreTimestamp);

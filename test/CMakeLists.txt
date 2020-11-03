@@ -1,4 +1,4 @@
-# Workaround until Catch can be integrated through conan.
+# Workaround until Catch can be integrated through conan (#57).
 Include(FetchContent)
 
 FetchContent_Declare(Catch2
