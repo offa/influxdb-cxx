@@ -18,7 +18,7 @@ target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil)
 function(add_unittest name)
     add_executable(${name} ${name}.cpp)
     target_link_libraries(${name} PRIVATE TestMain InfluxDB)
-    add_test(${name} ${name})
+    add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
 add_unittest(PointTest)
