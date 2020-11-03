@@ -4,6 +4,14 @@
 
 cmake_minimum_required(VERSION 3.12.0)
 
+# disable testsuite when included
+# using add_subdirectory
+if(DEFINED PROJECT_NAME)
+  set(INCLUDED_AS_SUBPROJECT ON)
+  set(INFLUXCXX_TESTING OFF CACHE BOOL "testing not available in sub-project")
+  set(INFLUXCXX_COVERAGE OFF CACHE BOOL "coverage not available in sub-project")
+endif()
+
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)

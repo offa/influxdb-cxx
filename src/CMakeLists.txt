@@ -6,16 +6,18 @@ add_library(InfluxDB
   $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
   HTTP.cxx
 )
+add_library(InfluxData::InfluxDB ALIAS InfluxDB)
+
 generate_export_header(InfluxDB)
 
 target_include_directories(InfluxDB
   PUBLIC
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    # for export header
+    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src>
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
-    # for export header
-    ${PROJECT_BINARY_DIR}/src
 )
 
 # Link targets
