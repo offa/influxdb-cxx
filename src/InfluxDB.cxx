@@ -202,6 +202,13 @@ std::vector<Point> InfluxDB::query(const std::string &query)
   return points;
 }
 
+#else
+std::vector<Point> InfluxDB::query(const std::string& /*query*/)
+{
+  throw InfluxDBException("InfluxDB::query", "Boost is required");
+}
+#endif
+
 void InfluxDB::createDatabaseIfNotExists()
 {
   try
@@ -213,12 +220,5 @@ void InfluxDB::createDatabaseIfNotExists()
     throw InfluxDBException(__func__, "Transport did not allow create database");
   }
 }
-
-#else
-std::vector<Point> InfluxDB::query(const std::string& /*query*/)
-{
-  throw InfluxDBException("InfluxDB::query", "Boost is required");
-}
-#endif
 
 } // namespace influxdb
