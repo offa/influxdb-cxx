@@ -29,7 +29,7 @@ namespace influxdb::test
 
     namespace
     {
-        constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp{std::chrono::nanoseconds{1230}};
+        constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp(std::chrono::milliseconds(1230));
     }
 
     TEST_CASE("Empty measurement", "[PointTest]")
@@ -133,13 +133,13 @@ namespace influxdb::test
     TEST_CASE("Line protocol of empty measurement", "[PointTest]")
     {
         const auto point = Point{"test"}.setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals("test  1230"));
+        CHECK_THAT(point.toLineProtocol(), Equals("test  1230000000"));
     }
 
     TEST_CASE("Line protocol of measurement with value", "[PointTest]")
     {
         const auto point = Point{"test"}.addField("x", "y").setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test x="y" 1230)"));
+        CHECK_THAT(point.toLineProtocol(), Equals(R"(test x="y" 1230000000)"));
     }
 
     TEST_CASE("Line protocol of measurement with multiple values", "[PointTest]")
@@ -154,7 +154,7 @@ namespace influxdb::test
         CHECK_THAT(point.toLineProtocol(), Equals("test int_field=12i,"
                                                   "longlong_field=123456790i,"
                                                   "string_field=\"str\","
-                                                  "double_field=1.81000 1230"));
+                                                  "double_field=1.81000 1230000000"));
     }
 
     TEST_CASE("Line protocol of measurement with tag", "[PointTest]")
@@ -163,7 +163,7 @@ namespace influxdb::test
                                .addField("v", 3)
                                .addTag("t0", "tv0")
                                .setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0 v=3i 1230)"));
+        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0 v=3i 1230000000)"));
     }
 
     TEST_CASE("Line protocol of measurement with multiple tags", "[PointTest]")
@@ -174,7 +174,7 @@ namespace influxdb::test
                                .addTag("t1", "tv1")
                                .addTag("t2", "tv2")
                                .setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0,t1=tv1,t2=tv2 v=3i 1230)"));
+        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0,t1=tv1,t2=tv2 v=3i 1230000000)"));
     }
 
 }

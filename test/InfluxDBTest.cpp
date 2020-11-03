@@ -63,7 +63,7 @@ namespace influxdb::test
             std::shared_ptr<TransportMock> mockImpl;
         };
 
-        constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp{std::chrono::nanoseconds{4567}};
+        constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp(std::chrono::milliseconds(4567));
 
     }
 
@@ -71,7 +71,7 @@ namespace influxdb::test
     TEST_CASE("Write transmits point", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("p f0=71i 4567"));
+        REQUIRE_CALL(*mock, send("p f0=71i 4567000000"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.write(Point{"p"}.addField("f0", 71).setTimestamp(ignoreTimestamp));
@@ -80,7 +80,7 @@ namespace influxdb::test
     TEST_CASE("Write transmits points", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("p0 f0=0i 4567\np1 f1=1i 4567\np2 f2=2i 4567\n"));
+        REQUIRE_CALL(*mock, send("p0 f0=0i 4567000000\np1 f1=1i 4567000000\np2 f2=2i 4567000000\n"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.write({Point{"p0"}.addField("f0", 0).setTimestamp(ignoreTimestamp),
@@ -107,7 +107,7 @@ namespace influxdb::test
         using trompeloeil::_;
 
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("x  4567\ny  4567\nz  4567\n"));
+        REQUIRE_CALL(*mock, send("x  4567000000\ny  4567000000\nz  4567000000\n"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.batchOf(3);
@@ -132,7 +132,7 @@ namespace influxdb::test
         db.write({Point{"y"}.setTimestamp(ignoreTimestamp),
                   Point{"z"}.setTimestamp(ignoreTimestamp)});
 
-        REQUIRE_CALL(*mock, send("x  4567\ny  4567\nz  4567\n"));
+        REQUIRE_CALL(*mock, send("x  4567000000\ny  4567000000\nz  4567000000\n"));
         db.flushBatch();
     }
 
@@ -141,7 +141,7 @@ namespace influxdb::test
         auto mock = std::make_shared<TransportMock>();
 
         {
-            REQUIRE_CALL(*mock, send("x  4567\n"));
+            REQUIRE_CALL(*mock, send("x  4567000000\n"));
             InfluxDB db{std::make_unique<TransportAdapter>(mock)};
             db.batchOf(100);
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
@@ -154,7 +154,7 @@ namespace influxdb::test
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         {
-            REQUIRE_CALL(*mock, send("x  4567"));
+            REQUIRE_CALL(*mock, send("x  4567000000"));
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
         }
 
