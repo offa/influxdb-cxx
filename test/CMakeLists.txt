@@ -11,12 +11,12 @@ FetchContent_Declare(trompeloeil
     GIT_TAG v39)
 FetchContent_MakeAvailable(trompeloeil)
 
-add_library(TestMain STATIC TestMain.cpp)
+add_library(TestMain STATIC TestMain.cxx)
 target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil)
 
 
 function(add_unittest name)
-    add_executable(${name} ${name}.cpp)
+    add_executable(${name} ${name}.cxx)
     target_link_libraries(${name} PRIVATE TestMain InfluxDB)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
