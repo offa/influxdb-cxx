@@ -133,7 +133,7 @@ namespace influxdb::test
     TEST_CASE("Line protocol of empty measurement", "[PointTest]")
     {
         const auto point = Point{"test"}.setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals("test  1230000000"));
+        CHECK_THAT(point.toLineProtocol(), Equals("test 1230000000"));
     }
 
     TEST_CASE("Line protocol of measurement with value", "[PointTest]")

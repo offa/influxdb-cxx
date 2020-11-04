@@ -107,7 +107,7 @@ namespace influxdb::test
         using trompeloeil::_;
 
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("x  4567000000\ny  4567000000\nz  4567000000\n"));
+        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000\n"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.batchOf(3);
@@ -132,7 +132,7 @@ namespace influxdb::test
         db.write({Point{"y"}.setTimestamp(ignoreTimestamp),
                   Point{"z"}.setTimestamp(ignoreTimestamp)});
 
-        REQUIRE_CALL(*mock, send("x  4567000000\ny  4567000000\nz  4567000000\n"));
+        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000\n"));
         db.flushBatch();
     }
 
@@ -141,7 +141,7 @@ namespace influxdb::test
         auto mock = std::make_shared<TransportMock>();
 
         {
-            REQUIRE_CALL(*mock, send("x  4567000000\n"));
+            REQUIRE_CALL(*mock, send("x 4567000000\n"));
             InfluxDB db{std::make_unique<TransportAdapter>(mock)};
             db.batchOf(100);
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
@@ -154,7 +154,7 @@ namespace influxdb::test
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         {
-            REQUIRE_CALL(*mock, send("x  4567000000"));
+            REQUIRE_CALL(*mock, send("x 4567000000"));
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
         }
 
