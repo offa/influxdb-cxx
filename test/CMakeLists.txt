@@ -36,10 +36,11 @@ if (Boost_FOUND)
         testInfluxDB.cxx
         )
     foreach (test ${TEST_SRCS})
+        set(INFLUXDB_PRIVATE_SRCS "")
         get_filename_component(test_name ${test} NAME)
         string(REGEX REPLACE ".cxx" "" test_name ${test_name})
 
-        if(${test_name} MATCHES "testUdp")
+        if(${test_name} MATCHES "testUdp" OR ${test_name} MATCHES "testHttp")
             # for testing the not-exported interface of InfluxDB,
             # we have to explicitly add the sources / symbols
             set(INFLUXDB_PRIVATE_SRCS ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
