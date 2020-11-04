@@ -27,6 +27,10 @@
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 
+/*
+ * \deprecated Tests moved to InfluxDBFactoryTest
+ */
+
 namespace influxdb::test {
 
 
