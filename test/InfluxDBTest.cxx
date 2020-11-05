@@ -67,6 +67,10 @@ namespace influxdb::test
 
     }
 
+    TEST_CASE("Ctor throws on nullptr transport", "[InfluxDBTest]")
+    {
+        CHECK_THROWS_AS(InfluxDB{nullptr}, InfluxDBException);
+    }
 
     TEST_CASE("Write transmits point", "[InfluxDBTest]")
     {

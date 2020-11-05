@@ -49,6 +49,10 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
   mTransport(std::move(transport)),
   mGlobalTags{}
 {
+  if (mTransport == nullptr)
+  {
+    throw InfluxDBException{"[InfluxDB]", "Transport must not be nullptr"};
+  }
 }
 
 InfluxDB::~InfluxDB()
