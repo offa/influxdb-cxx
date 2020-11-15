@@ -38,6 +38,7 @@ jobs:
       - name: Check installed library
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=OFF
 
+
   build_windows:
     runs-on: windows-latest
     strategy:
@@ -70,3 +71,21 @@ jobs:
         shell: bash
       - name: Install
         run: cmake --build build --target install
+
+
+  build_osx:
+    runs-on: macOS-latest
+    name: "Mac OS X"
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup
+        run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install influxdb
+          ln -sfv /usr/local/opt/influxdb/*.plist ~/Library/LaunchAgents
+          launchctl load ~/Library/LaunchAgents/homebrew.mxcl.influxdb.plist
+          sleep 10
+          influx -execute 'CREATE DATABASE test'
+      - name: Build
+        run: |
+          script/ci_build.sh
+          cmake --build build --target test
