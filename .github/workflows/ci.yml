@@ -39,6 +39,36 @@ jobs:
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=OFF
 
 
+  build_conan:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        boost:
+          - "True"
+          - "False"
+    name: "Conan (Boost: ${{ matrix.boost }})"
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup
+        run: |
+          pip install -U conan
+          echo "~/.local/bin" >> $GITHUB_PATH
+      - name: Setup Conan
+        run: |
+          conan profile new default --detect
+          conan profile update settings.compiler.libcxx=libstdc++11 default
+      - name: Setup InfluxDB
+        if: matrix.boost == 'True'
+        run: |
+          INFLUXDB_VERSION="1.8.3"
+          wget https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_amd64.deb
+          sudo dpkg -i influxdb_${INFLUXDB_VERSION}_amd64.deb
+          sudo systemctl unmask influxdb.service
+          sudo systemctl start influxdb
+      - name: Build
+        run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=${{ matrix.boost }} .
+
+
   build_windows:
     runs-on: windows-latest
     strategy:
