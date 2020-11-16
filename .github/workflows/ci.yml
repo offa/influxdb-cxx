@@ -59,12 +59,7 @@ jobs:
           conan profile update settings.compiler.libcxx=libstdc++11 default
       - name: Setup InfluxDB
         if: matrix.boost == 'True'
-        run: |
-          INFLUXDB_VERSION="1.8.3"
-          wget https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_amd64.deb
-          sudo dpkg -i influxdb_${INFLUXDB_VERSION}_amd64.deb
-          sudo systemctl unmask influxdb.service
-          sudo systemctl start influxdb
+        run: script/ci_setup_influxdb.sh -linux
       - name: Build
         run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=${{ matrix.boost }} .
 
@@ -108,13 +103,8 @@ jobs:
     name: "Mac OS X"
     steps:
       - uses: actions/checkout@master
-      - name: Setup
-        run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install influxdb
-          ln -sfv /usr/local/opt/influxdb/*.plist ~/Library/LaunchAgents
-          launchctl load ~/Library/LaunchAgents/homebrew.mxcl.influxdb.plist
-          sleep 10
-          influx -execute 'CREATE DATABASE test'
+      - name: Setup InfluxDB
+        run: script/ci_setup_influxdb.sh -osx
       - name: Build
         run: |
           script/ci_build.sh
