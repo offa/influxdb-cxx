@@ -103,6 +103,8 @@ jobs:
     name: "Mac OS X"
     steps:
       - uses: actions/checkout@master
+      - name: Setup Boost
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
       - name: Setup InfluxDB
         run: script/ci_setup_influxdb.sh -osx
       - name: Build
