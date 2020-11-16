@@ -84,7 +84,7 @@ namespace influxdb::test
     TEST_CASE("Write transmits points", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("p0 f0=0i 4567000000\np1 f1=1i 4567000000\np2 f2=2i 4567000000\n"));
+        REQUIRE_CALL(*mock, send("p0 f0=0i 4567000000\np1 f1=1i 4567000000\np2 f2=2i 4567000000"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.write({Point{"p0"}.addField("f0", 0).setTimestamp(ignoreTimestamp),
@@ -111,7 +111,7 @@ namespace influxdb::test
         using trompeloeil::_;
 
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000\n"));
+        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.batchOf(3);
@@ -136,7 +136,7 @@ namespace influxdb::test
         db.write({Point{"y"}.setTimestamp(ignoreTimestamp),
                   Point{"z"}.setTimestamp(ignoreTimestamp)});
 
-        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000\n"));
+        REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000"));
         db.flushBatch();
     }
 
@@ -145,7 +145,7 @@ namespace influxdb::test
         auto mock = std::make_shared<TransportMock>();
 
         {
-            REQUIRE_CALL(*mock, send("x 4567000000\n"));
+            REQUIRE_CALL(*mock, send("x 4567000000"));
             InfluxDB db{std::make_unique<TransportAdapter>(mock)};
             db.batchOf(100);
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));

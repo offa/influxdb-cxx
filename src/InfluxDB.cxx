@@ -88,6 +88,8 @@ std::string InfluxDB::joinLineProtocolBatch() const
   {
     joinedBatch += line + "\n";
   }
+
+  joinedBatch.erase(std::prev(joinedBatch.cend()));
   return joinedBatch;
 }
 
@@ -136,6 +138,8 @@ void InfluxDB::write(std::vector<Point> &&points)
     {
       lineProtocol += point.toLineProtocol() + "\n";
     }
+
+    lineProtocol.erase(std::prev(lineProtocol.cend()));
     transmit(std::move(lineProtocol));
   }
 }
