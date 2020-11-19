@@ -14,6 +14,8 @@ FetchContent_MakeAvailable(trompeloeil)
 add_library(TestMain STATIC TestMain.cxx)
 target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil)
 
+add_subdirectory("mock")
+
 
 function(add_unittest name)
     add_executable(${name} ${name}.cxx)
@@ -24,6 +26,11 @@ endfunction()
 add_unittest(PointTest)
 add_unittest(InfluxDBTest)
 add_unittest(InfluxDBFactoryTest)
+
+add_unittest(HttpTest)
+target_link_libraries(HttpTest PRIVATE CurlMock)
+target_sources(HttpTest PRIVATE ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
+target_include_directories(HttpTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 
 if (Boost_FOUND)
