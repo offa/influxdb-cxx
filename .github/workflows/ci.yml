@@ -77,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
+        uses: seanmiddleditch/gha-setup-ninja@master
       - name: Setup MSVC
         uses: seanmiddleditch/gha-setup-vsdevenv@master
       - name: Install dependencies
