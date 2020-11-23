@@ -181,9 +181,9 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
   {
     throw BadRequest(__func__, "Bad request: " + std::to_string(responseCode));
   }
-  else if (responseCode > 500)
+  else if (responseCode >= 500)
   {
-    throw ServerError(__func__, "Influx server error:" + std::to_string(responseCode));
+    throw ServerError(__func__, "Influx server error: " + std::to_string(responseCode));
   }
 }
 

@@ -181,6 +181,11 @@ namespace influxdb::test
         REQUIRE_THROWS_AS(http.send("content"), BadRequest);
 
         REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.send("content"), ServerError);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
             .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
             .RETURN(CURLE_OK);
         REQUIRE_THROWS_AS(http.send("content"), ServerError);
@@ -296,6 +301,11 @@ namespace influxdb::test
             .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
             .RETURN(CURLE_OK);
         REQUIRE_THROWS_AS(http.query(query), BadRequest);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.query(query), ServerError);
 
         REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
             .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
