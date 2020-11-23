@@ -38,6 +38,7 @@ namespace influxdb::test
         MAKE_MOCK1(curl_global_init, CURLcode(long));
         MAKE_MOCK0(curl_easy_init, CURL*());
         MAKE_MOCK2(curl_easy_setopt_, CURLcode(CURL*, CURLoption));
+        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, std::string));
         MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, void*));
         MAKE_MOCK1(curl_easy_cleanup, void(CURL*));
         MAKE_MOCK0(curl_global_cleanup, void());

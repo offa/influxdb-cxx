@@ -50,15 +50,27 @@ CURL* curl_easy_init()
 
 CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 {
-    if (option == CURLOPT_WRITEDATA)
+    switch (option)
     {
-        va_list argp;
-        va_start(argp, option);
-        void* outValue = va_arg(argp, void*);
-        va_end(argp);
-        return influxdb::test::curlMock.curl_easy_setopt_(handle, option, outValue);
+        case CURLOPT_WRITEDATA:
+        {
+            va_list argp;
+            va_start(argp, option);
+            void* outValue = va_arg(argp, void*);
+            va_end(argp);
+            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, outValue);
+        }
+        case CURLOPT_URL:
+        {
+            va_list argp;
+            va_start(argp, option);
+            const std::string value = va_arg(argp, const char*);
+            va_end(argp);
+            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+        }
+        default:
+            return influxdb::test::curlMock.curl_easy_setopt_(handle, option);
     }
-    return influxdb::test::curlMock.curl_easy_setopt_(handle, option);
 }
 
 CURLcode curl_easy_perform(CURL* easy_handle)
