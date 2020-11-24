@@ -26,8 +26,6 @@
 
 #include "HTTP.h"
 #include "InfluxDBException.h"
-#include <iostream>
-
 
 
 namespace influxdb::transports
