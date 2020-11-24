@@ -50,6 +50,8 @@ CURL* curl_easy_init()
 
 CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 {
+    using namespace influxdb::test;
+
     switch (option)
     {
         case CURLOPT_CONNECTTIMEOUT:
@@ -63,7 +65,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             va_start(argp, option);
             long value = va_arg(argp, long);
             va_end(argp);
-            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+            return curlMock.curl_easy_setopt_(handle, option, value);
         }
         case CURLOPT_WRITEDATA:
         {
@@ -71,7 +73,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             va_start(argp, option);
             void* outValue = va_arg(argp, void*);
             va_end(argp);
-            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, outValue);
+            return curlMock.curl_easy_setopt_(handle, option, outValue);
         }
         case CURLOPT_URL:
         case CURLOPT_POSTFIELDS:
@@ -80,16 +82,15 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             va_start(argp, option);
             const std::string value = va_arg(argp, const char*);
             va_end(argp);
-            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+            return curlMock.curl_easy_setopt_(handle, option, value);
         }
         case CURLOPT_WRITEFUNCTION:
         {
-            using influxdb::test::WriteCallbackFn;
             va_list argp;
             va_start(argp, option);
             WriteCallbackFn value = va_arg(argp, WriteCallbackFn);
             va_end(argp);
-            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+            return curlMock.curl_easy_setopt_(handle, option, value);
         }
         default:
             throw "Option unsupported by mock: " + std::to_string(option);
