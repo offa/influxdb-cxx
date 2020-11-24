@@ -56,6 +56,8 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
         case CURLOPT_TIMEOUT:
         case CURLOPT_TCP_KEEPIDLE:
         case CURLOPT_TCP_KEEPINTVL:
+        case CURLOPT_POST:
+        case CURLOPT_POSTFIELDSIZE:
         {
             va_list argp;
             va_start(argp, option);
@@ -72,6 +74,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             return influxdb::test::curlMock.curl_easy_setopt_(handle, option, outValue);
         }
         case CURLOPT_URL:
+        case CURLOPT_POSTFIELDS:
         {
             va_list argp;
             va_start(argp, option);
@@ -89,7 +92,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
         }
         default:
-            return influxdb::test::curlMock.curl_easy_setopt_(handle, option);
+            throw "Option unsupported by mock: " + std::to_string(option);
     }
 }
 
