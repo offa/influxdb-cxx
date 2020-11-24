@@ -42,24 +42,23 @@ namespace influxdb::test
 
     TEST_CASE("Construction initializes curl", "[HttpTest]")
     {
-
         REQUIRE_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
 
         REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
         REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT, 10)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT, 10)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE, 120)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL, 60)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT, 10)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT, 10)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE, 120)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL, 60)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, "http://localhost:8086/write?db=test")).RETURN(CURLE_OK);
         REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_POST)).RETURN(CURLE_OK);
 
@@ -88,7 +87,9 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
 
         {
             REQUIRE_CALL(curlMock, curl_easy_cleanup(handle)).TIMES(2);
@@ -102,8 +103,10 @@ namespace influxdb::test
     {
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, _)).TIMES(12).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -124,7 +127,9 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -143,7 +148,9 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -168,6 +175,8 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -200,8 +209,10 @@ namespace influxdb::test
     {
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, _)).TIMES(12).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -229,7 +240,9 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -255,7 +268,9 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
@@ -289,6 +304,8 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, _)).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
         ALLOW_CALL(curlMock, curl_easy_cleanup(_));
         ALLOW_CALL(curlMock, curl_global_cleanup());
 

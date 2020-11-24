@@ -52,6 +52,17 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 {
     switch (option)
     {
+        case CURLOPT_CONNECTTIMEOUT:
+        case CURLOPT_TIMEOUT:
+        case CURLOPT_TCP_KEEPIDLE:
+        case CURLOPT_TCP_KEEPINTVL:
+        {
+            va_list argp;
+            va_start(argp, option);
+            long value = va_arg(argp, long);
+            va_end(argp);
+            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+        }
         case CURLOPT_WRITEDATA:
         {
             va_list argp;
@@ -65,6 +76,15 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             va_list argp;
             va_start(argp, option);
             const std::string value = va_arg(argp, const char*);
+            va_end(argp);
+            return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
+        }
+        case CURLOPT_WRITEFUNCTION:
+        {
+            using influxdb::test::WriteCallbackFn;
+            va_list argp;
+            va_start(argp, option);
+            WriteCallbackFn value = va_arg(argp, WriteCallbackFn);
             va_end(argp);
             return influxdb::test::curlMock.curl_easy_setopt_(handle, option, value);
         }
