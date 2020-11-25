@@ -55,7 +55,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 
     va_list argp;
     va_start(argp, option);
-    std::variant<long, unsigned long, void*, const char*, WriteCallbackFn> value;
+    std::variant<long, unsigned long, void*, std::string, WriteCallbackFn> value;
 
     switch (option)
     {
@@ -97,7 +97,7 @@ CURLcode curl_easy_perform(CURL* easy_handle)
 
 void curl_free(void* ptr)
 {
-    static_cast<void>(ptr);
+    influxdb::test::curlMock.curl_free(ptr);
 }
 
 CURLcode curl_global_init(long flags)
