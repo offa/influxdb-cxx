@@ -114,10 +114,14 @@ CURLcode curl_global_init(long flags)
 
 CURLcode curl_easy_getinfo(CURL* curl, CURLINFO info, ...)
 {
-    va_list argp;
-    va_start(argp, info);
-    long* outValue = va_arg(argp, long*);
-    const auto result = influxdb::test::curlMock.curl_easy_getinfo_(curl, info, outValue);
-    va_end(argp);
-    return result;
+    if (info == CURLINFO_RESPONSE_CODE)
+    {
+        va_list argp;
+        va_start(argp, info);
+        long* outValue = va_arg(argp, long*);
+        const auto result = influxdb::test::curlMock.curl_easy_getinfo_(curl, info, outValue);
+        va_end(argp);
+        return result;
+    }
+    throw "Option unsupported by mock: " + std::to_string(info);
 }
