@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "CurlMock.h"
+#include <variant>
 #include <stdarg.h>
 
 void curl_easy_cleanup(CURL* handle)
@@ -52,6 +53,10 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 {
     using namespace influxdb::test;
 
+    va_list argp;
+    va_start(argp, option);
+    std::variant<long, void*, const char*, WriteCallbackFn> value;
+
     switch (option)
     {
         case CURLOPT_CONNECTTIMEOUT:
@@ -60,41 +65,25 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
         case CURLOPT_TCP_KEEPINTVL:
         case CURLOPT_POST:
         case CURLOPT_POSTFIELDSIZE:
-        {
-            va_list argp;
-            va_start(argp, option);
-            long value = va_arg(argp, long);
-            va_end(argp);
-            return curlMock.curl_easy_setopt_(handle, option, value);
-        }
+            value = va_arg(argp, long);
+            break;
         case CURLOPT_WRITEDATA:
-        {
-            va_list argp;
-            va_start(argp, option);
-            void* outValue = va_arg(argp, void*);
-            va_end(argp);
-            return curlMock.curl_easy_setopt_(handle, option, outValue);
-        }
+            value = va_arg(argp, void*);
+            break;
         case CURLOPT_URL:
         case CURLOPT_POSTFIELDS:
-        {
-            va_list argp;
-            va_start(argp, option);
-            const std::string value = va_arg(argp, const char*);
-            va_end(argp);
-            return curlMock.curl_easy_setopt_(handle, option, value);
-        }
+            value = va_arg(argp, const char*);
+            break;
         case CURLOPT_WRITEFUNCTION:
-        {
-            va_list argp;
-            va_start(argp, option);
-            WriteCallbackFn value = va_arg(argp, WriteCallbackFn);
-            va_end(argp);
-            return curlMock.curl_easy_setopt_(handle, option, value);
-        }
+            value = va_arg(argp, WriteCallbackFn);
+            break;
         default:
             throw "Option unsupported by mock: " + std::to_string(option);
     }
+
+    va_end(argp);
+
+    return std::visit([&](auto& v) { return curlMock.curl_easy_setopt_(handle, option, v); }, value);
 }
 
 CURLcode curl_easy_perform(CURL* easy_handle)
