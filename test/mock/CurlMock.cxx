@@ -55,7 +55,7 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 
     va_list argp;
     va_start(argp, option);
-    std::variant<long, void*, const char*, WriteCallbackFn> value;
+    std::variant<long, unsigned long, void*, const char*, WriteCallbackFn> value;
 
     switch (option)
     {
@@ -67,11 +67,15 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
         case CURLOPT_POSTFIELDSIZE:
             value = va_arg(argp, long);
             break;
+        case CURLOPT_HTTPAUTH:
+            value = va_arg(argp, unsigned long);
+            break;
         case CURLOPT_WRITEDATA:
             value = va_arg(argp, void*);
             break;
         case CURLOPT_URL:
         case CURLOPT_POSTFIELDS:
+        case CURLOPT_USERPWD:
             value = va_arg(argp, const char*);
             break;
         case CURLOPT_WRITEFUNCTION:
