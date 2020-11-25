@@ -70,7 +70,32 @@ namespace influxdb::test
 
     TEST_CASE("Construction throws if curl init fails", "[HttpTest]")
     {
-        REQUIRE_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_FAILED_INIT);
+        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_FAILED_INIT);
+
+        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
+    }
+
+    TEST_CASE("Construction throws if curl write handle init fails", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(nullptr);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
+    }
+
+    TEST_CASE("Construction throws if curl read handle init fails", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
+        trompeloeil::sequence seq;
+        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle).IN_SEQUENCE(seq);
+        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(nullptr).IN_SEQUENCE(seq);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
 
         CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
     }

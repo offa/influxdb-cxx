@@ -55,19 +55,27 @@ namespace influxdb::transports
 
         CURL* createReadHandle()
         {
-            CURL* readHandle = curl_easy_init();
-            setConnectionOptions(readHandle);
-            curl_easy_setopt(readHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
-            return readHandle;
+            if (CURL* readHandle = curl_easy_init(); readHandle != nullptr)
+            {
+                setConnectionOptions(readHandle);
+                curl_easy_setopt(readHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
+                return readHandle;
+            }
+
+            throw InfluxDBException{__func__, "Failed to initialize write handle"};
         }
 
         CURL* createWriteHandle(const std::string& url)
         {
-            CURL* writeHandle = curl_easy_init();
-            setConnectionOptions(writeHandle);
-            curl_easy_setopt(writeHandle, CURLOPT_URL, url.c_str());
-            curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
-            return writeHandle;
+            if (CURL* writeHandle = curl_easy_init(); writeHandle != nullptr)
+            {
+                setConnectionOptions(writeHandle);
+                curl_easy_setopt(writeHandle, CURLOPT_URL, url.c_str());
+                curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
+                return writeHandle;
+            }
+
+            throw InfluxDBException{__func__, "Failed to initialize write handle"};
         }
     }
 
