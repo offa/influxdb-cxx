@@ -33,6 +33,17 @@ target_sources(HttpTest PRIVATE ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
 target_include_directories(HttpTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 
+add_custom_target(unittest PointTest
+    COMMAND InfluxDBTest
+    COMMAND InfluxDBFactoryTest
+    COMMAND HttpTest
+
+    COMMENT "Running unittests\n\n"
+    VERBATIM
+    )
+
+
+
 if (Boost_FOUND)
     set(TEST_SRCS
         testUdp.cxx
@@ -70,4 +81,15 @@ if (Boost_FOUND)
         add_test(NAME ${test_name} COMMAND ${test_name})
         set_tests_properties(${test_name} PROPERTIES TIMEOUT 60)
     endforeach()
+
+    add_custom_target(systemtest testUdp
+        COMMAND testPoint
+        COMMAND testHttp
+        COMMAND testQuery
+        COMMAND testFactory
+        COMMAND testInfluxDB
+
+        COMMENT "Running systemtests\n\n"
+        VERBATIM
+        )
 endif()
