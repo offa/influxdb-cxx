@@ -20,17 +20,22 @@ jobs:
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@master
-      - name: update package list
-        run: apt-get update
       - name: Install dependencies
-        run: apt-get install -y libcurl4-openssl-dev influxdb
+        run: |
+          apt-get update
+          apt-get install -y libcurl4-openssl-dev
       - name: Install Boost
         if: ${{ matrix.boost == true }}
         run: apt-get install -y libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev
       - name: Build
-        run: script/ci_build.sh -DINFLUXCXX_TESTING=ON
-      - name: Test
-        run: script/ci_test.sh
+        run: |
+          script/ci_build.sh -DINFLUXCXX_TESTING=ON
+          cmake --build build --target unittest
+      - name: System Test
+        if: ${{ matrix.boost == true }}
+        run: |
+          script/ci_setup_influxdb.sh -linux
+          cmake --build build --target systemtest
       - name: Check deployment as cmake subdirectory
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON
       - name: Install
@@ -59,7 +64,7 @@ jobs:
           conan profile update settings.compiler.libcxx=libstdc++11 default
       - name: Setup InfluxDB
         if: matrix.boost == 'True'
-        run: script/ci_setup_influxdb.sh -linux
+        run: sudo script/ci_setup_influxdb.sh -linux
       - name: Build
         run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=${{ matrix.boost }} .
 
@@ -92,7 +97,11 @@ jobs:
           if [[ "${{ matrix.boost }}" == "true" ]]; then
             export BOOST_ROOT="${BOOST_ROOT_1_72_0}"
           fi
-          script/ci_build.sh -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake -G Ninja
+          script/ci_build.sh -DINFLUXCXX_TESTING=OFF \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00\
+            -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake \
+            -G Ninja
         shell: bash
       - name: Install
         run: cmake --build build --target install
@@ -105,9 +114,11 @@ jobs:
       - uses: actions/checkout@master
       - name: Setup Boost
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
-      - name: Setup InfluxDB
-        run: script/ci_setup_influxdb.sh -osx
       - name: Build
         run: |
-          script/ci_build.sh
-          cmake --build build --target test
+          script/ci_build.sh -DINFLUXCXX_TESTING=ON
+          cmake --build build --target unittest
+      - name: System Test
+        run: |
+          script/ci_setup_influxdb.sh -osx
+          cmake --build build --target systemtest

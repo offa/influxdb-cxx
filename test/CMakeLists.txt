@@ -38,7 +38,7 @@ add_custom_target(unittest PointTest
     COMMAND InfluxDBFactoryTest
     COMMAND HttpTest
 
-    COMMENT "Running unittests\n\n"
+    COMMENT "Running unit tests\n\n"
     VERBATIM
     )
 
@@ -89,7 +89,7 @@ if (Boost_FOUND)
         COMMAND testFactory
         COMMAND testInfluxDB
 
-        COMMENT "Running systemtests\n\n"
+        COMMENT "Running system tests\n\n"
         VERBATIM
         )
 endif()
