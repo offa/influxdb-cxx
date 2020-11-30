@@ -82,7 +82,8 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
             value = va_arg(argp, WriteCallbackFn);
             break;
         default:
-            throw "Option unsupported by mock: " + std::to_string(option);
+            FAIL("Option unsupported by mock: " + std::to_string(option));
+            return CURLE_UNKNOWN_OPTION;
     }
 
     va_end(argp);
@@ -116,5 +117,6 @@ CURLcode curl_easy_getinfo(CURL* curl, CURLINFO info, ...)
         va_end(argp);
         return result;
     }
-    throw "Option unsupported by mock: " + std::to_string(info);
+    FAIL("Option unsupported by mock: " + std::to_string(info));
+    return CURLE_UNKNOWN_OPTION;
 }
