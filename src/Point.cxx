@@ -25,8 +25,6 @@
 ///
 
 #include "Point.h"
-
-#include <iostream>
 #include <chrono>
 #include <memory>
 #include <sstream>
