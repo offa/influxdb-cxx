@@ -45,9 +45,6 @@ class INFLUXDB_EXPORT Point
     /// Constructs point based on measurement name
     explicit Point(const std::string& measurement);
 
-    /// Default destructor
-    ~Point() = default;
-
     /// Adds a tags
     Point&& addTag(std::string_view key, std::string_view value);
 
