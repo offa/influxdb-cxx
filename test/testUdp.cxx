@@ -28,7 +28,7 @@
 
 namespace influxdb::test {
 
-BOOST_AUTO_TEST_CASE(test)
+BOOST_AUTO_TEST_CASE(writeSinglePoint)
 {
   auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8084");
   influxdb->write(Point{"test"}
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test)
   );
 }
 
-BOOST_AUTO_TEST_CASE(test2)
+BOOST_AUTO_TEST_CASE(writeBatch)
 {
   auto influxdb = influxdb::InfluxDBFactory::Get("udp://localhost:8084");
   influxdb->batchOf(2);
