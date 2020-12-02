@@ -140,12 +140,14 @@ namespace influxdb::test
         db.flushBatch();
     }
 
-    TEST_CASE("Flush batch on dtor if enabled", "[InfluxDBTest]")
+    TEST_CASE("Destructs cleanly with pending batches", "[InfluxDBTest]")
     {
+        using trompeloeil::_;
+
         auto mock = std::make_shared<TransportMock>();
 
         {
-            REQUIRE_CALL(*mock, send("x 4567000000"));
+            ALLOW_CALL(*mock, send(_)).THROW(std::runtime_error{"Intentional"});
             InfluxDB db{std::make_unique<TransportAdapter>(mock)};
             db.batchOf(100);
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));

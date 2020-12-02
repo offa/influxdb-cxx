@@ -75,7 +75,6 @@ influxdb->write(influxdb::Point{"test"}
 ### Batch write
 
 ```cpp
-// Provide complete URI
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 // Write batches of 100 points
 influxdb->batchOf(100);
@@ -84,6 +83,22 @@ for (;;) {
   influxdb->write(influxdb::Point{"test"}.addField("value", 10));
 }
 ```
+
+###### Note:
+
+When batch write is enabled, call `flushBatch()` to flush pending batches.
+This is of particular importance to ensure all points are written prior to destruction.
+
+```cpp
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+influxdb->batchOf(3);
+influxdb->write(influxdb::Point{"test"}.addField("value", 1));
+influxdb->write(influxdb::Point{"test"}.addField("value", 2));
+
+// Flush batches, both points are written
+influxdb->flushBatch();
+```
+
 
 ### Query
 

@@ -186,4 +186,11 @@ namespace influxdb::test
         BOOST_CHECK_EQUAL(2, recorder->count());
     }
 
+    BOOST_AUTO_TEST_CASE(writeWrongHostIsHandled)
+    {
+        auto influxdb = influxdb::InfluxDBFactory::Get("http://192.168.1.1002:8086?db=test");
+        influxdb->batchOf(2);
+        influxdb->write(Point{"test"}.addField("value", 10));
+        BOOST_CHECK_THROW(influxdb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
+    }
 }
