@@ -154,33 +154,33 @@ void InfluxDB::addPointToBatch(const Point &point)
 
 std::vector<Point> InfluxDB::query(const std::string &query)
 {
-  auto response = mTransport->query(query);
+  const auto response = mTransport->query(query);
   std::stringstream responseString;
   responseString << response;
   std::vector<Point> points;
   boost::property_tree::ptree pt;
   boost::property_tree::read_json(responseString, pt);
 
-  for (auto &result : pt.get_child("results"))
+  for (const auto &result : pt.get_child("results"))
   {
-    auto isResultEmpty = result.second.find("series");
+    const auto isResultEmpty = result.second.find("series");
     if (isResultEmpty == result.second.not_found())
     {
         return {};
     }
-    for (auto &series : result.second.get_child("series"))
+    for (const auto &series : result.second.get_child("series"))
     {
-      auto columns = series.second.get_child("columns");
+      const auto columns = series.second.get_child("columns");
 
-      for (auto &values : series.second.get_child("values"))
+      for (const auto &values : series.second.get_child("values"))
       {
         Point point{series.second.get<std::string>("name")};
         auto iColumns = columns.begin();
         auto iValues = values.second.begin();
-        for (; iColumns != columns.end() && iValues != values.second.end(); iColumns++, iValues++)
+        for (; iColumns != columns.end() && iValues != values.second.end(); ++iColumns, ++iValues)
         {
-          auto value = iValues->second.get_value<std::string>();
-          auto column = iColumns->second.get_value<std::string>();
+          const auto value = iValues->second.get_value<std::string>();
+          const auto column = iColumns->second.get_value<std::string>();
           if (!column.compare("time"))
           {
             std::tm tm = {};
