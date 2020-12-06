@@ -71,15 +71,12 @@ void InfluxDB::batchOf(const std::size_t size)
 
 void InfluxDB::flushBatch()
 {
-  if (!mIsBatchingActivated || mLineProtocolBatch.empty())
+  if (mIsBatchingActivated && !mLineProtocolBatch.empty())
   {
-    return;
+    transmit(joinLineProtocolBatch());
+    mLineProtocolBatch.clear();
   }
-
-  transmit(joinLineProtocolBatch());
-  mLineProtocolBatch.clear();
 }
-
 
 std::string InfluxDB::joinLineProtocolBatch() const
 {
