@@ -136,7 +136,6 @@ void HTTP::initCurlRead(const std::string &url)
 
 std::string HTTP::query(const std::string &query)
 {
-  CURLcode response;
   long responseCode;
   std::string buffer;
   char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), static_cast<int>(query.size()));
@@ -144,7 +143,7 @@ std::string HTTP::query(const std::string &query)
   curl_free(encodedQuery);
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
-  response = curl_easy_perform(readHandle);
+  const CURLcode response = curl_easy_perform(readHandle);
   curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response, responseCode);
   return buffer;
@@ -160,11 +159,10 @@ void HTTP::enableBasicAuth(const std::string &auth)
 
 void HTTP::send(std::string &&lineprotocol)
 {
-  CURLcode response;
   long responseCode;
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.c_str());
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(lineprotocol.length()));
-  response = curl_easy_perform(writeHandle);
+  const CURLcode response = curl_easy_perform(writeHandle);
   curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response, responseCode);
 }
@@ -195,7 +193,8 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
 
 void HTTP::obtainInfluxServiceUrl(const std::string &url)
 {
-  auto questionMarkPosition = url.find('?');
+  const auto questionMarkPosition = url.find('?');
+
   if (url.at(questionMarkPosition - 1) == '/')
   {
     mInfluxDbServiceUrl = url.substr(0, questionMarkPosition-1);
@@ -208,7 +207,7 @@ void HTTP::obtainInfluxServiceUrl(const std::string &url)
 
 void HTTP::obtainDatabaseName(const std::string &url)
 {
-  auto dbParameterPosition = url.find("db=");
+  const auto dbParameterPosition = url.find("db=");
   mDatabaseName = url.substr(dbParameterPosition + 3);
 }
 
@@ -232,7 +231,7 @@ void HTTP::createDatabase()
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
   curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(postFields.length()));
 
-  CURLcode response = curl_easy_perform(createHandle);
+  const CURLcode response = curl_easy_perform(createHandle);
   long responseCode;
   curl_easy_getinfo(createHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response,responseCode);
