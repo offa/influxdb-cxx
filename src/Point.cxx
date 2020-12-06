@@ -50,7 +50,11 @@ Point&& Point::addField(std::string_view name, const std::variant<int, long long
 
   std::stringstream convert;
   convert << std::setprecision(floatsPrecision);
-  if (!mFields.empty()) convert << ",";
+
+  if (!mFields.empty())
+  {
+      convert << ",";
+  }
 
   convert << name << "=";
   std::visit(overloaded {

@@ -46,13 +46,13 @@ class INFLUXDB_EXPORT Transport
     virtual void send(std::string&& message) = 0;
 
     /// Sends request
-    virtual std::string query(const std::string& /*query*/) {
-      throw std::runtime_error("Queries are not supported in the selected transport");
+    virtual std::string query([[maybe_unused]] const std::string& query) {
+      throw std::runtime_error("Queries are not supported by the selected transport");
     }
 
     /// Sends request
     virtual void createDatabase() {
-      throw std::runtime_error("Creation of database is not supported by selected transport");
+      throw std::runtime_error("Creation of database is not supported by the selected transport");
     }
 };
 

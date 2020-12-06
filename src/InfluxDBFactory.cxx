@@ -91,7 +91,7 @@ std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
     throw InfluxDBException(__func__, "Ill-formed URI");
   }
 
-  auto iterator = map.find(parsedUrl.protocol);
+  const auto iterator = map.find(parsedUrl.protocol);
   if (iterator == map.end())
   {
     throw InfluxDBException(__func__, "Unrecognized backend " + parsedUrl.protocol);
