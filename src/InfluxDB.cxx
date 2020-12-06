@@ -208,7 +208,7 @@ std::vector<Point> InfluxDB::query(const std::string &query)
 }
 
 #else
-std::vector<Point> InfluxDB::query(const std::string& /*query*/)
+std::vector<Point> InfluxDB::query([[maybe_unused]] const std::string& query)
 {
   throw InfluxDBException("InfluxDB::query", "Boost is required");
 }
