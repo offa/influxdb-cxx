@@ -75,7 +75,7 @@ private:
   /// Obtain database name from the url passed
   void obtainDatabaseName(const std::string &url);
 
-  /// Initilizes CURL for writting and common options
+  /// Initializes CURL for writing and common options
   /// \throw InfluxDBException	if database (?db=) not specified
   void initCurl(const std::string &url);
 
@@ -85,7 +85,7 @@ private:
   /// treats responses of CURL requests
   void treatCurlResponse(const CURLcode &response, long responseCode) const;
 
-  /// CURL pointer configured for writting points
+  /// CURL pointer configured for writing points
   CURL *writeHandle;
 
   /// CURL pointer configured for querying
