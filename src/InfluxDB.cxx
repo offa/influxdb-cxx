@@ -55,14 +55,6 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
   }
 }
 
-InfluxDB::~InfluxDB()
-{
-  if (mIsBatchingActivated)
-  {
-      flushBatch();
-  }
-}
-
 void InfluxDB::batchOf(const std::size_t size)
 {
   mBatchSize = size;

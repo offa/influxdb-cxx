@@ -52,9 +52,6 @@ class INFLUXDB_EXPORT InfluxDB
     /// Constructor required valid transport
     explicit InfluxDB(std::unique_ptr<Transport> transport);
 
-    /// Flushes buffer
-    ~InfluxDB();
-
     /// Writes a point
     /// \param point
     void write(Point&& point);
