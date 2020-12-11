@@ -30,12 +30,5 @@ target_link_libraries(InfluxDB
     Threads::Threads
 )
 
-
 # Use C++17
 target_compile_features(InfluxDB PUBLIC cxx_std_${CMAKE_CXX_STANDARD})
-
-# Set compile definition if Boost found
-target_compile_definitions(InfluxDB
-  PRIVATE
-    $<$<BOOL:${Boost_FOUND}>:INFLUXDB_WITH_BOOST>
-)
