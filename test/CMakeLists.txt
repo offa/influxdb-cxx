@@ -32,11 +32,16 @@ target_link_libraries(HttpTest PRIVATE CurlMock)
 target_sources(HttpTest PRIVATE ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
 target_include_directories(HttpTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+add_unittest(NoBoostSupportTest)
+target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
+target_include_directories(NoBoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
+
 
 add_custom_target(unittest PointTest
     COMMAND InfluxDBTest
     COMMAND InfluxDBFactoryTest
     COMMAND HttpTest
+    COMMAND NoBoostSupportTest
 
     COMMENT "Running unit tests\n\n"
     VERBATIM
