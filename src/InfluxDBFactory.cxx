@@ -32,77 +32,52 @@
 #include "UriParser.h"
 #include "HTTP.h"
 #include "InfluxDBException.h"
-
-#ifdef INFLUXDB_WITH_BOOST
-
-#include "UDP.h"
-#include "UnixSocket.h"
-
-#endif
+#include "BoostSupport.h"
 
 namespace influxdb
 {
+    namespace internal
+    {
+        std::unique_ptr<Transport> withHttpTransport(const http::url& uri)
+        {
+            auto transport = std::make_unique<transports::HTTP>(uri.url);
+            if (!uri.user.empty())
+            {
+                transport->enableBasicAuth(uri.user + ":" + uri.password);
+            }
+            return transport;
+        }
 
-#ifdef INFLUXDB_WITH_BOOST
+    }
 
-std::unique_ptr<Transport> withUdpTransport(const http::url &uri)
-{
-  return std::make_unique<transports::UDP>(uri.host, uri.port);
-}
+    std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
+    {
+        static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url&)>> map = {
+            {"udp", internal::withUdpTransport},
+            {"http", internal::withHttpTransport},
+            {"https", internal::withHttpTransport},
+            {"unix", internal::withUnixSocketTransport},
+        };
 
-std::unique_ptr<Transport> withUnixSocketTransport(const http::url &uri)
-{
-  return std::make_unique<transports::UnixSocket>(uri.path);
-}
+        auto urlCopy = url;
+        http::url parsedUrl = http::ParseHttpUrl(urlCopy);
+        if (parsedUrl.protocol.empty())
+        {
+            throw InfluxDBException(__func__, "Ill-formed URI");
+        }
 
-#else
-std::unique_ptr<Transport> withUdpTransport([[maybe_unused]] const http::url& uri) {
-  throw InfluxDBException("InfluxDBFactory", "UDP transport requires Boost");
-}
+        const auto iterator = map.find(parsedUrl.protocol);
+        if (iterator == map.end())
+        {
+            throw InfluxDBException(__func__, "Unrecognized backend " + parsedUrl.protocol);
+        }
 
-std::unique_ptr<Transport> withUnixSocketTransport([[maybe_unused]] const http::url& uri) {
-  throw InfluxDBException("InfluxDBFactory", "Unix socket transport requires Boost");
-}
-#endif
+        return iterator->second(parsedUrl);
+    }
 
-std::unique_ptr<Transport> withHttpTransport(const http::url &uri)
-{
-  auto transport = std::make_unique<transports::HTTP>(uri.url);
-  if (!uri.user.empty())
-  {
-    transport->enableBasicAuth(uri.user + ":" + uri.password);
-  }
-  return transport;
-}
-
-std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
-{
-  static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url &)>> map = {
-    {"udp",   withUdpTransport},
-    {"http",  withHttpTransport},
-    {"https", withHttpTransport},
-    {"unix",  withUnixSocketTransport},
-  };
-
-  auto urlCopy = url;
-  http::url parsedUrl = http::ParseHttpUrl(urlCopy);
-  if (parsedUrl.protocol.empty())
-  {
-    throw InfluxDBException(__func__, "Ill-formed URI");
-  }
-
-  const auto iterator = map.find(parsedUrl.protocol);
-  if (iterator == map.end())
-  {
-    throw InfluxDBException(__func__, "Unrecognized backend " + parsedUrl.protocol);
-  }
-
-  return iterator->second(parsedUrl);
-}
-
-std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)
-{
-  return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url));
-}
+    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)
+    {
+        return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url));
+    }
 
 } // namespace influxdb

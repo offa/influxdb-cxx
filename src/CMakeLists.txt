@@ -1,5 +1,7 @@
 add_library(InfluxDB
   InfluxDB.cxx
+  $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
+  $<$<NOT:$<BOOL:${Boost_FOUND}>>:NoBoostSupport.cxx>
   Point.cxx
   InfluxDBFactory.cxx
   $<$<BOOL:${Boost_FOUND}>:UDP.cxx>

@@ -26,18 +26,10 @@
 
 #include "InfluxDB.h"
 #include "InfluxDBException.h"
-
+#include "BoostSupport.h"
 #include <iostream>
 #include <memory>
 #include <string>
-
-#ifdef INFLUXDB_WITH_BOOST
-
-#include <boost/lexical_cast.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-
-#endif
 
 namespace influxdb
 {
@@ -142,69 +134,10 @@ void InfluxDB::addPointToBatch(const Point &point)
   }
 }
 
-#ifdef INFLUXDB_WITH_BOOST
-
 std::vector<Point> InfluxDB::query(const std::string &query)
 {
-  const auto response = mTransport->query(query);
-  std::stringstream responseString;
-  responseString << response;
-  std::vector<Point> points;
-  boost::property_tree::ptree pt;
-  boost::property_tree::read_json(responseString, pt);
-
-  for (const auto &result : pt.get_child("results"))
-  {
-    const auto isResultEmpty = result.second.find("series");
-    if (isResultEmpty == result.second.not_found())
-    {
-        return {};
-    }
-    for (const auto &series : result.second.get_child("series"))
-    {
-      const auto columns = series.second.get_child("columns");
-
-      for (const auto &values : series.second.get_child("values"))
-      {
-        Point point{series.second.get<std::string>("name")};
-        auto iColumns = columns.begin();
-        auto iValues = values.second.begin();
-        for (; iColumns != columns.end() && iValues != values.second.end(); ++iColumns, ++iValues)
-        {
-          const auto value = iValues->second.get_value<std::string>();
-          const auto column = iColumns->second.get_value<std::string>();
-          if (!column.compare("time"))
-          {
-            std::tm tm = {};
-            std::stringstream timeString;
-            timeString << value;
-            timeString >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
-            point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
-            continue;
-          }
-          // cast all values to double, if strings add to tags
-          try
-          {
-              point.addField(column, boost::lexical_cast<double>(value));
-          }
-          catch (...)
-          {
-              point.addTag(column, value);
-          }
-        }
-        points.push_back(std::move(point));
-      }
-    }
-  }
-  return points;
+    return internal::queryImpl(mTransport.get(), query);
 }
-
-#else
-std::vector<Point> InfluxDB::query([[maybe_unused]] const std::string& query)
-{
-  throw InfluxDBException("InfluxDB::query", "Boost is required");
-}
-#endif
 
 void InfluxDB::createDatabaseIfNotExists()
 {
