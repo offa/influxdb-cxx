@@ -1,13 +1,23 @@
+add_library(InfluxDB-Http OBJECT HTTP.cxx)
+target_include_directories(InfluxDB-Http
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_BINARY_DIR}/src
+        )
+target_include_directories(InfluxDB-Http SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
+
+
 add_library(InfluxDB
-  InfluxDB.cxx
-  $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
-  $<$<NOT:$<BOOL:${Boost_FOUND}>>:NoBoostSupport.cxx>
-  Point.cxx
-  InfluxDBFactory.cxx
-  $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
-  $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
-  HTTP.cxx
-)
+    InfluxDB.cxx
+    $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
+    $<$<NOT:$<BOOL:${Boost_FOUND}>>:NoBoostSupport.cxx>
+    Point.cxx
+    InfluxDBFactory.cxx
+    $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
+    $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
+    $<TARGET_OBJECTS:InfluxDB-Http>
+    )
 add_library(InfluxData::InfluxDB ALIAS InfluxDB)
 
 generate_export_header(InfluxDB)

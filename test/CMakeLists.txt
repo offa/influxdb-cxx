@@ -28,8 +28,7 @@ add_unittest(InfluxDBTest)
 add_unittest(InfluxDBFactoryTest)
 
 add_unittest(HttpTest)
-target_link_libraries(HttpTest PRIVATE CurlMock)
-target_sources(HttpTest PRIVATE ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
+target_link_libraries(HttpTest PRIVATE InfluxDB-Http CurlMock)
 target_include_directories(HttpTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_unittest(NoBoostSupportTest)
@@ -48,7 +47,6 @@ add_custom_target(unittest PointTest
     )
 
 
-
 if (Boost_FOUND)
     set(TEST_SRCS
         testUdp.cxx
@@ -59,16 +57,17 @@ if (Boost_FOUND)
         testInfluxDB.cxx
         )
     foreach (test ${TEST_SRCS})
-        set(INFLUXDB_PRIVATE_SRCS "")
         get_filename_component(test_name ${test} NAME)
         string(REGEX REPLACE ".cxx" "" test_name ${test_name})
+
+        add_executable(${test_name} ${test})
 
         if(${test_name} MATCHES "testUdp" OR ${test_name} MATCHES "testHttp")
             # for testing the not-exported interface of InfluxDB,
             # we have to explicitly add the sources / symbols
-            set(INFLUXDB_PRIVATE_SRCS ${PROJECT_SOURCE_DIR}/src/HTTP.cxx)
+            target_link_libraries(${test_name} PRIVATE InfluxDB-Http)
         endif()
-        add_executable(${test_name} ${test} "${INFLUXDB_PRIVATE_SRCS}")
+
         target_link_libraries(${test_name}
             PRIVATE
             InfluxDB
