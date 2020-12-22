@@ -29,7 +29,7 @@ jobs:
         run: apt-get install -y libboost-system1.71-dev libboost-test1.71-dev libboost-program-options1.71-dev
       - name: Build
         run: |
-          script/ci_build.sh -DINFLUXCXX_TESTING=ON
+          script/ci_build.sh
           cmake --build build --target unittest
       - name: System Test
         if: ${{ matrix.boost == true }}
@@ -116,7 +116,7 @@ jobs:
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
       - name: Build
         run: |
-          script/ci_build.sh -DINFLUXCXX_TESTING=ON
+          script/ci_build.sh
           cmake --build build --target unittest
       - name: System Test
         run: |
