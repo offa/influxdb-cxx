@@ -47,6 +47,9 @@ class InfluxdbCxxConan(ConanFile):
         self.output.info("Project version from CMakeLists.txt: '{}'".format(self.version))
 
     def requirements(self):
+        if self.options.tests:
+            self.requires("catch2/2.13.3")
+            self.requires("trompeloeil/39")
         if self.options.boost:
             self.requires("boost/1.74.0")
 

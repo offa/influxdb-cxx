@@ -1,18 +1,10 @@
-# Workaround until Catch can be integrated through conan (#57).
-Include(FetchContent)
 
-FetchContent_Declare(Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG v2.13.3)
-FetchContent_MakeAvailable(Catch2)
+find_package(Catch2 REQUIRED)
+find_package(trompeloeil REQUIRED)
 
-FetchContent_Declare(trompeloeil
-    GIT_REPOSITORY https://github.com/rollbear/trompeloeil.git
-    GIT_TAG v39)
-FetchContent_MakeAvailable(trompeloeil)
 
 add_library(TestMain STATIC TestMain.cxx)
-target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil)
+target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil::trompeloeil)
 
 add_subdirectory("mock")
 
