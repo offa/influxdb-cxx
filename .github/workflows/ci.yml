@@ -66,7 +66,7 @@ jobs:
         if: matrix.boost == 'True'
         run: sudo script/ci_setup_influxdb.sh -linux
       - name: Build
-        run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=${{ matrix.boost }} .
+        run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=True .
 
 
   build_windows:
