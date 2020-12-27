@@ -16,18 +16,17 @@ class InfluxdbCxxConan(ConanFile):
     generators = ("cmake_find_package", "cmake_paths")
     options = {"shared": [True, False],
                "tests": [True, False],
+               "system": [True, False],
                "boost": [True, False]}
     default_options = {"shared": False,
                        "tests": False,
+                       "system": False,
                        "boost": True,
                        "boost:shared": True,
                        "libcurl:with_openssl": True,
                        "libcurl:shared": True}
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*", "conan/CMakeLists.txt")
-    requires = (
-        "libcurl/7.72.0"
-    )
 
 
     def set_version(self):
@@ -47,11 +46,13 @@ class InfluxdbCxxConan(ConanFile):
         self.output.info("Project version from CMakeLists.txt: '{}'".format(self.version))
 
     def requirements(self):
+        if not self.options.system:
+            self.requires("libcurl/7.72.0")
+            if self.options.boost:
+                self.requires("boost/1.74.0")
         if self.options.tests:
             self.requires("catch2/2.13.3")
             self.requires("trompeloeil/39")
-        if self.options.boost:
-            self.requires("boost/1.74.0")
 
     def build(self):
         cmake = self._configure_cmake()
