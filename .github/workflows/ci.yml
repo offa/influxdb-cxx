@@ -112,11 +112,14 @@ jobs:
     name: "Mac OS X"
     steps:
       - uses: actions/checkout@master
-      - name: Setup Boost
-        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
+      - name: Install Dependencies
+        run: |
+          pip3 install -U conan
+          conan install -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True .
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install boost
       - name: Build
         run: |
-          script/ci_build.sh
+          script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
           cmake --build build --target unittest
       - name: System Test
         run: |
