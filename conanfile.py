@@ -53,11 +53,6 @@ class InfluxdbCxxConan(ConanFile):
         if self.options.boost:
             self.requires("boost/1.74.0")
 
-    def source(self):
-        # Wrap the original CMake file to call conan_basic_setup
-        shutil.move("CMakeLists.txt", "CMakeListsOriginal.txt")
-        shutil.move(os.path.join("conan", "CMakeLists.txt"), "CMakeLists.txt")
-
     def build(self):
         cmake = self._configure_cmake()
         cmake.build()
