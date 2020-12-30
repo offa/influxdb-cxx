@@ -27,12 +27,24 @@ add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
 target_include_directories(NoBoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
+if (Boost_FOUND)
+    add_unittest(BoostSupportTest)
+    target_sources(BoostSupportTest PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/BoostSupport.cxx
+        ${PROJECT_SOURCE_DIR}/src/UnixSocket.cxx
+        ${PROJECT_SOURCE_DIR}/src/UDP.cxx
+        )
+    target_link_libraries(BoostSupportTest PRIVATE Boost::system)
+    target_include_directories(BoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
+endif()
+
 
 add_custom_target(unittest PointTest
     COMMAND InfluxDBTest
     COMMAND InfluxDBFactoryTest
     COMMAND HttpTest
     COMMAND NoBoostSupportTest
+    COMMAND $<$<BOOL:${Boost_FOUND}>:BoostSupportTest>
 
     COMMENT "Running unit tests\n\n"
     VERBATIM
@@ -40,6 +52,8 @@ add_custom_target(unittest PointTest
 
 
 if (Boost_FOUND)
+    add_dependencies(unittest BoostSupportTest)
+
     set(TEST_SRCS
         testUdp.cxx
         testPoint.cxx
