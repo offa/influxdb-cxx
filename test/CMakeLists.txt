@@ -34,7 +34,7 @@ if (Boost_FOUND)
         ${PROJECT_SOURCE_DIR}/src/UnixSocket.cxx
         ${PROJECT_SOURCE_DIR}/src/UDP.cxx
         )
-    target_link_libraries(BoostSupportTest PRIVATE Boost::system)
+    target_link_libraries(BoostSupportTest PRIVATE Threads::Threads Boost::system)
     target_include_directories(BoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 endif()
 
