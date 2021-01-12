@@ -53,7 +53,13 @@ namespace influxdb::internal
 
                 for (const auto& values : series.second.get_child("values"))
                 {
-                    Point point{series.second.get<std::string>("name")};
+                    std::string name;
+                    if(series.second.find("name") != series.second.not_found())
+                    {
+                        name = series.second.get<std::string>("name");
+                    }
+                    Point point{name};
+
                     auto iColumns = columns.begin();
                     auto iValues = values.second.begin();
                     for (; iColumns != columns.end() && iValues != values.second.end(); ++iColumns, ++iValues)
