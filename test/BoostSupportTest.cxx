@@ -83,6 +83,11 @@ namespace influxdb::test
     {
         using trompeloeil::_;
 
+        std::tm timestamp{};
+        std::stringstream timeString;
+        timeString << "2021-01-01:11:22.000000000Z";
+        timeString >> std::get_time(&timestamp, "%Y-%m-%dT%H:%M:%SZ");
+
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"unittest","columns":["time","host","value"],"values":[["2021-01-01:11:22.000000000Z","localhost",112233]]}]}]})");
@@ -91,7 +96,7 @@ namespace influxdb::test
         CHECK(result.size() == 1);
         const auto point = result[0];
         CHECK(point.getName() == "unittest");
-        CHECK(std::chrono::duration_cast<std::chrono::seconds>(point.getTimestamp().time_since_epoch()).count() == 1609455600);
+        CHECK(point.getTimestamp() == std::chrono::system_clock::from_time_t(std::mktime(&timestamp)));
         CHECK(point.getTags() == "host=localhost");
         CHECK(point.getFields() == "value=112233.000000000000000000");
     }
