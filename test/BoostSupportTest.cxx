@@ -129,4 +129,18 @@ namespace influxdb::test
         CHECK_THROWS_AS(internal::queryImpl(&transport, "SELECT * from test"), boost::property_tree::ptree_bad_path);
     }
 
+    TEST_CASE("Query is safe to empty name", "[BoostSupportTest]")
+    {
+        using trompeloeil::_;
+
+        TransportMock transport;
+        ALLOW_CALL(transport, query(_))
+            .RETURN(R"({"results":[{"statement_id":0,"series":[{"columns":["time","host","value"],"values":[["2021-01-01:11:22.000000000Z","x",8]]}]}]})");
+
+        const auto result = internal::queryImpl(&transport, "SELECT * from test");
+        CHECK(result.size() == 1);
+        CHECK(result[0].getName() == "");
+        CHECK(result[0].getTags() == "host=x");
+    }
+
 }
