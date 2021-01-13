@@ -12,6 +12,7 @@ add_subdirectory("mock")
 function(add_unittest name)
     add_executable(${name} ${name}.cxx)
     target_link_libraries(${name} PRIVATE TestMain InfluxDB)
+    target_include_directories(${name} PRIVATE "mock")
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 

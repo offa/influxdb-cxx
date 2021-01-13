@@ -22,6 +22,7 @@
 
 #include "InfluxDB.h"
 #include "InfluxDBException.h"
+#include "mock/TransportMock.h"
 #include <catch2/catch.hpp>
 #include <catch2/trompeloeil.hpp>
 
@@ -29,42 +30,7 @@ namespace influxdb::test
 {
     namespace
     {
-        struct TransportMock
-        {
-            MAKE_MOCK1(send, void(std::string&&));
-            MAKE_MOCK1(query, std::string(const std::string&));
-            MAKE_MOCK0(createDatabase, void());
-        };
-
-        class TransportAdapter : public Transport
-        {
-        public:
-            explicit TransportAdapter(std::shared_ptr<TransportMock> mock)
-                : mockImpl(mock)
-            {
-            }
-
-            void send(std::string&& message) override
-            {
-                mockImpl->send(std::move(message));
-            }
-
-            std::string query(const std::string& query) override
-            {
-                return mockImpl->query(query);
-            }
-
-            void createDatabase() override
-            {
-                mockImpl->createDatabase();
-            }
-
-        private:
-            std::shared_ptr<TransportMock> mockImpl;
-        };
-
         constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp(std::chrono::milliseconds(4567));
-
     }
 
     TEST_CASE("Ctor throws on nullptr transport", "[InfluxDBTest]")

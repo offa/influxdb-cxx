@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020 offa
+// Copyright (c) 2020-2021 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,13 @@
 
 #include "BoostSupport.h"
 #include "InfluxDBException.h"
+#include "mock/TransportMock.h"
 #include <boost/property_tree/exceptions.hpp>
 #include <catch2/catch.hpp>
 #include <catch2/trompeloeil.hpp>
 
 namespace influxdb::test
 {
-    namespace
-    {
-        struct TransportMock : public Transport
-        {
-            void send([[maybe_unused]] std::string&& message) override
-            {
-                throw "Mock not implemented";
-            }
-
-            MAKE_MOCK1(query, std::string(const std::string&), override);
-        };
-    }
-
     TEST_CASE("With UDP returns transport", "[BoostSupportTest]")
     {
         CHECK(internal::withUdpTransport(http::url{}) != nullptr);
