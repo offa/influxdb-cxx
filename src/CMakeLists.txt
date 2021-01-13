@@ -8,15 +8,28 @@ target_include_directories(InfluxDB-Http
 target_include_directories(InfluxDB-Http SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
 
 
-add_library(InfluxDB
-    InfluxDB.cxx
-    $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
+add_library(InfluxDB-BoostSupport OBJECT
     $<$<NOT:$<BOOL:${Boost_FOUND}>>:NoBoostSupport.cxx>
-    Point.cxx
-    InfluxDBFactory.cxx
+    $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
     $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
     $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
+    )
+target_include_directories(InfluxDB-BoostSupport
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_BINARY_DIR}/src
+        )
+if (Boost_FOUND)
+    target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::system)
+endif()
+
+add_library(InfluxDB
+    InfluxDB.cxx
+    Point.cxx
+    InfluxDBFactory.cxx
     $<TARGET_OBJECTS:InfluxDB-Http>
+    $<TARGET_OBJECTS:InfluxDB-BoostSupport>
     )
 add_library(InfluxData::InfluxDB ALIAS InfluxDB)
 
@@ -35,7 +48,6 @@ target_include_directories(InfluxDB
 # Link targets
 target_link_libraries(InfluxDB
   PRIVATE
-    $<$<BOOL:${Boost_FOUND}>:Boost::system>
     CURL::libcurl
     Threads::Threads
 )

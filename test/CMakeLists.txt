@@ -30,12 +30,7 @@ target_include_directories(NoBoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 if (Boost_FOUND)
     add_unittest(BoostSupportTest)
-    target_sources(BoostSupportTest PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/BoostSupport.cxx
-        ${PROJECT_SOURCE_DIR}/src/UnixSocket.cxx
-        ${PROJECT_SOURCE_DIR}/src/UDP.cxx
-        )
-    target_link_libraries(BoostSupportTest PRIVATE Threads::Threads Boost::system)
+    target_link_libraries(BoostSupportTest PRIVATE InfluxDB-BoostSupport Threads::Threads Boost::system)
     target_include_directories(BoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 endif()
 
