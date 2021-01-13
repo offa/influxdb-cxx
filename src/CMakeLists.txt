@@ -20,9 +20,8 @@ target_include_directories(InfluxDB-BoostSupport
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_BINARY_DIR}/src
         )
-if (Boost_FOUND)
-    target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::system)
-endif()
+target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${Boost_FOUND}>:Boost::system>)
+
 
 add_library(InfluxDB
     InfluxDB.cxx

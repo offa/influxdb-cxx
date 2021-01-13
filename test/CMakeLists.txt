@@ -12,7 +12,11 @@ add_subdirectory("mock")
 function(add_unittest name)
     add_executable(${name} ${name}.cxx)
     target_link_libraries(${name} PRIVATE TestMain InfluxDB)
-    target_include_directories(${name} PRIVATE "mock")
+    target_include_directories(${name}
+        PRIVATE
+            ${CMAKE_SOURCE_DIR}/src
+            ${CMAKE_CURRENT_SOURCE_DIR}/mock
+            )
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
@@ -22,16 +26,13 @@ add_unittest(InfluxDBFactoryTest)
 
 add_unittest(HttpTest)
 target_link_libraries(HttpTest PRIVATE InfluxDB-Http CurlMock)
-target_include_directories(HttpTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
-target_include_directories(NoBoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 if (Boost_FOUND)
     add_unittest(BoostSupportTest)
     target_link_libraries(BoostSupportTest PRIVATE InfluxDB-BoostSupport Threads::Threads Boost::system)
-    target_include_directories(BoostSupportTest PRIVATE ${CMAKE_SOURCE_DIR}/src)
 endif()
 
 
