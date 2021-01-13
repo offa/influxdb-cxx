@@ -42,7 +42,8 @@ namespace influxdb::test
     TEST_CASE("Query is passed to transport", "[BoostSupportTest]")
     {
         TransportMock transport;
-        REQUIRE_CALL(transport, query("SELECT * from test WHERE host = 'localhost'")).RETURN(R"({"results":[{"statement_id":0}]})");
+        REQUIRE_CALL(transport, query("SELECT * from test WHERE host = 'localhost'"))
+            .RETURN(R"({"results":[{"statement_id":0}]})");
 
         internal::queryImpl(&transport, "SELECT * from test WHERE host = 'localhost'");
     }
@@ -78,7 +79,9 @@ namespace influxdb::test
 
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"unittest","columns":["time","host","value"],"values":[["2021-01-01:11:22.000000000Z","localhost",112233]]}]}]})");
+            .RETURN(R"({"results":[{"statement_id":0,)"
+                    R"("series":[{"name":"unittest","columns":["time","host","value"],)"
+                    R"("values":[["2021-01-01:11:22.000000000Z","localhost",112233]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 1);
@@ -91,12 +94,15 @@ namespace influxdb::test
 
     TEST_CASE("Query returns points of multiple results", "[BoostSupportTest]")
     {
-        using namespace Catch::Matchers;
         using trompeloeil::_;
 
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"unittest","columns":["time","host","value"],"values":[["2021-01-01:11:22.000000000Z","host-0",100],["2021-01-01:11:23.000000000Z","host-1",30],["2021-01-01:11:24.000000000Z","host-2",54]]}]}]})");
+            .RETURN(R"({"results":[{"statement_id":0,)"
+                    R"("series":[{"name":"unittest","columns":["time","host","value"],)"
+                    R"("values":[["2021-01-01:11:22.000000000Z","host-0",100],)"
+                    R"(["2021-01-01:11:23.000000000Z","host-1",30],)"
+                    R"(["2021-01-01:11:24.000000000Z","host-2",54]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 3);
@@ -128,7 +134,8 @@ namespace influxdb::test
 
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,"series":[{"columns":["time","host","value"],"values":[["2021-01-01:11:22.000000000Z","x",8]]}]}]})");
+            .RETURN(R"({"results":[{"statement_id":0,"series":[{"columns":["time","host","value"],)"
+                    R"("values":[["2021-01-01:11:22.000000000Z","x",8]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 1);
