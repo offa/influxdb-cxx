@@ -23,7 +23,7 @@ project(influxdb-cxx
   LANGUAGES CXX
 )
 
-# Add compiler flags for warnings and debug symbols
+# Add compiler flags for warnings
 if(NOT MSVC)
     add_compile_options(-Wall
       -Wextra
