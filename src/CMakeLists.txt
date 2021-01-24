@@ -1,10 +1,11 @@
+set(INTERNAL_INCLUDE_DIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/src
+    )
+
 add_library(InfluxDB-Http OBJECT HTTP.cxx)
-target_include_directories(InfluxDB-Http
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_BINARY_DIR}/src
-        )
+target_include_directories(InfluxDB-Http PRIVATE ${INTERNAL_INCLUDE_DIRS})
 target_include_directories(InfluxDB-Http SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
 
 
@@ -14,12 +15,7 @@ add_library(InfluxDB-BoostSupport OBJECT
     $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
     $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
     )
-target_include_directories(InfluxDB-BoostSupport
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_BINARY_DIR}/src
-        )
+target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
 target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${Boost_FOUND}>:Boost::system>)
 
 
