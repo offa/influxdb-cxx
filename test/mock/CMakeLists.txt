@@ -1,5 +1,5 @@
 add_library(CurlMock STATIC CurlMock.cxx)
-target_include_directories(CurlMock PUBLIC ".")
+target_include_directories(CurlMock PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(CurlMock PRIVATE Catch2::Catch2 trompeloeil::trompeloeil)
 
 target_include_directories(CurlMock SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
