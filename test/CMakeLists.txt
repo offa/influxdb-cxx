@@ -21,6 +21,8 @@ function(add_unittest name)
 endfunction()
 
 add_unittest(PointTest)
+add_unittest(LineProtocolTest)
+target_link_libraries(LineProtocolTest PRIVATE InfluxDB-Internal)
 add_unittest(InfluxDBTest)
 add_unittest(InfluxDBFactoryTest)
 
@@ -37,6 +39,7 @@ endif()
 
 
 add_custom_target(unittest PointTest
+    COMMAND LineProtocolTest
     COMMAND InfluxDBTest
     COMMAND InfluxDBFactoryTest
     COMMAND HttpTest

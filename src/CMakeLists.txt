@@ -19,10 +19,15 @@ target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS
 target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${Boost_FOUND}>:Boost::system>)
 
 
+add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
+target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
+
+
 add_library(InfluxDB
     InfluxDB.cxx
     Point.cxx
     InfluxDBFactory.cxx
+    $<TARGET_OBJECTS:InfluxDB-Internal>
     $<TARGET_OBJECTS:InfluxDB-Http>
     $<TARGET_OBJECTS:InfluxDB-BoostSupport>
     )
