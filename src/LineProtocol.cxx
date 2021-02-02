@@ -58,17 +58,4 @@ namespace influxdb
         return line.append(" ")
             .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
     }
-
-    void LineProtocol::addTag(std::string_view key, std::string_view value)
-    {
-        if (!key.empty() && !value.empty())
-        {
-            if (!globalTags.empty())
-            {
-                globalTags.append(",");
-            }
-            globalTags.append(key).append("=").append(value);
-        }
-    }
-
 }

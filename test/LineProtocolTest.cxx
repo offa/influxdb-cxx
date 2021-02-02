@@ -129,32 +129,4 @@ namespace influxdb::test
         LineProtocol lineProtocol{"a=0,b=1,c=2"};
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p1,a=0,b=1,c=2,pointtag=3 n=1i 54000000)"));
     }
-
-    TEST_CASE("Adds addtional global tag", "[LineProtocolTest]")
-    {
-        const auto point = Point{"p"}
-                               .addField("x", 5)
-                               .addTag("t", "17")
-                               .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol{"global0=aa"};
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p,global0=aa,t=17 x=5i 54000000)"));
-        lineProtocol.addTag("global1", "bbb");
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p,global0=aa,global1=bbb,t=17 x=5i 54000000)"));
-    }
-
-    TEST_CASE("Add global tag ignores empty values", "[LineProtocolTest]")
-    {
-        const auto point = Point{"p0"}
-                               .addField("n", 0)
-                               .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p0 n=0i 54000000)"));
-        lineProtocol.addTag("", "value0");
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p0 n=0i 54000000)"));
-        lineProtocol.addTag("key0", "");
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p0 n=0i 54000000)"));
-        lineProtocol.addTag("", "");
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(p0 n=0i 54000000)"));
-    }
-
 }

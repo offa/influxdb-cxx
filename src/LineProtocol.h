@@ -34,8 +34,6 @@ namespace influxdb
 
         std::string format(const Point& point);
 
-        void addTag(std::string_view key, std::string_view value);
-
     private:
         std::string globalTags;
     };

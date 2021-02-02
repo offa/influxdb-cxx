@@ -133,6 +133,7 @@ void InfluxDB::addPointToBatch(const Point &point)
 {
   LineProtocol formatter;
   mLineProtocolBatch.emplace_back(formatter.format(point));
+
   if (mLineProtocolBatch.size() >= mBatchSize)
   {
     flushBatch();
