@@ -58,6 +58,25 @@ namespace influxdb::test
                   Point{"p2"}.addField("f2", 2).setTimestamp(ignoreTimestamp)});
     }
 
+    TEST_CASE("Write adds global tags", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, send("p0,x=1 f0=11i 4567000000\n"
+                                 "p1,x=1,existing=yes f1=22i 4567000000\n"
+                                 "p2,x=1 f2=33i 4567000000"));
+        REQUIRE_CALL(*mock, send("p4,x=1 f3=44i 4567000000"));
+        REQUIRE_CALL(*mock, send("p5,x=1 f4=55i 4567000000"));
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.addGlobalTag("x", "1");
+        db.write({Point{"p0"}.addField("f0", 11).setTimestamp(ignoreTimestamp),
+                  Point{"p1"}.addField("f1", 22).addTag("existing", "yes").setTimestamp(ignoreTimestamp),
+                  Point{"p2"}.addField("f2", 33).setTimestamp(ignoreTimestamp)});
+        db.write(Point{"p4"}.addField("f3", 44).setTimestamp(ignoreTimestamp));
+        db.batchOf(1);
+        db.write(Point{"p5"}.addField("f4", 55).setTimestamp(ignoreTimestamp));
+    }
+
     TEST_CASE("Write with batch enabled adds point to batch if size not reached", "[InfluxDBTest]")
     {
         using trompeloeil::_;

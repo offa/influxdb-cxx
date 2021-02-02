@@ -100,7 +100,7 @@ void InfluxDB::write(Point &&point)
   }
   else
   {
-    LineProtocol formatter;
+    LineProtocol formatter{mGlobalTags};
     transmit(formatter.format(point));
   }
 }
@@ -117,7 +117,7 @@ void InfluxDB::write(std::vector<Point> &&points)
   else
   {
     std::string lineProtocol;
-    LineProtocol formatter;
+    LineProtocol formatter{mGlobalTags};
 
     for (const auto &point : points)
     {
@@ -131,7 +131,7 @@ void InfluxDB::write(std::vector<Point> &&points)
 
 void InfluxDB::addPointToBatch(const Point &point)
 {
-  LineProtocol formatter;
+  LineProtocol formatter{mGlobalTags};
   mLineProtocolBatch.emplace_back(formatter.format(point));
 
   if (mLineProtocolBatch.size() >= mBatchSize)
