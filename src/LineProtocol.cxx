@@ -24,6 +24,16 @@
 
 namespace influxdb
 {
+    namespace
+    {
+        void appendIfNotEmpty(std::string& dest, const std::string& value, char separator)
+        {
+            if (!value.empty())
+            {
+                dest.append(std::string{separator}).append(value);
+            }
+        }
+    }
     LineProtocol::LineProtocol()
         : LineProtocol(std::string{})
     {
@@ -37,23 +47,9 @@ namespace influxdb
     std::string LineProtocol::format(const Point& point) const
     {
         std::string line{point.getName()};
-
-        if (!globalTags.empty())
-        {
-            line.append(",");
-            line.append(globalTags);
-        }
-
-        if (!point.getTags().empty())
-        {
-            line.append(",");
-            line.append(point.getTags());
-        }
-
-        if (!point.getFields().empty())
-        {
-            line.append(" ").append(point.getFields());
-        }
+        appendIfNotEmpty(line, globalTags, ',');
+        appendIfNotEmpty(line, point.getTags(), ',');
+        appendIfNotEmpty(line, point.getFields(), ' ');
 
         return line.append(" ")
             .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
