@@ -29,7 +29,7 @@ namespace influxdb
     class LineProtocol
     {
     public:
-        explicit LineProtocol();
+        LineProtocol();
         explicit LineProtocol(const std::string& tags);
 
         std::string format(const Point& point) const;
