@@ -25,6 +25,7 @@
 ///
 
 #include "Point.h"
+#include "LineProtocol.h"
 #include <chrono>
 #include <memory>
 #include <sstream>
@@ -93,20 +94,8 @@ auto Point::getCurrentTimestamp() -> decltype(std::chrono::system_clock::now())
 
 std::string Point::toLineProtocol() const
 {
-    std::string line{mMeasurement};
-
-    if (!mTags.empty())
-    {
-        line.append(mTags);
-    }
-
-    if (!mFields.empty())
-    {
-        line.append(" ").append(mFields);
-    }
-
-    return line.append(" ")
-        .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(mTimestamp.time_since_epoch()).count()));
+    LineProtocol formatter;
+    return formatter.format(*this);
 }
 
 std::string Point::getName() const

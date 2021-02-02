@@ -26,6 +26,7 @@
 
 #include "InfluxDB.h"
 #include "InfluxDBException.h"
+#include "LineProtocol.h"
 #include "BoostSupport.h"
 #include <iostream>
 #include <memory>
@@ -99,7 +100,8 @@ void InfluxDB::write(Point &&point)
   }
   else
   {
-    transmit(point.toLineProtocol());
+    LineProtocol formatter;
+    transmit(formatter.format(point));
   }
 }
 
@@ -115,9 +117,11 @@ void InfluxDB::write(std::vector<Point> &&points)
   else
   {
     std::string lineProtocol;
+    LineProtocol formatter;
+
     for (const auto &point : points)
     {
-      lineProtocol += point.toLineProtocol() + "\n";
+      lineProtocol += formatter.format(point) + "\n";
     }
 
     lineProtocol.erase(std::prev(lineProtocol.cend()));
@@ -127,7 +131,8 @@ void InfluxDB::write(std::vector<Point> &&points)
 
 void InfluxDB::addPointToBatch(const Point &point)
 {
-  mLineProtocolBatch.emplace_back(point.toLineProtocol());
+  LineProtocol formatter;
+  mLineProtocolBatch.emplace_back(formatter.format(point));
   if (mLineProtocolBatch.size() >= mBatchSize)
   {
     flushBatch();
