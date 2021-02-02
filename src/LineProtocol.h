@@ -32,7 +32,7 @@ namespace influxdb
         explicit LineProtocol();
         explicit LineProtocol(const std::string& tags);
 
-        std::string format(const Point& point);
+        std::string format(const Point& point) const;
 
     private:
         std::string globalTags;

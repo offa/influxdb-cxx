@@ -36,14 +36,14 @@ namespace influxdb::test
     TEST_CASE("Empty measurement", "[LineProtocolTest]")
     {
         const auto point = Point{"p0"}.setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Equals("p0 54000000"));
     }
 
     TEST_CASE("Measurement with value", "[LineProtocolTest]")
     {
         const auto point = Point{"p0"}.addField("f0", "1").setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p0 f0="1" 54000000)"));
     }
 
@@ -56,7 +56,7 @@ namespace influxdb::test
                                .addField("string_value", "abc def ghi")
                                .setTimestamp(ignoreTimestamp);
 
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Matches("multitype "
                                                        "int_value=567i,"
                                                        "longlong_value=1234567890i,"
@@ -72,7 +72,7 @@ namespace influxdb::test
                                .addField("value1", 99807)
                                .addField("value2", 2334)
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Equals("multiFieldPoint value0=4455i,"
                                                       "value1=99807i,"
                                                       "value2=2334i"
@@ -85,7 +85,7 @@ namespace influxdb::test
                                .addField("x", 5)
                                .addTag("tag0", "value0")
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Equals(R"(taggedPoint,tag0=value0 x=5i 54000000)"));
     }
 
@@ -97,7 +97,7 @@ namespace influxdb::test
                                .addTag("t1", "v1")
                                .addTag("t2", "v2")
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol;
+        const LineProtocol lineProtocol;
         CHECK_THAT(lineProtocol.format(point), Equals(R"(taggedPoint,t0=v0,t1=v1,t2=v2 y=9i 54000000)"));
     }
 
@@ -106,7 +106,7 @@ namespace influxdb::test
         const auto point = Point{"p0"}
                                .addField("n", 0)
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol{"global=true"};
+        const LineProtocol lineProtocol{"global=true"};
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p0,global=true n=0i 54000000)"));
     }
 
@@ -116,7 +116,7 @@ namespace influxdb::test
                                .addField("n", 0)
                                .addTag("local", "1")
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol{"global=true"};
+        const LineProtocol lineProtocol{"global=true"};
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p0,global=true,local=1 n=0i 54000000)"));
     }
 
@@ -126,7 +126,7 @@ namespace influxdb::test
                                .addField("n", 1)
                                .addTag("pointtag", "3")
                                .setTimestamp(ignoreTimestamp);
-        LineProtocol lineProtocol{"a=0,b=1,c=2"};
+        const LineProtocol lineProtocol{"a=0,b=1,c=2"};
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p1,a=0,b=1,c=2,pointtag=3 n=1i 54000000)"));
     }
 }

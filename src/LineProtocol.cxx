@@ -34,7 +34,7 @@ namespace influxdb
     {
     }
 
-    std::string LineProtocol::format(const Point& point)
+    std::string LineProtocol::format(const Point& point) const
     {
         std::string line{point.getName()};
 
