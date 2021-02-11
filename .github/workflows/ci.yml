@@ -42,6 +42,7 @@ jobs:
         run: |
           script/ci_setup_influxdb.sh -linux
           cmake --build build --target systemtest
+          cmake --build build --target systemtest2
       - name: Check deployment as cmake subdirectory
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON
       - name: Install
@@ -133,3 +134,4 @@ jobs:
         run: |
           script/ci_setup_influxdb.sh -osx
           cmake --build build --target systemtest
+          cmake --build build --target systemtest2
