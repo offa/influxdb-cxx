@@ -50,6 +50,8 @@ add_custom_target(unittest PointTest
     VERBATIM
     )
 
+add_subdirectory(integration)
+
 
 if (Boost_FOUND)
     add_dependencies(unittest BoostSupportTest)
