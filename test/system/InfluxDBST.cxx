@@ -2,6 +2,14 @@
 #include "HTTP.h"
 #include <catch2/catch.hpp>
 
+namespace
+{
+    std::size_t querySize(influxdb::InfluxDB& db, const std::string& tag)
+    {
+        return db.query("select * from x where type='" + tag + "'").size();
+    }
+}
+
 TEST_CASE("InfluxDB system test", "[InfluxDBST]")
 {
     using namespace influxdb;
@@ -11,6 +19,7 @@ TEST_CASE("InfluxDB system test", "[InfluxDBST]")
     const std::string url{"http://localhost:8086?db=st_db"};
     auto db = InfluxDBFactory::Get(url);
     HTTP http{url};
+
 
     SECTION("Database does not exist")
     {
@@ -41,13 +50,9 @@ TEST_CASE("InfluxDB system test", "[InfluxDBST]")
 
     SECTION("Write point")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='sp')").size();
-        };
-
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "sp") == 0);
         db->write(Point{"x"}.addField("value", 20).addTag("type", "sp"));
-        CHECK(querySize() == 1);
+        CHECK(querySize(*db, "sp") == 1);
     }
 
     SECTION("Query point")
@@ -61,34 +66,26 @@ TEST_CASE("InfluxDB system test", "[InfluxDBST]")
 
     SECTION("Write multiple points")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='mp')").size();
-        };
-
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "mp") == 0);
         db->write(Point{"x"}.addField("n", 0).addTag("type", "mp"));
-        CHECK(querySize() == 1);
+        CHECK(querySize(*db, "mp") == 1);
         db->write(Point{"x"}.addField("n", 1).addTag("type", "mp"));
-        CHECK(querySize() == 2);
+        CHECK(querySize(*db, "mp") == 2);
         db->write(Point{"x"}.addField("n", 2).addTag("type", "mp"));
-        CHECK(querySize() == 3);
+        CHECK(querySize(*db, "mp") == 3);
         db->write(Point{"x"}.addField("n", 2).addTag("type", "mp"));
-        CHECK(querySize() == 4);
+        CHECK(querySize(*db, "mp") == 4);
     }
 
     SECTION("Write multiple points by container")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='mpc')").size();
-        };
-
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "mpc") == 0);
 
         db->write({Point{"x"}.addField("n", 0).addTag("type", "mpc"),
                    Point{"x"}.addField("n", 1).addTag("type", "mpc"),
                    Point{"x"}.addField("n", 2).addTag("type", "mpc")});
 
-        CHECK(querySize() == 3);
+        CHECK(querySize(*db, "mpc") == 3);
     }
 
     SECTION("Query points")
@@ -105,48 +102,36 @@ TEST_CASE("InfluxDB system test", "[InfluxDBST]")
 
     SECTION("Write as batch doesn't send if batch size not reached")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='bpns')").size();
-        };
-
         db->batchOf(3);
 
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "bpns") == 0);
         db->write({Point{"x"}.addField("n", 0).addTag("type", "bpns"),
                    Point{"x"}.addField("n", 1).addTag("type", "bpns")});
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "bpns") == 0);
     }
 
     SECTION("Write as batch sends if batch size reached")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='bp')").size();
-        };
-
         db->batchOf(2);
 
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "bp") == 0);
         db->write({Point{"x"}.addField("n", 1).addTag("type", "bp"),
                    Point{"x"}.addField("n", 2).addTag("type", "bp"),
                    Point{"x"}.addField("n", -1).addTag("type", "bp")});
-        CHECK(querySize() == 2);
+        CHECK(querySize(*db, "bp") == 2);
     }
 
     SECTION("Write as batch sends if on flush")
     {
-        auto querySize = [&db] {
-            return db->query(R"(select * from x where type='bpf')").size();
-        };
-
         db->batchOf(200);
 
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "bpf") == 0);
         db->write({Point{"x"}.addField("n", 1).addTag("type", "bpf"),
                    Point{"x"}.addField("n", 2).addTag("type", "bpf"),
                    Point{"x"}.addField("n", -1).addTag("type", "bpf")});
-        CHECK(querySize() == 0);
+        CHECK(querySize(*db, "bpf") == 0);
         db->flushBatch();
-        CHECK(querySize() == 3);
+        CHECK(querySize(*db, "bpf") == 3);
     }
 
     SECTION("Cleanup")
