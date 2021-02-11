@@ -2,7 +2,7 @@
 #include "HTTP.h"
 #include <catch2/catch.hpp>
 
-TEST_CASE("InfluxDB integration test" "[InfluxDBIT]")
+TEST_CASE("InfluxDB integration test", "[InfluxDBIT]")
 {
     using namespace influxdb;
     using namespace influxdb::transports;
@@ -85,8 +85,8 @@ TEST_CASE("InfluxDB integration test" "[InfluxDBIT]")
         CHECK(querySize() == 0);
 
         db->write({Point{"x"}.addField("n", 0).addTag("type", "mpc"),
-                Point{"x"}.addField("n", 1).addTag("type", "mpc"),
-                Point{"x"}.addField("n", 2).addTag("type", "mpc")});
+                   Point{"x"}.addField("n", 1).addTag("type", "mpc"),
+                   Point{"x"}.addField("n", 2).addTag("type", "mpc")});
 
         CHECK(querySize() == 3);
     }
@@ -113,7 +113,7 @@ TEST_CASE("InfluxDB integration test" "[InfluxDBIT]")
 
         CHECK(querySize() == 0);
         db->write({Point{"x"}.addField("n", 0).addTag("type", "bpns"),
-                Point{"x"}.addField("n", 1).addTag("type", "bpns")});
+                   Point{"x"}.addField("n", 1).addTag("type", "bpns")});
         CHECK(querySize() == 0);
     }
 
@@ -127,8 +127,8 @@ TEST_CASE("InfluxDB integration test" "[InfluxDBIT]")
 
         CHECK(querySize() == 0);
         db->write({Point{"x"}.addField("n", 1).addTag("type", "bp"),
-                Point{"x"}.addField("n", 2).addTag("type", "bp"),
-                Point{"x"}.addField("n", -1).addTag("type", "bp")});
+                   Point{"x"}.addField("n", 2).addTag("type", "bp"),
+                   Point{"x"}.addField("n", -1).addTag("type", "bp")});
         CHECK(querySize() == 2);
     }
 
@@ -142,8 +142,8 @@ TEST_CASE("InfluxDB integration test" "[InfluxDBIT]")
 
         CHECK(querySize() == 0);
         db->write({Point{"x"}.addField("n", 1).addTag("type", "bpf"),
-                Point{"x"}.addField("n", 2).addTag("type", "bpf"),
-                Point{"x"}.addField("n", -1).addTag("type", "bpf")});
+                   Point{"x"}.addField("n", 2).addTag("type", "bpf"),
+                   Point{"x"}.addField("n", -1).addTag("type", "bpf")});
         CHECK(querySize() == 0);
         db->flushBatch();
         CHECK(querySize() == 3);
