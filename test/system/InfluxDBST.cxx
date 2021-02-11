@@ -2,31 +2,31 @@
 #include "HTTP.h"
 #include <catch2/catch.hpp>
 
-TEST_CASE("InfluxDB integration test", "[InfluxDBIT]")
+TEST_CASE("InfluxDB system test", "[InfluxDBST]")
 {
     using namespace influxdb;
     using namespace influxdb::transports;
     using namespace Catch::Matchers;
 
-    const std::string url{"http://localhost:8086?db=it_db"};
+    const std::string url{"http://localhost:8086?db=st_db"};
     auto db = InfluxDBFactory::Get(url);
     HTTP http{url};
 
     SECTION("Database does not exist")
     {
         const auto response = http.query("show databases");
-        CHECK_THAT(http.query("show databases"), !Contains(R"(["it_db"])"));
+        CHECK_THAT(http.query("show databases"), !Contains(R"(["st_db"])"));
     }
 
     SECTION("Query on non existing database returns empty")
     {
-        CHECK(db->query("select * from it_db").size() == 0);
+        CHECK(db->query("select * from st_db").size() == 0);
     }
 
     SECTION("Create database if not existing")
     {
         db->createDatabaseIfNotExists();
-        CHECK_THAT(http.query("show databases"), Contains(R"(["it_db"])"));
+        CHECK_THAT(http.query("show databases"), Contains(R"(["st_db"])"));
     }
 
     SECTION("Create database if not existing does nothing on existing database")
@@ -36,7 +36,7 @@ TEST_CASE("InfluxDB integration test", "[InfluxDBIT]")
 
     SECTION("Created database is empty")
     {
-        CHECK(db->query("select * from it_db").size() == 0);
+        CHECK(db->query("select * from st_db").size() == 0);
     }
 
     SECTION("Write point")
@@ -151,6 +151,6 @@ TEST_CASE("InfluxDB integration test", "[InfluxDBIT]")
 
     SECTION("Cleanup")
     {
-        http.query("drop database it_db");
+        http.query("drop database st_db");
     }
 }
