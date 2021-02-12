@@ -9,9 +9,16 @@ jobs:
       matrix:
         compiler:
           - gcc-10
+        influx_version:
+          - 1.8
     container:
       image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
-    name: "${{ matrix.compiler }}"
+    services:
+      influxdb:
+        image: influxdb:${{ matrix.influx_version }}
+    env:
+      INFLUXDB_SYSTEMTEST_HOST: influxdb
+    name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
     steps:
       - uses: actions/checkout@master
       - name: Setup
@@ -24,9 +31,6 @@ jobs:
             conan profile update settings.compiler.libcxx=libstdc++11 default
           fi
           conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True .
-          curl https://dl.influxdata.com/influxdb/releases/influxdb_1.8.4_amd64.deb --output influxdb_1.8.4_amd64.deb
-          dpkg -i influxdb_1.8.4_amd64.deb
-          service influxdb start
       - name: Build
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
