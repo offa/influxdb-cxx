@@ -37,12 +37,6 @@ jobs:
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
           cmake --build build --target unittest
-      - name: System Test
-        if: ${{ matrix.boost == true }}
-        run: |
-          script/ci_setup_influxdb.sh -linux
-          cmake --build build --target systemtest
-          cmake --build build --target systemtest2
       - name: Check deployment as cmake subdirectory
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON
       - name: Install
