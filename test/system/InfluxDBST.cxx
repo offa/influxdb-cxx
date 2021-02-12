@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "InfluxDBFactory.h"
+#include "InfluxDBException.h"
 #include "HTTP.h"
 #include <catch2/catch.hpp>
 
@@ -156,6 +157,23 @@ namespace influxdb::test
             CHECK(querySize(*db, "bpf") == 0);
             db->flushBatch();
             CHECK(querySize(*db, "bpf") == 3);
+        }
+
+        SECTION("Write of invalid line protocol throws")
+        {
+            CHECK_THROWS_AS(db->write(Point{"test,this=is ,,====,, invalid"}), BadRequest);
+        }
+
+        SECTION("Write to unreachable host throws")
+        {
+            auto invalidDb = influxdb::InfluxDBFactory::Get("http://non_existing_host:123456?db=not_existing_db");
+            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), ConnectionError);
+        }
+
+        SECTION("Write to nonexistent database throws")
+        {
+            auto invalidDb = influxdb::InfluxDBFactory::Get(url + "_nonexistent");
+            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), NonExistentDatabase);
         }
 
         SECTION("Cleanup")
