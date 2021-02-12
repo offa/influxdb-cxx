@@ -89,6 +89,17 @@ namespace influxdb::test
             CHECK(response[0].getTags() == "type=sp");
         }
 
+        SECTION("Query point with no matches")
+        {
+            const auto response = db->query("select * from nothing_to_find");
+            CHECK(response.size() == 0);
+        }
+
+        SECTION("Query point throws on invalid query")
+        {
+            CHECK_THROWS_AS(db->query("select* from_INVALID"), BadRequest);
+        }
+
         SECTION("Write multiple points")
         {
             CHECK(querySize(*db, "mp") == 0);
