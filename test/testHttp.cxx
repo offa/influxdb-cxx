@@ -31,6 +31,10 @@
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 
+/**
+ * \deprecated related test has been moved
+ */
+
 namespace influxdb::test {
 
 int getRandomNumber()

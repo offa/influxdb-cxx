@@ -30,13 +30,14 @@
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 
+/**
+ * \deprecated related test has been moved
+ */
+
 namespace influxdb::test
 {
     namespace
     {
-        /**
-         * \deprecated related test has been moved to unit test
-         */
         class WriteRecorder
         {
         public:

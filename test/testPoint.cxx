@@ -27,8 +27,8 @@
 #include "InfluxDBFactory.h"
 #include <iterator>
 
-/*
- * \deprecated Tests moved to PointTest
+/**
+ * \deprecated related test has been moved
  */
 
 namespace influxdb::test {

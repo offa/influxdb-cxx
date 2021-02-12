@@ -26,9 +26,11 @@
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 
+/**
+ * \deprecated related test has been moved
+ */
+
 namespace influxdb::test {
-
-
 
 BOOST_AUTO_TEST_CASE(query1)
 {
