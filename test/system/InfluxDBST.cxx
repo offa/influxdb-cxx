@@ -23,6 +23,7 @@
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 #include "HTTP.h"
+#include <cstdlib>
 #include <catch2/catch.hpp>
 
 namespace influxdb::test
@@ -33,6 +34,15 @@ namespace influxdb::test
         {
             return db.query("select * from x where type='" + tag + "'").size();
         }
+
+        std::string dbServerUrl()
+        {
+            if (const auto host = std::getenv("INFLUXDB_SYSTEMTEST_HOST"); host != nullptr)
+            {
+                return host;
+            }
+            return "localhost";
+        }
     }
 
     TEST_CASE("InfluxDB system test", "[InfluxDBST]")
@@ -41,7 +51,7 @@ namespace influxdb::test
         using namespace influxdb::transports;
         using namespace Catch::Matchers;
 
-        const std::string url{"http://localhost:8086?db=st_db"};
+        const std::string url{"http://" + dbServerUrl() + ":8086?db=st_db"};
         auto db = InfluxDBFactory::Get(url);
         HTTP http{url};
 
