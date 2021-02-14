@@ -27,8 +27,7 @@
 #ifndef INFLUXDATA_TRANSPORTINTERFACE_H
 #define INFLUXDATA_TRANSPORTINTERFACE_H
 
-#include <string>
-#include <stdexcept>
+#include "InfluxDBException.h"
 #include "influxdb_export.h"
 
 namespace influxdb
@@ -47,12 +46,12 @@ class INFLUXDB_EXPORT Transport
 
     /// Sends request
     virtual std::string query([[maybe_unused]] const std::string& query) {
-      throw std::runtime_error("Queries are not supported by the selected transport");
+      throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
     }
 
     /// Sends request
     virtual void createDatabase() {
-      throw std::runtime_error("Creation of database is not supported by the selected transport");
+      throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
     }
 };
 
