@@ -1,0 +1,36 @@
+name: codeql
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 5 * * 3'
+
+jobs:
+  codeql:
+    runs-on: ubuntu-20.04
+    container:
+      image: "registry.gitlab.com/offa/docker-images/gcc-10:stable"
+    name: "CodeQL"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y python3-pip libcurl4-openssl-dev libboost-system1.71-dev libboost-test1.71-dev
+          pip3 install -U conan
+          if [ "${{ startsWith(matrix.compiler, 'gcc') }}" = true ]; then
+            conan profile new default --detect
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+          fi
+          conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True .
+      - name: CodeQL Initialization
+        uses: github/codeql-action/init@v1
+        with:
+          languages: cpp
+          queries: +security-and-quality
+      - name: Build
+        run: script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
+      - name: CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
