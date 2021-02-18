@@ -96,8 +96,7 @@ HTTP::~HTTP()
 
 void HTTP::initCurl(const std::string &url)
 {
-  CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL);
-  if (globalInitResult != CURLE_OK)
+  if (const CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL); globalInitResult != CURLE_OK)
   {
     throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
   }
