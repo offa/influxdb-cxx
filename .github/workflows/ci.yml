@@ -35,7 +35,7 @@ jobs:
         run: apt-get install -y libboost-system1.71-dev libboost-test1.71-dev
       - name: Build
         run: |
-          script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
+          script/ci_build.sh
           cmake --build build --target unittest
       - name: System Test
         if: ${{ matrix.boost == true }}
@@ -106,7 +106,6 @@ jobs:
           script/ci_build.sh \
             -DBUILD_SHARED_LIBS=OFF \
             -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 \
-            -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake \
             -G Ninja
         shell: bash
       - name: Install
@@ -127,7 +126,7 @@ jobs:
           brew install boost
       - name: Build
         run: |
-          script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
+          script/ci_build.sh
           cmake --build build --target unittest
       - name: System Test
         run: |
