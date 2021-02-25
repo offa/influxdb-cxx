@@ -63,9 +63,6 @@ jobs:
         run: |
           conan profile new default --detect
           conan profile update settings.compiler.libcxx=libstdc++11 default
-      - name: Setup InfluxDB
-        if: matrix.boost == 'True'
-        run: sudo script/ci_setup_influxdb.sh -linux
       - name: Build
         run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=True .
 
