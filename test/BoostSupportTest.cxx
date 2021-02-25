@@ -39,6 +39,18 @@ namespace influxdb::test
         CHECK(internal::withUnixSocketTransport(http::url{}) != nullptr);
     }
 
+    TEST_CASE("UDP transport throws on create database", "[BoostSupportTest]")
+    {
+        auto udp = internal::withUdpTransport(http::url{});
+        CHECK_THROWS_AS(udp->createDatabase(), std::runtime_error);
+    }
+
+    TEST_CASE("Unix socket transport throws on create database", "[BoostSupportTest]")
+    {
+        auto udp = internal::withUnixSocketTransport(http::url{});
+        CHECK_THROWS_AS(udp->createDatabase(), std::runtime_error);
+    }
+
     TEST_CASE("Query is passed to transport", "[BoostSupportTest]")
     {
         TransportMock transport;
@@ -142,5 +154,4 @@ namespace influxdb::test
         CHECK(result[0].getName() == "");
         CHECK(result[0].getTags() == "host=x");
     }
-
 }

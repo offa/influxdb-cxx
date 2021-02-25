@@ -1,0 +1,37 @@
+name: system test
+
+on: [push, pull_request]
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        compiler:
+          - gcc-10
+        influx_version:
+          - 1.8
+    container:
+      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
+    services:
+      influxdb:
+        image: influxdb:${{ matrix.influx_version }}
+    env:
+      INFLUXDB_SYSTEMTEST_HOST: influxdb
+    name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup
+        run: |
+          apt-get update
+          apt-get install -y python3-pip libcurl4-openssl-dev libboost-system1.71-dev libboost-test1.71-dev
+          pip3 install -U conan
+          if [ "${{ startsWith(matrix.compiler, 'gcc') }}" = true ]; then
+            conan profile new default --detect
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+          fi
+          conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True .
+      - name: Build
+        run: |
+          script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
+          cmake --build build --target systemtest

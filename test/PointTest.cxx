@@ -66,6 +66,12 @@ namespace influxdb::test
         CHECK_THAT(point.getFields(), Equals(""));
     }
 
+    TEST_CASE("Field with empty value is added", "[PointTest]")
+    {
+        const auto point = Point{"test"}.addField("added", "");
+        CHECK_THAT(point.getFields(), Equals("added=\"\""));
+    }
+
     TEST_CASE("Measurement with tag", "[PointTest]")
     {
         const auto point = Point{"test"}.addTag("tag_name", "tag_value");
