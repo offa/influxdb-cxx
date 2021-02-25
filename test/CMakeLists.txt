@@ -56,4 +56,6 @@ if (Boost_FOUND)
 endif()
 
 
-add_subdirectory(system)
+if (INFLUXCXX_SYSTEMTEST)
+    add_subdirectory(system)
+endif()
