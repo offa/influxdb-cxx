@@ -124,7 +124,3 @@ jobs:
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
           cmake --build build --target unittest
-      - name: System Test
-        run: |
-          script/ci_setup_influxdb.sh -osx
-          cmake --build build --target systemtest
