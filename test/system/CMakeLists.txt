@@ -3,7 +3,7 @@ target_link_libraries(InfluxDBST PRIVATE InfluxDB InfluxDB-Http CURL::libcurl Te
 target_include_directories(InfluxDBST PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 
-add_custom_target(systemtest2 InfluxDBST
+add_custom_target(systemtest InfluxDBST
         COMMENT "Running system tests\n\n"
         VERBATIM
         )

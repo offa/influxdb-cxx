@@ -34,4 +34,4 @@ jobs:
       - name: Build
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
-          cmake --build build --target systemtest2
+          cmake --build build --target systemtest
