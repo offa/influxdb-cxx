@@ -32,11 +32,6 @@ cmake ..
 sudo make install
  ```
 
-### macOS
-```bash
-brew install awegrzyn/influxdata/influxdb-cxx
-```
-
 ## Quick start
 
 ### Include in CMake project
