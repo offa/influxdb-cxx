@@ -79,7 +79,7 @@ set(Boost_USE_MULTITHREADED TRUE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Boost COMPONENTS unit_test_framework system)
+find_package(Boost COMPONENTS system)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED MODULE)
 
