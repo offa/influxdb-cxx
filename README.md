@@ -115,6 +115,9 @@ List of supported transport is following:
 
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
-| HTTP        | cURL        | `http`/`https` | `http://localhost:8086?db=<db>`      |
+| HTTP        | cURL<sup>i)</sup> | `http`/`https` | `http://localhost:8086?db=<db>`      |
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
+
+
+<sup>i)</sup> boost is needed to support queries.
