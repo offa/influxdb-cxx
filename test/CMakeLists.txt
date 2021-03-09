@@ -21,8 +21,11 @@ function(add_unittest name)
 endfunction()
 
 add_unittest(PointTest)
+target_compile_options(PointTest PRIVATE $<$<NOT:$<BOOL:${MSVC}>>:-Wno-deprecated-declarations>)
+
 add_unittest(LineProtocolTest)
 target_link_libraries(LineProtocolTest PRIVATE InfluxDB-Internal)
+
 add_unittest(InfluxDBTest)
 add_unittest(InfluxDBFactoryTest)
 

@@ -55,6 +55,8 @@ class INFLUXDB_EXPORT Point
     static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
 
     /// Converts point to Influx Line Protocol
+    /// \deprecated Will be removed in a later version
+    [[deprecated("toLineProtocol() will be removed in a later version")]]
     std::string toLineProtocol() const;
 
     /// Sets custom timestamp
