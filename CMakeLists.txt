@@ -21,7 +21,7 @@ option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)
 
 # Define project
 project(influxdb-cxx
-  VERSION 0.6.5
+  VERSION 0.6.6
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
 )
