@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#pragma once
+
 #include "Transport.h"
 #include "Point.h"
 #include "UriParser.h"
@@ -32,6 +34,6 @@ namespace influxdb::internal
 {
     std::vector<Point> queryImpl(Transport* transport, const std::string& query);
 
-    std::unique_ptr<Transport> withUdpTransport(const http::url &uri);
-    std::unique_ptr<Transport> withUnixSocketTransport(const http::url &uri);
+    std::unique_ptr<Transport> withUdpTransport(const http::url& uri);
+    std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri);
 }
