@@ -17,7 +17,7 @@ add_library(InfluxDB-BoostSupport OBJECT
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
 target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>)
-
+target_include_directories(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:${Boost_INCLUDE_DIRS}>)
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
