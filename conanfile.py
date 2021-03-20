@@ -72,5 +72,6 @@ class InfluxdbCxxConan(ConanFile):
     def _configure_cmake(self):
         cmake = CMake(self)
         cmake.definitions["INFLUXCXX_TESTING"] = self.options.tests
+        cmake.definitions["INFLUXCXX_WITH_BOOST"] = self.options.boost
         cmake.configure(build_folder="build")
         return cmake

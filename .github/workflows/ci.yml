@@ -35,10 +35,10 @@ jobs:
         run: apt-get install -y libboost-system1.71-dev
       - name: Build
         run: |
-          script/ci_build.sh
+          script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
           cmake --build build --target unittest
       - name: Check deployment as cmake subdirectory
-        run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON
+        run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Install
         run: cmake --build build --target install
       - name: Check installed library
@@ -96,6 +96,7 @@ jobs:
             conan install -o influxdb-cxx:boost=True .
           fi
           script/ci_build.sh \
+            -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }} \
             -DBUILD_SHARED_LIBS=OFF \
             -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 \
             -G Ninja

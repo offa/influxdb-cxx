@@ -14,6 +14,7 @@ if(DEFINED PROJECT_NAME)
 endif()
 
 option(BUILD_SHARED_LIBS "Build shared versions of libraries" ON)
+option(INFLUXCXX_WITH_BOOST "Build with Boost support enabled" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 option(INFLUXCXX_SYSTEMTEST "Enable system tests" ON)
 option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)
@@ -64,14 +65,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
+message(STATUS "Boost support : ${INFLUXCXX_WITH_BOOST}")
 
 # Add coverage flags
 if(INFLUXCXX_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 endif()
-
-# Fixes warning when using boost from brew
-set(Boost_USE_MULTITHREADED TRUE)
 
 ####################################
 # Dependencies
@@ -79,9 +78,15 @@ set(Boost_USE_MULTITHREADED TRUE)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
-find_package(Boost COMPONENTS system)
 find_package(Threads REQUIRED)
 find_package(CURL REQUIRED MODULE)
+
+if (INFLUXCXX_WITH_BOOST)
+    # Fixes warning when using boost from brew
+    set(Boost_USE_MULTITHREADED TRUE)
+
+    find_package(Boost REQUIRED COMPONENTS system)
+endif()
 
 
 ####################################

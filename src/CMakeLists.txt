@@ -10,14 +10,14 @@ target_include_directories(InfluxDB-Http SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::l
 
 
 add_library(InfluxDB-BoostSupport OBJECT
-    $<$<NOT:$<BOOL:${Boost_FOUND}>>:NoBoostSupport.cxx>
-    $<$<BOOL:${Boost_FOUND}>:BoostSupport.cxx>
-    $<$<BOOL:${Boost_FOUND}>:UDP.cxx>
-    $<$<BOOL:${Boost_FOUND}>:UnixSocket.cxx>
+    $<$<NOT:$<BOOL:${INFLUXCXX_WITH_BOOST}>>:NoBoostSupport.cxx>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:BoostSupport.cxx>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UDP.cxx>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UnixSocket.cxx>
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
-target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${Boost_FOUND}>:Boost::system>)
-
+target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>)
+target_include_directories(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:${Boost_INCLUDE_DIRS}>)
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})

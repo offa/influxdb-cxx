@@ -35,7 +35,7 @@ target_link_libraries(HttpTest PRIVATE InfluxDB-Http CurlMock)
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
 
-if (Boost_FOUND)
+if (INFLUXCXX_WITH_BOOST)
     add_unittest(BoostSupportTest)
     target_link_libraries(BoostSupportTest PRIVATE InfluxDB-BoostSupport Threads::Threads Boost::system)
 endif()
@@ -47,14 +47,14 @@ add_custom_target(unittest PointTest
     COMMAND InfluxDBFactoryTest
     COMMAND HttpTest
     COMMAND NoBoostSupportTest
-    COMMAND $<$<BOOL:${Boost_FOUND}>:BoostSupportTest>
+    COMMAND $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:BoostSupportTest>
 
     COMMENT "Running unit tests\n\n"
     VERBATIM
     )
 
 
-if (Boost_FOUND)
+if (INFLUXCXX_WITH_BOOST)
     add_dependencies(unittest BoostSupportTest)
 endif()
 
