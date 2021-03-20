@@ -93,7 +93,7 @@ jobs:
           CXX: cl
         run: |
           if [[ "${{ matrix.boost }}" == "true" ]]; then
-            export BOOST_ROOT="${BOOST_ROOT_1_72_0}"
+            conan install -o influxdb-cxx:boost=True .
           fi
           script/ci_build.sh \
             -DBUILD_SHARED_LIBS=OFF \
