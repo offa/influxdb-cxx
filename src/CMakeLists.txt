@@ -15,12 +15,12 @@ add_library(InfluxDB-BoostSupport OBJECT
     $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UDP.cxx>
     $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UnixSocket.cxx>
     )
-target_include_directories(InfluxDB-BoostSupport
+target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
+target_link_libraries(InfluxDB-BoostSupport
     PRIVATE
-        ${INTERNAL_INCLUDE_DIRS}
-        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:${Boost_INCLUDE_DIRS}>
-    )
-target_link_libraries(InfluxDB-BoostSupport PRIVATE $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>)
+        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
+        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
+        )
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
