@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y python3-pip libcurl4-openssl-dev libboost-system1.71-dev libboost-test1.71-dev
+          apt-get install -y python3-pip libcurl4-openssl-dev libboost-system1.71-dev
           pip3 install -U conan
           if [ "${{ startsWith(matrix.compiler, 'gcc') }}" = true ]; then
             conan profile new default --detect
