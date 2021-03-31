@@ -22,7 +22,6 @@ class InfluxdbCxxConan(ConanFile):
                        "system": False,
                        "boost": True,
                        "boost:shared": True,
-                       "libcurl:with_openssl": True,
                        "libcurl:shared": True}
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*", "conan/CMakeLists.txt")
