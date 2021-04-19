@@ -76,13 +76,13 @@ std::string InfluxDB::joinLineProtocolBatch() const
 }
 
 
-void InfluxDB::addGlobalTag(std::string_view key, std::string_view value)
+void InfluxDB::addGlobalTag(std::string_view name, std::string_view value)
 {
   if (!mGlobalTags.empty())
   {
       mGlobalTags += ",";
   }
-  mGlobalTags += key;
+  mGlobalTags += name;
   mGlobalTags += "=";
   mGlobalTags += value;
 }
