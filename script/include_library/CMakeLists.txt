@@ -9,5 +9,5 @@ else()
     find_package(InfluxDB REQUIRED)
 endif()
 
-add_executable(influxcxx-writer main)
+add_executable(influxcxx-writer main.cpp)
 target_link_libraries(influxcxx-writer PRIVATE InfluxData::InfluxDB)
