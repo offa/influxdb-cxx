@@ -11,4 +11,6 @@ if [[ ${CC} == gcc* ]]; then
     conan profile update settings.compiler.libcxx=libstdc++11 default
 fi
 
+cp script/settings.yml ~/.conan/
+
 conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True .
