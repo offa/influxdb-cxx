@@ -20,6 +20,7 @@ target_link_libraries(InfluxDB-BoostSupport
     PRIVATE
         $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
         $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
+        date
         )
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)

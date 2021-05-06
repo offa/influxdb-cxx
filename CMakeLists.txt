@@ -94,6 +94,7 @@ if (INFLUXCXX_WITH_BOOST)
     find_package(Boost REQUIRED COMPONENTS system)
 endif()
 
+add_subdirectory(3rd-party)
 
 ####################################
 # Library

@@ -28,6 +28,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <date/date.h>
 
 namespace influxdb::internal
 {
@@ -62,11 +63,11 @@ namespace influxdb::internal
                         const auto column = iColumns->second.get_value<std::string>();
                         if (!column.compare("time"))
                         {
-                            std::tm tm = {};
-                            std::stringstream timeString;
-                            timeString << value;
-                            timeString >> std::get_time(&tm, "%Y-%m-%dT%H:%M:%SZ");
-                            point.setTimestamp(std::chrono::system_clock::from_time_t(std::mktime(&tm)));
+                            std::istringstream timeString{value};
+                            std::chrono::system_clock::time_point timeStamp;
+                            timeString >> date::parse("%FT%T%Z", timeStamp);
+
+                            point.setTimestamp(timeStamp);
                             continue;
                         }
                         // cast all values to double, if strings add to tags

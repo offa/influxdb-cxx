@@ -26,6 +26,8 @@
 #include <boost/property_tree/exceptions.hpp>
 #include <catch2/catch.hpp>
 #include <catch2/trompeloeil.hpp>
+#include <date/date.h>
+#include <sstream>
 
 namespace influxdb::test
 {
@@ -84,22 +86,21 @@ namespace influxdb::test
     {
         using trompeloeil::_;
 
-        std::tm timestamp{};
-        std::stringstream timeString;
-        timeString << "2021-01-01:11:22.000000000Z";
-        timeString >> std::get_time(&timestamp, "%Y-%m-%dT%H:%M:%SZ");
+        std::istringstream in{"2021-01-01T00:11:22.123456789Z"};
+        std::chrono::system_clock::time_point expectedTimeStamp;
+        in >> date::parse("%FT%T%Z", expectedTimeStamp);
 
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,)"
                     R"("series":[{"name":"unittest","columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01:11:22.000000000Z","localhost",112233]]}]}]})");
+                    R"("values":[["2021-01-01T00:11:22.123456789Z","localhost",112233]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 1);
         const auto point = result[0];
         CHECK(point.getName() == "unittest");
-        CHECK(point.getTimestamp() == std::chrono::system_clock::from_time_t(std::mktime(&timestamp)));
+        CHECK(point.getTimestamp() == expectedTimeStamp);
         CHECK(point.getTags() == "host=localhost");
         CHECK(point.getFields() == "value=112233.000000000000000000");
     }
@@ -113,8 +114,8 @@ namespace influxdb::test
             .RETURN(R"({"results":[{"statement_id":0,)"
                     R"("series":[{"name":"unittest","columns":["time","host","value"],)"
                     R"("values":[["2021-01-01:11:22.000000000Z","host-0",100],)"
-                    R"(["2021-01-01:11:23.000000000Z","host-1",30],)"
-                    R"(["2021-01-01:11:24.000000000Z","host-2",54]]}]}]})");
+                    R"(["2021-01-01T00:11:23.560000000Z","host-1",30],)"
+                    R"(["2021-01-01T00:11:24.780000000Z","host-2",54]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 3);
