@@ -61,7 +61,7 @@ namespace influxdb::internal
                     {
                         const auto value = iValues->second.get_value<std::string>();
                         const auto column = iColumns->second.get_value<std::string>();
-                        if (!column.compare("time"))
+                        if (column == "time")
                         {
                             std::istringstream timeString{value};
                             std::chrono::system_clock::time_point timeStamp;
