@@ -28,6 +28,7 @@
 #define INFLUXDATA_POINT_H
 
 #include <string>
+#include <string_view>
 #include <chrono>
 #include <variant>
 
