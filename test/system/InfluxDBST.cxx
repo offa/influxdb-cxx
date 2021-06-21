@@ -64,7 +64,7 @@ namespace influxdb::test
 
         SECTION("Query on non existing database returns empty")
         {
-            CHECK(db->query("select * from st_db").size() == 0);
+            CHECK(db->query("select * from st_db").empty());
         }
 
         SECTION("Create database if not existing")
@@ -80,7 +80,7 @@ namespace influxdb::test
 
         SECTION("Created database is empty")
         {
-            CHECK(db->query("select * from st_db").size() == 0);
+            CHECK(db->query("select * from st_db").empty());
         }
 
         SECTION("Write point")
@@ -102,7 +102,7 @@ namespace influxdb::test
         SECTION("Query point with no matches")
         {
             const auto response = db->query("select * from nothing_to_find");
-            CHECK(response.size() == 0);
+            CHECK(response.empty());
         }
 
         SECTION("Query point throws on invalid query")
