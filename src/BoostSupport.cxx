@@ -23,6 +23,7 @@
 
 #include "BoostSupport.h"
 #include "UDP.h"
+#include "TCP.h"
 #include "UnixSocket.h"
 #include <chrono>
 #include <boost/lexical_cast.hpp>
@@ -103,6 +104,11 @@ namespace influxdb::internal
     std::unique_ptr<Transport> withUdpTransport(const http::url& uri)
     {
         return std::make_unique<transports::UDP>(uri.host, uri.port);
+    }
+
+    std::unique_ptr<Transport> withTcpTransport(const http::url& uri)
+    {
+        return std::make_unique<transports::TCP>(uri.host, uri.port);
     }
 
     std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri)
