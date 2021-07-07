@@ -1,7 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2023 offa
-// Copyright (c) 2019 Adam Wegrzynek
+// Copyright (c) 2021 Felix Moessbauer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,28 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "BoostSupport.h"
-#include "InfluxDBException.h"
+///
+/// \author Felix Moessbauer
+///
 
-namespace influxdb::internal
+#ifndef INFLUXDATA_TRANSPORTS_TCP_H
+#define INFLUXDATA_TRANSPORTS_TCP_H
+
+#include "Transport.h"
+
+#include <boost/asio.hpp>
+#include <chrono>
+#include <string>
+
+namespace influxdb::transports
 {
-    std::vector<Point> queryImpl([[maybe_unused]] Transport* transport, [[maybe_unused]] const std::string& query)
-    {
-        throw InfluxDBException("InfluxDB", "Query requires Boost");
-    }
 
-    std::unique_ptr<Transport> withUdpTransport([[maybe_unused]] const http::url& uri)
+    /// \brief TCP transport
+    class TCP : public Transport
     {
-        throw InfluxDBException("InfluxDBFactory", "UDP transport requires Boost");
-    }
+    public:
+        /// Constructor
+        TCP(const std::string& hostname, int port);
+        ~TCP();
 
-    std::unique_ptr<Transport> withTcpTransport([[maybe_unused]] const http::url& uri)
-    {
-        throw InfluxDBException("InfluxDBFactory", "TCP transport requires Boost");
-    }
+        /// Sends blob via TCP
+        void send(std::string&& message) override;
 
-    std::unique_ptr<Transport> withUnixSocketTransport([[maybe_unused]] const http::url& uri)
-    {
-        throw InfluxDBException("InfluxDBFactory", "Unix socket transport requires Boost");
-    }
-}
+        /// check if socket is connected
+        bool is_connected() const;
+
+        /// reconnect socket
+        void reconnect();
+
+    private:
+        /// Boost Asio I/O functionality
+        boost::asio::io_service mIoService;
+
+        /// TCP socket
+        boost::asio::ip::tcp::socket mSocket;
+
+        /// TCP endpoint
+        boost::asio::ip::tcp::endpoint mEndpoint;
+    };
+
+} // namespace influxdb::transports
+
+#endif // INFLUXDATA_TRANSPORTS_TCP_H

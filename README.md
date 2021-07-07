@@ -125,6 +125,7 @@ List of supported transport is following:
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
 | HTTP        | cURL<sup>i)</sup> | `http`/`https` | `http://localhost:8086?db=<db>`      |
+| TCP         | boost       | `tcp`          | `tcp://localhost:8094`                |
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
 
