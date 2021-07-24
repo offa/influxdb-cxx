@@ -37,7 +37,7 @@ namespace influxdb
 template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
 template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
 
-Point::Point(const std::string& measurement) : mValue({}),
+Point::Point(const std::string& measurement) :
   mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp()), mTags({}), mFields({})
 {
 }
@@ -49,23 +49,9 @@ Point&& Point::addField(std::string_view name, const std::variant<int, long long
     return std::move(*this);
   }
 
-  std::stringstream convert;
-  convert << std::setprecision(floatsPrecision);
-
-  if (!mFields.empty())
-  {
-      convert << ",";
-  }
-
-  convert << name << "=";
-  std::visit(overloaded {
-    [&convert](int v) { convert << v << 'i'; },
-    [&convert](long long int v) { convert << v << 'i'; },
-    [&convert](double v) { convert  << std::fixed << v; },
-    [&convert](const std::string& v) { convert << '"' << v << '"'; },
-    }, value);
-  mFields += convert.str();
+  mFields.emplace_back(std::make_pair(name, value));
   return std::move(*this);
+ 
 }
 
 Point&& Point::addTag(std::string_view key, std::string_view value)
@@ -74,10 +60,8 @@ Point&& Point::addTag(std::string_view key, std::string_view value)
   {
     return std::move(*this);
   }
-  mTags += ",";
-  mTags += key;
-  mTags += "=";
-  mTags += value;
+  
+  mTags.emplace_back(std::make_pair(key,value));
   return std::move(*this);
 }
 
@@ -110,7 +94,30 @@ std::chrono::time_point<std::chrono::system_clock> Point::getTimestamp() const
 
 std::string Point::getFields() const
 {
-  return mFields;
+  std::string fields;
+
+  for (auto& field : mFields)
+  {
+    std::stringstream convert;
+    convert << std::setprecision(floatsPrecision);
+
+    if (!fields.empty())
+    {
+        convert << ",";
+    }
+
+    convert << field.first << "=";
+    std::visit(overloaded {
+      [&convert](int v) { convert << v << 'i'; },
+      [&convert](long long int v) { convert << v << 'i'; },
+      [&convert](double v) { convert  << std::fixed << v; },
+      [&convert](const std::string& v) { convert << '"' << v << '"'; },
+      }, field.second);
+    
+    fields += convert.str();
+  }
+
+  return fields;
 }
 
 std::string Point::getTags() const
@@ -119,7 +126,17 @@ std::string Point::getTags() const
     {
         return "";
     }
-    return mTags.substr(1, mTags.size());
+
+    std::string tags;
+    for (auto& tag : mTags)
+    {
+        tags += ",";
+        tags += tag.first;
+        tags += "=";
+        tags += tag.second;
+    }
+
+    return tags.substr(1, tags.size());
 }
 
 } // namespace influxdb

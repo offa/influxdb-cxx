@@ -80,16 +80,19 @@ class INFLUXDB_EXPORT InfluxDB
     /// \param size
     void batchOf(const std::size_t size = 32);
 
+    /// Returns current stores size
+    size_t batchSize();
+
     /// Adds a global tag
     /// \param name
     /// \param value
     void addGlobalTag(std::string_view name, std::string_view value);
 
   private:
-    void addPointToBatch(const Point &point);
+    void addPointToBatch(Point &&point);
 
     /// line protocol batch to be written
-    std::deque<std::string> mLineProtocolBatch;
+    std::deque<Point> mPointBatch;
 
     /// Flag stating whether point buffering is enabled
     bool mIsBatchingActivated;
@@ -106,8 +109,7 @@ class INFLUXDB_EXPORT InfluxDB
     /// List of global tags
     std::string mGlobalTags;
 
-
-  std::string joinLineProtocolBatch() const;
+    std::string joinLineProtocolBatch() const;
 };
 
 } // namespace influxdb
