@@ -87,10 +87,10 @@ protected:
     std::chrono::time_point<std::chrono::system_clock> mTimestamp;
 
     //// Tags    
-    std::deque<std::pair<std::string, std::string>> mTags;
+    std::deque<std::pair<const std::string, const std::string>> mTags;
 
     //// Fields
-    std::deque<std::pair<std::string_view, std::variant<int, long long int, std::string, double>>> mFields;
+    std::deque<std::pair<const std::string, std::variant<int, long long int, std::string, double>>> mFields;
 };
 
 } // namespace influxdb
