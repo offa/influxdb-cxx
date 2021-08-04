@@ -54,7 +54,7 @@ void InfluxDB::batchOf(const std::size_t size)
   mIsBatchingActivated = true;
 }
 
-size_t InfluxDB::batchSize()
+size_t InfluxDB::batchSize() const
 {
   return mPointBatch.size();
 }

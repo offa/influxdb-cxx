@@ -80,8 +80,8 @@ class INFLUXDB_EXPORT InfluxDB
     /// \param size
     void batchOf(const std::size_t size = 32);
 
-    /// Returns current stores size
-    size_t batchSize();
+    /// Returns current batch size
+    size_t batchSize() const;
 
     /// Adds a global tag
     /// \param name

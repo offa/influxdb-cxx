@@ -96,7 +96,7 @@ std::string Point::getFields() const
 {
   std::string fields;
 
-  for (auto& field : mFields)
+  for (const auto& field : mFields)
   {
     std::stringstream convert;
     convert << std::setprecision(floatsPrecision);
@@ -128,7 +128,7 @@ std::string Point::getTags() const
     }
 
     std::string tags;
-    for (auto& tag : mTags)
+    for (const auto& tag : mTags)
     {
         tags += ",";
         tags += tag.first;
