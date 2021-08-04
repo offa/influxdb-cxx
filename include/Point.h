@@ -31,6 +31,7 @@
 #include <string_view>
 #include <chrono>
 #include <variant>
+#include <deque>
 
 #include "influxdb_export.h"
 
@@ -79,21 +80,17 @@ class INFLUXDB_EXPORT Point
     static inline int floatsPrecision{defaultFloatsPrecision};
 
 protected:
-    /// A value
-    std::variant<long long int, std::string, double> mValue;
-
     /// A name
     std::string mMeasurement;
 
     /// A timestamp
     std::chrono::time_point<std::chrono::system_clock> mTimestamp;
 
-    /// Tags
-    std::string mTags;
+    //// Tags    
+    std::deque<std::pair<const std::string, const std::string>> mTags;
 
-    /// Fields
-    std::string mFields;
-
+    //// Fields
+    std::deque<std::pair<const std::string, std::variant<int, long long int, std::string, double>>> mFields;
 };
 
 } // namespace influxdb
