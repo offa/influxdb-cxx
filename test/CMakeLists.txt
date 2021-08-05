@@ -2,6 +2,11 @@
 find_package(Catch2 REQUIRED)
 find_package(trompeloeil REQUIRED)
 
+if( NOT TARGET trompeloeil::trompeloeil )
+    add_library(trompeloeil::trompeloeil INTERFACE IMPORTED)
+    target_link_libraries(trompeloeil::trompeloeil INTERFACE trompeloeil)
+endif()
+
 
 add_library(TestMain STATIC TestMain.cxx)
 target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil::trompeloeil)
