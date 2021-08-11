@@ -78,7 +78,7 @@ std::string InfluxDB::joinLineProtocolBatch() const
     joinedBatch += formatter.format(point) + "\n";
   }
 
-  joinedBatch.erase(std::prev(joinedBatch.cend()));
+  joinedBatch.erase(std::prev(joinedBatch.end()));
   return joinedBatch;
 }
 
@@ -131,7 +131,7 @@ void InfluxDB::write(std::vector<Point> &&points)
       lineProtocol += formatter.format(point) + "\n";
     }
 
-    lineProtocol.erase(std::prev(lineProtocol.cend()));
+    lineProtocol.erase(std::prev(lineProtocol.end()));
     transmit(std::move(lineProtocol));
   }
 }
