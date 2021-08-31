@@ -19,7 +19,7 @@ jobs:
       image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: Install dependencies
         run: script/ci_setup.sh
       - name: Install Boost
@@ -46,7 +46,7 @@ jobs:
           - "False"
     name: "Conan (Boost: ${{ matrix.boost }})"
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: Setup
         run: |
           pip install -U conan
@@ -70,7 +70,7 @@ jobs:
           - false
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
       - name: Setup MSVC
@@ -101,7 +101,7 @@ jobs:
     runs-on: macOS-latest
     name: "Mac OS X"
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: Install Dependencies
         run: |
           pip3 install -U conan

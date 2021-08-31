@@ -20,7 +20,7 @@ jobs:
       INFLUXDB_SYSTEMTEST_HOST: influxdb
     name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: Setup
         run: |
           script/ci_setup.sh
