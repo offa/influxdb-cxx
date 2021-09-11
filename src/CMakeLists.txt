@@ -70,6 +70,8 @@ target_link_libraries(InfluxDB
   PRIVATE
     CURL::libcurl
     Threads::Threads
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
 )
 
 # Use C++17
