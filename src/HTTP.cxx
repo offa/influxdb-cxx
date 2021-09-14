@@ -180,11 +180,11 @@ void HTTP::treatCurlResponse(const CURLcode &response, long responseCode) const
   {
     throw NonExistentDatabase(__func__, "Nonexistent database: " + std::to_string(responseCode));
   }
-  else if ((responseCode >= 400) && (responseCode < 500))
+  if ((responseCode >= 400) && (responseCode < 500))
   {
     throw BadRequest(__func__, "Bad request: " + std::to_string(responseCode));
   }
-  else if (responseCode >= 500)
+  if (responseCode >= 500)
   {
     throw ServerError(__func__, "Influx server error: " + std::to_string(responseCode));
   }
