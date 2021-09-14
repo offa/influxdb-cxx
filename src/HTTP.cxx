@@ -135,7 +135,6 @@ void HTTP::initCurlRead(const std::string &url)
 
 std::string HTTP::query(const std::string &query)
 {
-  long responseCode;
   std::string buffer;
   char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), static_cast<int>(query.size()));
   auto fullUrl = mReadUrl + std::string(encodedQuery);
@@ -143,6 +142,7 @@ std::string HTTP::query(const std::string &query)
   curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
   curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
   const CURLcode response = curl_easy_perform(readHandle);
+  long responseCode{0};
   curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response, responseCode);
   return buffer;
@@ -158,10 +158,10 @@ void HTTP::enableBasicAuth(const std::string &auth)
 
 void HTTP::send(std::string &&lineprotocol)
 {
-  long responseCode;
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.c_str());
   curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(lineprotocol.length()));
   const CURLcode response = curl_easy_perform(writeHandle);
+  long responseCode{0};
   curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);
   treatCurlResponse(response, responseCode);
 }
