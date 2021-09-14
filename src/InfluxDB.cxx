@@ -48,13 +48,13 @@ InfluxDB::InfluxDB(std::unique_ptr<Transport> transport) :
   }
 }
 
-void InfluxDB::batchOf(const std::size_t size)
+void InfluxDB::batchOf(std::size_t size)
 {
   mBatchSize = size;
   mIsBatchingActivated = true;
 }
 
-size_t InfluxDB::batchSize() const
+std::size_t InfluxDB::batchSize() const
 {
   return mPointBatch.size();
 }

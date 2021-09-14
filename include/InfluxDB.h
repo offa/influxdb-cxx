@@ -78,10 +78,10 @@ class INFLUXDB_EXPORT InfluxDB
 
     /// Enables points batching
     /// \param size
-    void batchOf(const std::size_t size = 32);
+    void batchOf(std::size_t size = 32);
 
     /// Returns current batch size
-    size_t batchSize() const;
+    std::size_t batchSize() const;
 
     /// Adds a global tag
     /// \param name
