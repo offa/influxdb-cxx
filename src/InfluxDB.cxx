@@ -59,6 +59,11 @@ std::size_t InfluxDB::batchSize() const
   return mPointBatch.size();
 }
 
+void InfluxDB::clearBatch()
+{
+    mPointBatch.clear();
+}
+
 void InfluxDB::flushBatch()
 {
   if (mIsBatchingActivated && !mPointBatch.empty())

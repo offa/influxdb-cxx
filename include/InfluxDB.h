@@ -83,6 +83,9 @@ class INFLUXDB_EXPORT InfluxDB
     /// Returns current batch size
     std::size_t batchSize() const;
 
+    /// Clears the point batch
+    void clearBatch();
+
     /// Adds a global tag
     /// \param name
     /// \param value

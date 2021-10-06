@@ -142,14 +142,26 @@ namespace influxdb::test
     TEST_CASE("Flush batch does nothing if batch disabled", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+
         {
             REQUIRE_CALL(*mock, send("x 4567000000"));
             db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
         }
 
         db.flushBatch();
+    }
+
+    TEST_CASE("Clear Batch clears batch", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.batchOf(10);
+
+        db.write(Point{"x"}.setTimestamp(ignoreTimestamp));
+        CHECK(db.batchSize() == 1);
+        db.clearBatch();
+        CHECK(db.batchSize() == 0);
     }
 
     TEST_CASE("Create database throws if unsupported by transport", "[InfluxDBTest]")
