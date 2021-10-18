@@ -28,7 +28,7 @@ namespace influxdb::internal
 {
     std::vector<Point> queryImpl([[maybe_unused]] Transport* transport, [[maybe_unused]] const std::string& query)
     {
-        throw InfluxDBException("InfluxDB", "Qeury requires Boost");
+        throw InfluxDBException("InfluxDB", "Query requires Boost");
     }
 
     std::unique_ptr<Transport> withUdpTransport([[maybe_unused]] const http::url& uri)
