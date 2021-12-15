@@ -45,12 +45,12 @@ class InfluxdbCxxConan(ConanFile):
 
     def requirements(self):
         if not self.options.system:
-            self.requires("libcurl/7.77.0")
+            self.requires("libcurl/7.80.0")
             if self.options.boost:
-                self.requires("boost/1.76.0")
+                self.requires("boost/1.77.0")
         if self.options.tests:
-            self.requires("catch2/2.13.6")
-            self.requires("trompeloeil/41")
+            self.requires("catch2/2.13.7")
+            self.requires("trompeloeil/42")
 
     def build(self):
         cmake = self._configure_cmake()
