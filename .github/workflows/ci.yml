@@ -78,7 +78,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U conan
-          conan install --build=missing -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True .
+          conan install -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True .
       - name: Build
         env:
           CC: cl
