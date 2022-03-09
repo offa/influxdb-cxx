@@ -51,7 +51,7 @@ Point&& Point::addField(std::string_view name, const std::variant<int, long long
 
   mFields.emplace_back(std::make_pair(name, value));
   return std::move(*this);
- 
+
 }
 
 Point&& Point::addTag(std::string_view key, std::string_view value)
@@ -60,7 +60,7 @@ Point&& Point::addTag(std::string_view key, std::string_view value)
   {
     return std::move(*this);
   }
-  
+
   mTags.emplace_back(std::make_pair(key,value));
   return std::move(*this);
 }
@@ -113,7 +113,7 @@ std::string Point::getFields() const
       [&convert](double v) { convert  << std::fixed << v; },
       [&convert](const std::string& v) { convert << '"' << v << '"'; },
       }, field.second);
-    
+
     fields += convert.str();
   }
 
