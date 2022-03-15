@@ -50,11 +50,18 @@ namespace influxdb::internal
             }
             for (const auto& series : result.second.get_child("series"))
             {
-                const auto columns = series.second.get_child("columns");
-
                 for (const auto& values : series.second.get_child("values"))
                 {
                     Point point{series.second.get<std::string>("name", "")};
+
+                    if (const auto tags = series.second.get_child_optional("tags"); tags)
+                    {
+                        for (const auto& tag : tags.get())
+                        {
+                            point.addTag(tag.first, tag.second.data());
+                        }
+                    }
+                    const auto columns = series.second.get_child("columns");
                     auto iColumns = columns.begin();
                     auto iValues = values.second.begin();
                     for (; iColumns != columns.end() && iValues != values.second.end(); ++iColumns, ++iValues)
