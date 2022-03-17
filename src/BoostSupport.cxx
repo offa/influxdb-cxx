@@ -32,6 +32,17 @@
 
 namespace influxdb::internal
 {
+    namespace
+    {
+        std::chrono::system_clock::time_point parseTimeStamp(const std::string& value)
+        {
+            std::istringstream timeString{value};
+            std::chrono::system_clock::time_point timeStamp;
+            timeString >> date::parse("%FT%T%Z", timeStamp);
+            return timeStamp;
+        }
+    }
+
     std::vector<Point> queryImpl(Transport* transport, const std::string& query)
     {
         const auto response = transport->query(query);
@@ -43,18 +54,24 @@ namespace influxdb::internal
 
         for (const auto& result : pt.get_child("results"))
         {
-            const auto isResultEmpty = result.second.find("series");
-            if (isResultEmpty == result.second.not_found())
+            if (const auto isResultEmpty = result.second.find("series"); isResultEmpty == result.second.not_found())
             {
                 return {};
             }
             for (const auto& series : result.second.get_child("series"))
             {
-                const auto columns = series.second.get_child("columns");
-
                 for (const auto& values : series.second.get_child("values"))
                 {
                     Point point{series.second.get<std::string>("name", "")};
+
+                    if (const auto tags = series.second.get_child_optional("tags"); tags)
+                    {
+                        for (const auto& tag : tags.get())
+                        {
+                            point.addTag(tag.first, tag.second.data());
+                        }
+                    }
+                    const auto columns = series.second.get_child("columns");
                     auto iColumns = columns.begin();
                     auto iValues = values.second.begin();
                     for (; iColumns != columns.end() && iValues != values.second.end(); ++iColumns, ++iValues)
@@ -63,11 +80,7 @@ namespace influxdb::internal
                         const auto column = iColumns->second.get_value<std::string>();
                         if (column == "time")
                         {
-                            std::istringstream timeString{value};
-                            std::chrono::system_clock::time_point timeStamp;
-                            timeString >> date::parse("%FT%T%Z", timeStamp);
-
-                            point.setTimestamp(timeStamp);
+                            point.setTimestamp(parseTimeStamp(value));
                             continue;
                         }
                         // cast all values to double, if strings add to tags

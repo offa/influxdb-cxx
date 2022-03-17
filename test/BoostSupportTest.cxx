@@ -155,4 +155,18 @@ namespace influxdb::test
         CHECK(result[0].getName() == "");
         CHECK(result[0].getTags() == "host=x");
     }
+
+    TEST_CASE("Query reads optional tags element", "[BoostSupportTest")
+    {
+        using trompeloeil::_;
+
+        TransportMock transport;
+        ALLOW_CALL(transport, query(_))
+            .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"x","tags":{"type":"sp"},"columns":["time","value"],)"
+                    R"("values":[["2022-01-01:01:02.000000000ZZ",99]]}]}]})");
+
+        const auto result = internal::queryImpl(&transport, "SELECT * from test");
+        CHECK(result.size() == 1);
+        CHECK(result[0].getTags() == "type=sp");
+    }
 }

@@ -105,6 +105,13 @@ namespace influxdb::test
             CHECK(response.empty());
         }
 
+        SECTION("Query point grouped by tag")
+        {
+            const auto response = db->query("select * from x group by type");
+            CHECK(response.size() == 1);
+            CHECK(response[0].getTags() == "type=sp");
+        }
+
         SECTION("Query point throws on invalid query")
         {
             CHECK_THROWS_AS(db->query("select* from_INVALID"), BadRequest);
