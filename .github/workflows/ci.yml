@@ -10,8 +10,8 @@ jobs:
         compiler:
           - gcc-11
           - gcc-10
+          - clang-14
           - clang-13
-          - clang-12
         boost:
           - true
           - false
