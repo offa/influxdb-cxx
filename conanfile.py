@@ -49,7 +49,7 @@ class InfluxdbCxxConan(ConanFile):
             if self.options.boost:
                 self.requires("boost/1.78.0")
         if self.options.tests:
-            self.requires("catch2/2.13.8")
+            self.requires("catch2/2.13.9")
             self.requires("trompeloeil/42")
 
     def build(self):
