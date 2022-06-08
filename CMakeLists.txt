@@ -30,7 +30,7 @@ message(STATUS "~~~ ${PROJECT_NAME} v${PROJECT_VERSION} ~~~")
 
 
 # Add compiler flags for warnings
-if(NOT MSVC)
+if(NOT MSVC AND NOT INCLUDED_AS_SUBPROJECT)
     add_compile_options(-Wall
       -Wextra
       -pedantic
