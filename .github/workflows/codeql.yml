@@ -16,7 +16,7 @@ jobs:
       - name: Install dependencies
         run: |
           script/ci_setup.sh
-          apt-get install -y libboost-system1.71-dev
+          apt-get install -y libboost-system-dev
       - name: CodeQL Initialization
         uses: github/codeql-action/init@v2
         with:

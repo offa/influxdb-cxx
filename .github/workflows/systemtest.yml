@@ -24,7 +24,7 @@ jobs:
       - name: Setup
         run: |
           script/ci_setup.sh
-          apt-get install -y libboost-system1.71-dev
+          apt-get install -y libboost-system-dev
       - name: Build
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake

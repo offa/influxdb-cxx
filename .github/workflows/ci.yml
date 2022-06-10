@@ -24,7 +24,7 @@ jobs:
         run: script/ci_setup.sh
       - name: Install Boost
         if: ${{ matrix.boost == true }}
-        run: apt-get install -y libboost-system1.71-dev
+        run: apt-get install -y libboost-system-dev
       - name: Build
         run: |
           script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
