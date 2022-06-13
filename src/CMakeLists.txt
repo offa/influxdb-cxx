@@ -16,12 +16,18 @@ add_library(InfluxDB-BoostSupport OBJECT
     $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UnixSocket.cxx>
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
+
 target_link_libraries(InfluxDB-BoostSupport
     PRIVATE
         $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
         $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
         date
         )
+
+# #117: Workaround for Boost ASIO null-dereference
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "12")
+    set_source_files_properties(UDP.cxx UnixSocket.cxx PROPERTIES COMPILE_OPTIONS "-Wno-null-dereference")
+endif()
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})

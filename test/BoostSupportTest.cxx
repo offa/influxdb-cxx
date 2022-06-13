@@ -87,7 +87,7 @@ namespace influxdb::test
         using trompeloeil::_;
 
         std::istringstream in{"2021-01-01T00:11:22.123456789Z"};
-        std::chrono::system_clock::time_point expectedTimeStamp;
+        std::chrono::system_clock::time_point expectedTimeStamp{};
         in >> date::parse("%FT%T%Z", expectedTimeStamp);
 
         TransportMock transport;
