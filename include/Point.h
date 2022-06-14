@@ -51,7 +51,7 @@ class INFLUXDB_EXPORT Point
     /// Adds a tags
     Point&& addTag(std::string_view key, std::string_view value);
 
-    /// Adds filed
+    /// Adds field
     Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
 
     /// Generates current timestamp
