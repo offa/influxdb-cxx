@@ -1,7 +1,6 @@
 // MIT License
 //
 // Copyright (c) 2020-2022 offa
-// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///
-/// \author Adam Wegrzynek
-///
+#ifndef INFLUXDATA_PROXY_H
+#define INFLUXDATA_PROXY_H
 
-#ifndef INFLUXDATA_TRANSPORTINTERFACE_H
-#define INFLUXDATA_TRANSPORTINTERFACE_H
-
-#include "InfluxDBException.h"
 #include "influxdb_export.h"
-#include "Proxy.h"
+#include <string>
+#include <optional>
 
 namespace influxdb
 {
+    class INFLUXDB_EXPORT Proxy
+    {
+    public:
+        struct Auth
+        {
+            std::string user;
+            std::string password;
+        };
 
-/// \brief Transport interface
-class INFLUXDB_EXPORT Transport
-{
-  public:
-    Transport() = default;
 
-    virtual ~Transport() = default;
+        Proxy(const std::string& proxy, Auth auth);
+        explicit Proxy(const std::string& proxy);
 
-    /// Sends string blob
-    virtual void send(std::string&& message) = 0;
+        const std::string& getProxy() const;
+        std::optional<Auth> getAuthentication() const;
 
-    /// Sends request
-    virtual std::string query([[maybe_unused]] const std::string& query) {
-      throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
-    }
-
-    /// Sends request
-    virtual void createDatabase() {
-      throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
-    }
-
-    /// Sets proxy
-    virtual void setProxy([[maybe_unused]] Proxy proxy) {
-      throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
-    }
-};
-
-} // namespace influxdb
-
-#endif // INFLUXDATA_TRANSPORTINTERFACE_H
+    private:
+        std::string proxy_;
+        std::optional<Auth> auth_;
+    };
+}
+#endif /* INFLUXDATA_PROXY_H */

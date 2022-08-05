@@ -221,6 +221,22 @@ std::string HTTP::influxDbServiceUrl() const
   return mInfluxDbServiceUrl;
 }
 
+void HTTP::setProxy(Proxy proxy)
+{
+  auto proxyServer = proxy.getProxy();
+  curl_easy_setopt(writeHandle, CURLOPT_PROXY, proxyServer.c_str());
+  curl_easy_setopt(readHandle, CURLOPT_PROXY, proxyServer.c_str());
+
+  if (auto auth = proxy.getAuthentication(); auth.has_value())
+  {
+    curl_easy_setopt(writeHandle, CURLOPT_PROXYUSERNAME, auth->user.c_str());
+    curl_easy_setopt(writeHandle, CURLOPT_PROXYPASSWORD, auth->password.c_str());
+
+    curl_easy_setopt(readHandle, CURLOPT_PROXYUSERNAME, auth->user.c_str());
+    curl_easy_setopt(readHandle, CURLOPT_PROXYPASSWORD, auth->password.c_str());
+  }
+}
+
 void HTTP::createDatabase()
 {
   const std::string createUrl = mInfluxDbServiceUrl + "/query";

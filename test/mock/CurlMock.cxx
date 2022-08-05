@@ -76,6 +76,9 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
         case CURLOPT_URL:
         case CURLOPT_POSTFIELDS:
         case CURLOPT_USERPWD:
+        case CURLOPT_PROXY:
+        case CURLOPT_PROXYUSERNAME:
+        case CURLOPT_PROXYPASSWORD:
             value = va_arg(argp, const char*);
             break;
         case CURLOPT_WRITEFUNCTION:

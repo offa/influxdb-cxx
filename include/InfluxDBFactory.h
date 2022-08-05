@@ -47,9 +47,16 @@ class INFLUXDB_EXPORT InfluxDBFactory
 
    /// InfluxDB factory
    /// Provides InfluxDB instance with given transport
-   /// \param url 	URL defining transport details
-   /// \throw InfluxDBException 	if unrecognised backend or missing protocol
+   /// \param url   URL defining transport details
+   /// \throw InfluxDBException     if unrecognised backend or missing protocol
    static std::unique_ptr<InfluxDB> Get(const std::string& url) noexcept(false);
+
+   /// InfluxDB factory
+   /// Provides InfluxDB instance with given transport and proxy
+   /// \param url   URL defining transport details
+   /// \param proxy   Proxy
+   /// \throw InfluxDBException     if unrecognised backend, missing protocol or unsupported proxy
+   static std::unique_ptr<InfluxDB> Get(const std::string& url, Proxy proxy);
 
  private:
    ///\return  backend based on provided URL

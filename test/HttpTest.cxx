@@ -515,4 +515,38 @@ namespace influxdb::test
         CHECK(http.influxDbServiceUrl() == "http://localhost:8086");
     }
 
+    TEST_CASE("Set proxy without authentication", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXY, "https://proxy-server:1234")).RETURN(CURLE_OK).TIMES(2);
+
+        HTTP http{"http://localhost:8086?db=test"};
+        http.setProxy(Proxy{"https://proxy-server:1234"});
+    }
+
+    TEST_CASE("Set proxy with authentication", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXY, "https://proxy-server:1234")).RETURN(CURLE_OK).TIMES(2);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXYUSERNAME, "abc")).RETURN(CURLE_OK).TIMES(2);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXYPASSWORD, "def")).RETURN(CURLE_OK).TIMES(2);
+
+        HTTP http{"http://localhost:8086?db=test"};
+        http.setProxy(Proxy{"https://proxy-server:1234", Proxy::Auth{"abc", "def"}});
+    }
+
 }

@@ -37,6 +37,7 @@ add_library(InfluxDB
     InfluxDB.cxx
     Point.cxx
     InfluxDBFactory.cxx
+    Proxy.cxx
     $<TARGET_OBJECTS:InfluxDB-Internal>
     $<TARGET_OBJECTS:InfluxDB-Http>
     $<TARGET_OBJECTS:InfluxDB-BoostSupport>

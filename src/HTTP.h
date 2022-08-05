@@ -68,6 +68,9 @@ public:
   /// Get the influx service url which transport connects to
   [[nodiscard]] std::string influxDbServiceUrl() const;
 
+  /// Sets proxy
+  void setProxy(Proxy proxy) override;
+
 private:
 
   /// Obtain InfluxDB service url from the url passed

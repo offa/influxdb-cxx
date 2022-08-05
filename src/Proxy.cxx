@@ -1,7 +1,6 @@
 // MIT License
 //
 // Copyright (c) 2020-2022 offa
-// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///
-/// \author Adam Wegrzynek
-///
-
-#ifndef INFLUXDATA_TRANSPORTINTERFACE_H
-#define INFLUXDATA_TRANSPORTINTERFACE_H
-
-#include "InfluxDBException.h"
-#include "influxdb_export.h"
 #include "Proxy.h"
 
 namespace influxdb
 {
-
-/// \brief Transport interface
-class INFLUXDB_EXPORT Transport
-{
-  public:
-    Transport() = default;
-
-    virtual ~Transport() = default;
-
-    /// Sends string blob
-    virtual void send(std::string&& message) = 0;
-
-    /// Sends request
-    virtual std::string query([[maybe_unused]] const std::string& query) {
-      throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
+    Proxy::Proxy(const std::string& proxy, Proxy::Auth auth)
+        : proxy_(proxy),
+          auth_(auth)
+    {
     }
 
-    /// Sends request
-    virtual void createDatabase() {
-      throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
+    Proxy::Proxy(const std::string& proxy)
+        : proxy_(proxy), auth_({})
+    {
     }
 
-    /// Sets proxy
-    virtual void setProxy([[maybe_unused]] Proxy proxy) {
-      throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
+
+    const std::string& Proxy::getProxy() const
+    {
+        return proxy_;
     }
-};
 
-} // namespace influxdb
+    std::optional<Proxy::Auth> Proxy::getAuthentication() const
+    {
+        return auth_;
+    }
 
-#endif // INFLUXDATA_TRANSPORTINTERFACE_H
+}

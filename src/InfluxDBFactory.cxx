@@ -81,4 +81,11 @@ namespace influxdb
         return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url));
     }
 
+    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, Proxy proxy)
+    {
+        auto transport = InfluxDBFactory::GetTransport(url);
+        transport->setProxy(proxy);
+        return std::make_unique<InfluxDB>(std::move(transport));
+    }
+
 } // namespace influxdb

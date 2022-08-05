@@ -1,7 +1,6 @@
 // MIT License
 //
 // Copyright (c) 2020-2022 offa
-// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,47 +20,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///
-/// \author Adam Wegrzynek
-///
-
-#ifndef INFLUXDATA_TRANSPORTINTERFACE_H
-#define INFLUXDATA_TRANSPORTINTERFACE_H
-
-#include "InfluxDBException.h"
-#include "influxdb_export.h"
 #include "Proxy.h"
+#include <catch2/catch.hpp>
 
-namespace influxdb
+
+namespace influxdb::test
 {
+    using namespace Catch::Matchers;
 
-/// \brief Transport interface
-class INFLUXDB_EXPORT Transport
-{
-  public:
-    Transport() = default;
-
-    virtual ~Transport() = default;
-
-    /// Sends string blob
-    virtual void send(std::string&& message) = 0;
-
-    /// Sends request
-    virtual std::string query([[maybe_unused]] const std::string& query) {
-      throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
+    TEST_CASE("Proxy without authentication", "[ProxyTest]")
+    {
+        const Proxy p("https://proxy-host");
+        CHECK_THAT(p.getProxy(), Equals("https://proxy-host"));
+        CHECK(p.getAuthentication().has_value() == false);
     }
 
-    /// Sends request
-    virtual void createDatabase() {
-      throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
+    TEST_CASE("Proxy with authentication", "[ProxyTest]")
+    {
+        const Proxy p("https://proxy-host", Proxy::Auth{"uname", "upw"});
+        CHECK_THAT(p.getProxy(), Equals("https://proxy-host"));
+
+        const auto auth = p.getAuthentication();
+        CHECK(auth.has_value() == true);
+        CHECK_THAT(auth->user, Equals("uname"));
+        CHECK_THAT(auth->password, Equals("upw"));
     }
 
-    /// Sets proxy
-    virtual void setProxy([[maybe_unused]] Proxy proxy) {
-      throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
-    }
-};
-
-} // namespace influxdb
-
-#endif // INFLUXDATA_TRANSPORTINTERFACE_H
+}
