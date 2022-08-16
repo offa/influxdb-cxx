@@ -20,6 +20,11 @@ jobs:
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
+      - name: Cache Conan Packages
+        uses: actions/cache@main
+        with:
+          path: ~/.conan/data/
+          key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Install dependencies
         run: script/ci_setup.sh
       - name: Install Boost
@@ -47,6 +52,11 @@ jobs:
     name: "Conan (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
+      - name: Cache Conan Packages
+        uses: actions/cache@main
+        with:
+          path: ~/.conan/data/
+          key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup
         run: |
           pip install -U conan
@@ -71,6 +81,11 @@ jobs:
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
+      - name: Cache Conan Packages
+        uses: actions/cache@main
+        with:
+          path: ~/.conan/data/
+          key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
       - name: Setup MSVC
@@ -102,6 +117,11 @@ jobs:
     name: "Mac OS X"
     steps:
       - uses: actions/checkout@main
+      - name: Cache Conan Packages
+        uses: actions/cache@main
+        with:
+          path: ~/.conan/data/
+          key: conan-${{ runner.os }}-macos-${{ hashFiles('conanfile.py') }}
       - name: Install Dependencies
         run: |
           pip3 install -U conan

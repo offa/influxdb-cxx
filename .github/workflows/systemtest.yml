@@ -21,6 +21,11 @@ jobs:
     name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
     steps:
       - uses: actions/checkout@main
+      - name: Cache Conan Packages
+        uses: actions/cache@main
+        with:
+          path: ~/.conan/data/
+          key: conan-${{ runner.os }}-${{ matrix.compiler }}-db${{ matrix.influx_version }}-${{ hashFiles('conanfile.py') }}
       - name: Setup
         run: |
           script/ci_setup.sh
