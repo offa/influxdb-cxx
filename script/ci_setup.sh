@@ -3,12 +3,7 @@
 set -ex
 
 apt-get update
-
-# #129: Workaround for broken python3-pip package
-curl -sSL https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-python3 get-pip.py
-
-apt-get install -y libcurl4-openssl-dev
+apt-get install -y python3-pip libcurl4-openssl-dev
 pip3 install -U conan
 
 conan profile new default --detect
