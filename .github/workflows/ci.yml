@@ -70,7 +70,7 @@ jobs:
 
 
   build_windows:
-    runs-on: windows-2019
+    runs-on: windows-latest
     strategy:
       matrix:
         compiler:
@@ -84,7 +84,9 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: ~/.conan/data/
+          path: |
+            ~/.conan/data/
+            C:\.conan
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
         uses: seanmiddleditch/gha-setup-ninja@master
@@ -93,15 +95,15 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U conan
-          conan install -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True .
+          conan install -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True --build=missing .
+      - name: Install Boost
+        if: ${{ matrix.boost == true }}
+        run: conan install -o influxdb-cxx:boost=True --build=missing .
       - name: Build
         env:
           CC: cl
           CXX: cl
         run: |
-          if [[ "${{ matrix.boost }}" == "true" ]]; then
-            conan install -o influxdb-cxx:boost=True .
-          fi
           script/ci_build.sh \
             -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }} \
             -DBUILD_SHARED_LIBS=OFF \
