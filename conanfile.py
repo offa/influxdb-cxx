@@ -3,6 +3,7 @@ import os
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanInvalidConfiguration
 
+
 class InfluxdbCxxConan(ConanFile):
     name = "influxdb-cxx"
     license = "MIT"
@@ -13,35 +14,44 @@ class InfluxdbCxxConan(ConanFile):
     topics = ("influxdb", "influxdb-client")
     settings = "os", "compiler", "build_type", "arch"
     generators = ("cmake_find_package", "cmake_paths")
-    options = {"shared": [True, False],
-               "tests": [True, False],
-               "system": [True, False],
-               "boost": [True, False]}
-    default_options = {"shared": False,
-                       "tests": False,
-                       "system": False,
-                       "boost": True,
-                       "boost:shared": True,
-                       "libcurl:shared": True}
+    options = {
+        "shared": [True, False],
+        "tests": [True, False],
+        "system": [True, False],
+        "boost": [True, False]
+    }
+    default_options = {
+        "shared": False,
+        "tests": False,
+        "system": False,
+        "boost": True,
+        "boost:shared": True,
+        "libcurl:shared": True
+    }
     exports = ["LICENSE"]
-    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*", "cmake/*", "3rd-party/*")
-
+    exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*",
+                       "cmake/*", "3rd-party/*")
 
     def set_version(self):
-        cmake_lists_content = tools.load(os.path.join(self.recipe_folder, "CMakeLists.txt"))
-        project_match = re.search(r'project\s*\((.+?)\)', cmake_lists_content, re.DOTALL)
+        cmake_lists_content = tools.load(
+            os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        project_match = re.search(r'project\s*\((.+?)\)', cmake_lists_content,
+                                  re.DOTALL)
 
         if not project_match:
-            raise ConanInvalidConfiguration("No valid project() statement found in CMakeLists.txt")
+            raise ConanInvalidConfiguration(
+                "No valid project() statement found in CMakeLists.txt")
 
         project_params = project_match.group(1).split()
         version_string = project_params[project_params.index("VERSION") + 1]
 
         if not re.search(r'\d+\.\d+\.\d+(?:\.\d)?', version_string):
-            raise ConanInvalidConfiguration("No valid version found in CMakeLists.txt")
+            raise ConanInvalidConfiguration(
+                "No valid version found in CMakeLists.txt")
 
         self.version = version_string
-        self.output.info(f"Project version from CMakeLists.txt: '{self.version}'")
+        self.output.info(
+            f"Project version from CMakeLists.txt: '{self.version}'")
 
     def requirements(self):
         if not self.options.system:
