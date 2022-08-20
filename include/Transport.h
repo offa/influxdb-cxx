@@ -35,32 +35,35 @@
 namespace influxdb
 {
 
-/// \brief Transport interface
-class INFLUXDB_EXPORT Transport
-{
-  public:
-    Transport() = default;
+    /// \brief Transport interface
+    class INFLUXDB_EXPORT Transport
+    {
+    public:
+        Transport() = default;
 
-    virtual ~Transport() = default;
+        virtual ~Transport() = default;
 
-    /// Sends string blob
-    virtual void send(std::string&& message) = 0;
+        /// Sends string blob
+        virtual void send(std::string&& message) = 0;
 
-    /// Sends request
-    virtual std::string query([[maybe_unused]] const std::string& query) {
-      throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
-    }
+        /// Sends request
+        virtual std::string query([[maybe_unused]] const std::string& query)
+        {
+            throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
+        }
 
-    /// Sends request
-    virtual void createDatabase() {
-      throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
-    }
+        /// Sends request
+        virtual void createDatabase()
+        {
+            throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
+        }
 
-    /// Sets proxy
-    virtual void setProxy([[maybe_unused]] Proxy proxy) {
-      throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
-    }
-};
+        /// Sets proxy
+        virtual void setProxy([[maybe_unused]] Proxy proxy)
+        {
+            throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
+        }
+    };
 
 } // namespace influxdb
 

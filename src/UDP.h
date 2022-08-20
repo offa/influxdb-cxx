@@ -37,27 +37,26 @@
 namespace influxdb::transports
 {
 
-/// \brief UDP transport
-class UDP : public Transport
-{
-  public:
-    /// Constructor
-    UDP(const std::string &hostname, int port);
+    /// \brief UDP transport
+    class UDP : public Transport
+    {
+    public:
+        /// Constructor
+        UDP(const std::string& hostname, int port);
 
-    /// Sends blob via UDP
-    void send(std::string&& message) override;
+        /// Sends blob via UDP
+        void send(std::string&& message) override;
 
-  private:
-    /// Boost Asio I/O functionality
-    boost::asio::io_service mIoService;
+    private:
+        /// Boost Asio I/O functionality
+        boost::asio::io_service mIoService;
 
-    /// UDP socket
-    boost::asio::ip::udp::socket mSocket;
+        /// UDP socket
+        boost::asio::ip::udp::socket mSocket;
 
-    /// UDP endpoint
-    boost::asio::ip::udp::endpoint mEndpoint;
-
-};
+        /// UDP endpoint
+        boost::asio::ip::udp::endpoint mEndpoint;
+    };
 
 } // namespace influxdb::transports
 

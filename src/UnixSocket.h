@@ -36,26 +36,26 @@
 namespace influxdb::transports
 {
 
-/// \brief Unix datagram socket transport
-class UnixSocket : public Transport
-{
-  public:
-    explicit UnixSocket(const std::string &socketPath);
+    /// \brief Unix datagram socket transport
+    class UnixSocket : public Transport
+    {
+    public:
+        explicit UnixSocket(const std::string& socketPath);
 
-    /// \param message   r-value string formated
-    void send(std::string&& message) override;
+        /// \param message   r-value string formated
+        void send(std::string&& message) override;
 
-  private:
-    /// Boost Asio I/O functionality
-    boost::asio::io_service mIoService;
+    private:
+        /// Boost Asio I/O functionality
+        boost::asio::io_service mIoService;
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
-    /// Unix socket
-    boost::asio::local::datagram_protocol::socket mSocket;
+        /// Unix socket
+        boost::asio::local::datagram_protocol::socket mSocket;
 
-    /// Unix endpoint
-    boost::asio::local::datagram_protocol::endpoint mEndpoint;
+        /// Unix endpoint
+        boost::asio::local::datagram_protocol::endpoint mEndpoint;
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
-};
+    };
 
 } // namespace influxdb::transports
 

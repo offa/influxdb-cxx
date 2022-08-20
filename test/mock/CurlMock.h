@@ -49,7 +49,7 @@ namespace influxdb::test
         MAKE_MOCK0(curl_global_cleanup, void());
         MAKE_MOCK1(curl_easy_perform, CURLcode(CURL* easy_handle));
         MAKE_MOCK3(curl_easy_getinfo_, CURLcode(CURL*, CURLINFO, long*));
-        MAKE_MOCK3(curl_easy_escape, char*(CURL*, const char*, int));
+        MAKE_MOCK3(curl_easy_escape, char*(CURL*, const char*, int) );
         MAKE_MOCK1(curl_free, void(void*));
     };
 

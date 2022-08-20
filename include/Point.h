@@ -39,60 +39,59 @@
 namespace influxdb
 {
 
-static inline constexpr int defaultFloatsPrecision{18};
+    static inline constexpr int defaultFloatsPrecision{18};
 
-/// \brief Represents a point
-class INFLUXDB_EXPORT Point
-{
-  public:
-    /// Constructs point based on measurement name
-    explicit Point(const std::string& measurement);
+    /// \brief Represents a point
+    class INFLUXDB_EXPORT Point
+    {
+    public:
+        /// Constructs point based on measurement name
+        explicit Point(const std::string& measurement);
 
-    /// Adds a tags
-    Point&& addTag(std::string_view key, std::string_view value);
+        /// Adds a tags
+        Point&& addTag(std::string_view key, std::string_view value);
 
-    /// Adds field
-    Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
+        /// Adds field
+        Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
 
-    /// Generates current timestamp
-    static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
+        /// Generates current timestamp
+        static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
 
-    /// Converts point to Influx Line Protocol
-    /// \deprecated Will be removed in a later version
-    [[deprecated("toLineProtocol() will be removed in a later version")]]
-    std::string toLineProtocol() const;
+        /// Converts point to Influx Line Protocol
+        /// \deprecated Will be removed in a later version
+        [[deprecated("toLineProtocol() will be removed in a later version")]] std::string toLineProtocol() const;
 
-    /// Sets custom timestamp
-    Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
+        /// Sets custom timestamp
+        Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
 
-    /// Name getter
-    std::string getName() const;
+        /// Name getter
+        std::string getName() const;
 
-    /// Timestamp getter
-    std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
+        /// Timestamp getter
+        std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
 
-    /// Fields getter
-    std::string getFields() const;
+        /// Fields getter
+        std::string getFields() const;
 
-    /// Tags getter
-    std::string getTags() const;
+        /// Tags getter
+        std::string getTags() const;
 
-    /// Precision for float fields
-    static inline int floatsPrecision{defaultFloatsPrecision};
+        /// Precision for float fields
+        static inline int floatsPrecision{defaultFloatsPrecision};
 
-protected:
-    /// A name
-    std::string mMeasurement;
+    protected:
+        /// A name
+        std::string mMeasurement;
 
-    /// A timestamp
-    std::chrono::time_point<std::chrono::system_clock> mTimestamp;
+        /// A timestamp
+        std::chrono::time_point<std::chrono::system_clock> mTimestamp;
 
-    //// Tags
-    std::deque<std::pair<std::string, std::string>> mTags;
+        //// Tags
+        std::deque<std::pair<std::string, std::string>> mTags;
 
-    //// Fields
-    std::deque<std::pair<std::string, std::variant<int, long long int, std::string, double>>> mFields;
-};
+        //// Fields
+        std::deque<std::pair<std::string, std::variant<int, long long int, std::string, double>>> mFields;
+    };
 
 } // namespace influxdb
 

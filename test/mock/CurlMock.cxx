@@ -91,7 +91,9 @@ CURLcode curl_easy_setopt(CURL* handle, CURLoption option, ...)
 
     va_end(argp);
 
-    return std::visit([&](auto& v) { return curlMock.curl_easy_setopt_(handle, option, v); }, value);
+    return std::visit([&](auto& v)
+                      { return curlMock.curl_easy_setopt_(handle, option, v); },
+                      value);
 }
 
 CURLcode curl_easy_perform(CURL* easy_handle)

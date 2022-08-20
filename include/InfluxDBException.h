@@ -33,33 +33,52 @@
 
 #include "influxdb_export.h"
 
-namespace influxdb {
+namespace influxdb
+{
 
-class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error {
-public:
-  InfluxDBException(const std::string &source, const std::string &message) : std::runtime_error::runtime_error(
-          "influx-cxx [" + source + "]: " + message) {}
-};
+    class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error
+    {
+    public:
+        InfluxDBException(const std::string& source, const std::string& message)
+            : std::runtime_error::runtime_error(
+                  "influx-cxx [" + source + "]: " + message)
+        {
+        }
+    };
 
-class NonExistentDatabase : public InfluxDBException {
-public:
-  NonExistentDatabase(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
-};
+    class NonExistentDatabase : public InfluxDBException
+    {
+    public:
+        NonExistentDatabase(const std::string& source, const std::string& message)
+            : InfluxDBException(source, message)
+        {
+        }
+    };
 
-class BadRequest : public InfluxDBException {
-public:
-  BadRequest(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
-};
+    class BadRequest : public InfluxDBException
+    {
+    public:
+        BadRequest(const std::string& source, const std::string& message)
+            : InfluxDBException(source, message)
+        {
+        }
+    };
 
-class ServerError : public InfluxDBException {
-public:
-  ServerError(const std::string &source, const std::string &message) : InfluxDBException(source, message) {}
-};
+    class ServerError : public InfluxDBException
+    {
+    public:
+        ServerError(const std::string& source, const std::string& message)
+            : InfluxDBException(source, message)
+        {
+        }
+    };
 
-class ConnectionError : public InfluxDBException {
-public:
-  ConnectionError(const std::string &source, const std::string &message) : InfluxDBException(source, message) {};
-};
+    class ConnectionError : public InfluxDBException
+    {
+    public:
+        ConnectionError(const std::string& source, const std::string& message)
+            : InfluxDBException(source, message){};
+    };
 
 
 } // namespace influxdb

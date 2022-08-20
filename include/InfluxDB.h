@@ -41,80 +41,79 @@
 namespace influxdb
 {
 
-class INFLUXDB_EXPORT InfluxDB
-{
-  public:
-    /// Disable copy constructor
-    InfluxDB & operator=(const InfluxDB&) = delete;
-
-    /// Disable copy constructor
-    InfluxDB(const InfluxDB&) = delete;
-
-    /// Constructor required valid transport
-    explicit InfluxDB(std::unique_ptr<Transport> transport);
-
-    /// Writes a point
-    /// \param point
-    void write(Point&& point);
-
-    /// Writes a vector of point
-    /// \param point
-    void write(std::vector<Point> &&points);
-
-    /// Queries InfluxDB database
-    std::vector<Point> query(const std::string& query);
-
-    /// Create InfluxDB database if does not exists
-    void createDatabaseIfNotExists();
-
-    /// Flushes points batched (this can also happens when buffer is full)
-    void flushBatch();
-
-    /// \deprecated use \ref flushBatch() instead
-    [[deprecated("Use flushBatch() instead")]]
-    inline void flushBuffer()
+    class INFLUXDB_EXPORT InfluxDB
     {
-        flushBatch();
-    }
+    public:
+        /// Disable copy constructor
+        InfluxDB& operator=(const InfluxDB&) = delete;
 
-    /// Enables points batching
-    /// \param size
-    void batchOf(std::size_t size = 32);
+        /// Disable copy constructor
+        InfluxDB(const InfluxDB&) = delete;
 
-    /// Returns current batch size
-    std::size_t batchSize() const;
+        /// Constructor required valid transport
+        explicit InfluxDB(std::unique_ptr<Transport> transport);
 
-    /// Clears the point batch
-    void clearBatch();
+        /// Writes a point
+        /// \param point
+        void write(Point&& point);
 
-    /// Adds a global tag
-    /// \param name
-    /// \param value
-    void addGlobalTag(std::string_view name, std::string_view value);
+        /// Writes a vector of point
+        /// \param point
+        void write(std::vector<Point>&& points);
 
-  private:
-    void addPointToBatch(Point &&point);
+        /// Queries InfluxDB database
+        std::vector<Point> query(const std::string& query);
 
-    /// line protocol batch to be written
-    std::deque<Point> mPointBatch;
+        /// Create InfluxDB database if does not exists
+        void createDatabaseIfNotExists();
 
-    /// Flag stating whether point buffering is enabled
-    bool mIsBatchingActivated;
+        /// Flushes points batched (this can also happens when buffer is full)
+        void flushBatch();
 
-    /// Points batch size
-    std::size_t mBatchSize;
+        /// \deprecated use \ref flushBatch() instead
+        [[deprecated("Use flushBatch() instead")]] inline void flushBuffer()
+        {
+            flushBatch();
+        }
 
-    /// Underlying transport UDP/HTTP/Unix socket
-    std::unique_ptr<Transport> mTransport;
+        /// Enables points batching
+        /// \param size
+        void batchOf(std::size_t size = 32);
 
-    /// Transmits string over transport
-    void transmit(std::string&& point);
+        /// Returns current batch size
+        std::size_t batchSize() const;
 
-    /// List of global tags
-    std::string mGlobalTags;
+        /// Clears the point batch
+        void clearBatch();
 
-    std::string joinLineProtocolBatch() const;
-};
+        /// Adds a global tag
+        /// \param name
+        /// \param value
+        void addGlobalTag(std::string_view name, std::string_view value);
+
+    private:
+        void addPointToBatch(Point&& point);
+
+        /// line protocol batch to be written
+        std::deque<Point> mPointBatch;
+
+        /// Flag stating whether point buffering is enabled
+        bool mIsBatchingActivated;
+
+        /// Points batch size
+        std::size_t mBatchSize;
+
+        /// Underlying transport UDP/HTTP/Unix socket
+        std::unique_ptr<Transport> mTransport;
+
+        /// Transmits string over transport
+        void transmit(std::string&& point);
+
+        /// List of global tags
+        std::string mGlobalTags;
+
+        std::string joinLineProtocolBatch() const;
+    };
 
 } // namespace influxdb
 
