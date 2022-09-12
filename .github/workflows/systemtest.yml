@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         compiler:
-          - gcc-10
+          - gcc-12
         influx_version:
           - 1.8
     container:
