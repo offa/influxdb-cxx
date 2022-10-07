@@ -24,7 +24,8 @@
 #include "InfluxDBException.h"
 #include "HTTP.h"
 #include <cstdlib>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_all.hpp>
 
 namespace influxdb::test
 {
@@ -59,7 +60,7 @@ namespace influxdb::test
         SECTION("Database does not exist")
         {
             const auto response = http.query("show databases");
-            CHECK_THAT(http.query("show databases"), !Contains(R"(["st_db"])"));
+            CHECK_THAT(response, !ContainsSubstring(R"(["st_db"])"));
         }
 
         SECTION("Query on non existing database returns empty")
@@ -70,7 +71,7 @@ namespace influxdb::test
         SECTION("Create database if not existing")
         {
             db->createDatabaseIfNotExists();
-            CHECK_THAT(http.query("show databases"), Contains(R"(["st_db"])"));
+            CHECK_THAT(http.query("show databases"), ContainsSubstring(R"(["st_db"])"));
         }
 
         SECTION("Create database if not existing does nothing on existing database")

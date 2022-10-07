@@ -23,7 +23,7 @@
 #include "InfluxDB.h"
 #include "InfluxDBException.h"
 #include "mock/TransportMock.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 
 namespace influxdb::test

@@ -7,16 +7,12 @@ if( NOT TARGET trompeloeil::trompeloeil )
     target_link_libraries(trompeloeil::trompeloeil INTERFACE trompeloeil)
 endif()
 
-
-add_library(TestMain STATIC TestMain.cxx)
-target_link_libraries(TestMain PUBLIC Catch2::Catch2 trompeloeil::trompeloeil)
-
 add_subdirectory("mock")
 
 
 function(add_unittest name)
     add_executable(${name} ${name}.cxx)
-    target_link_libraries(${name} PRIVATE TestMain InfluxDB)
+    target_link_libraries(${name} PRIVATE InfluxDB Catch2::Catch2WithMain trompeloeil::trompeloeil)
     target_include_directories(${name}
         PRIVATE
             ${CMAKE_SOURCE_DIR}/src

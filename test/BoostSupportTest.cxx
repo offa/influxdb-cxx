@@ -24,7 +24,8 @@
 #include "InfluxDBException.h"
 #include "mock/TransportMock.h"
 #include <boost/property_tree/exceptions.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_version_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 #include <date/date.h>
 #include <sstream>
