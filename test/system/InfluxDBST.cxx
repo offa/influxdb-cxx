@@ -22,7 +22,6 @@
 
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
-#include "HTTP.h"
 #include <cstdlib>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
@@ -49,17 +48,15 @@ namespace influxdb::test
     TEST_CASE("InfluxDB system test", "[InfluxDBST]")
     {
         using namespace influxdb;
-        using namespace influxdb::transports;
         using namespace Catch::Matchers;
 
         const std::string url{"http://" + dbServerUrl() + ":8086?db=st_db"};
         auto db = InfluxDBFactory::Get(url);
-        HTTP http{url};
 
 
         SECTION("Database does not exist")
         {
-            const auto response = http.query("show databases");
+            const auto response = db->execute("show databases");
             CHECK_THAT(response, !ContainsSubstring(R"(["st_db"])"));
         }
 
@@ -71,7 +68,7 @@ namespace influxdb::test
         SECTION("Create database if not existing")
         {
             db->createDatabaseIfNotExists();
-            CHECK_THAT(http.query("show databases"), ContainsSubstring(R"(["st_db"])"));
+            CHECK_THAT(db->execute("show databases"), ContainsSubstring(R"(["st_db"])"));
         }
 
         SECTION("Create database if not existing does nothing on existing database")
@@ -207,7 +204,7 @@ namespace influxdb::test
 
         SECTION("Cleanup")
         {
-            http.query("drop database st_db");
+            db->execute("drop database st_db");
         }
     }
 }

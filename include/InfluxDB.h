@@ -91,6 +91,10 @@ namespace influxdb
         /// \param value
         void addGlobalTag(std::string_view name, std::string_view value);
 
+        /// Executes a command and returns it's response.
+        /// \param cmd
+        std::string execute(const std::string& cmd);
+
     private:
         void addPointToBatch(Point&& point);
 

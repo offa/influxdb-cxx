@@ -181,4 +181,15 @@ namespace influxdb::test
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.createDatabaseIfNotExists();
     }
+
+    TEST_CASE("Execute executes query", "[InfluxDBTest]")
+    {
+        const std::string response = "name: databases\nname\n----\n_internal\n";
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, execute("show databases")).RETURN(response);
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        const auto result = db.execute("show databases");
+        CHECK(result == response);
+    }
 }

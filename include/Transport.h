@@ -52,6 +52,12 @@ namespace influxdb
             throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
         }
 
+        /// Executes command
+        virtual std::string execute([[maybe_unused]] const std::string& cmd)
+        {
+            throw InfluxDBException{"Transport", "Execution is not supported by the selected transport"};
+        }
+
         /// Sends request
         virtual void createDatabase()
         {
