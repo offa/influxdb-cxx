@@ -129,7 +129,7 @@ jobs:
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install conan boost
-          conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True .
+          conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True --build=missing .
       - name: Build
         run: |
           script/ci_build.sh
