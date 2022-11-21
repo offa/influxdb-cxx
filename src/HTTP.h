@@ -54,6 +54,10 @@ namespace influxdb::transports
         /// \throw InfluxDBException	when CURL GET fails
         std::string query(const std::string& query) override;
 
+        /// Execute command
+        /// \throw InfluxDBException    when execution fails
+        std::string execute(const std::string& cmd) override;
+
         /// Creates database used at url if it does not exists
         /// \throw InfluxDBException	when CURL POST fails
         void createDatabase() override;

@@ -237,6 +237,21 @@ namespace influxdb::transports
         }
     }
 
+    std::string HTTP::execute(const std::string& cmd)
+    {
+        std::string buffer;
+        char* encodedQuery = curl_easy_escape(readHandle, cmd.c_str(), static_cast<int>(cmd.size()));
+        auto fullUrl = mInfluxDbServiceUrl + "/query?q=" + std::string(encodedQuery);
+        curl_free(encodedQuery);
+        curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
+        curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
+        const CURLcode response = curl_easy_perform(readHandle);
+        long responseCode{0};
+        curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
+        treatCurlResponse(response, responseCode);
+        return buffer;
+    }
+
     void HTTP::createDatabase()
     {
         const std::string createUrl = mInfluxDbServiceUrl + "/query";

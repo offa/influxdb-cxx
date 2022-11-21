@@ -53,6 +53,12 @@ namespace influxdb::test
         CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), std::runtime_error);
     }
 
+    TEST_CASE("UDP transport throws on execute", "[BoostSupport]")
+    {
+        auto udp = internal::withUdpTransport(http::url{});
+        CHECK_THROWS_AS(udp->execute("show databases"), std::runtime_error);
+    }
+
     TEST_CASE("Unix socket transport throws on create database", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
@@ -63,6 +69,12 @@ namespace influxdb::test
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
         CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), std::runtime_error);
+    }
+
+    TEST_CASE("Unix socket transport throws on execute", "[BoostSupportTest]")
+    {
+        auto unix = internal::withUnixSocketTransport(http::url{});
+        CHECK_THROWS_AS(unix->execute("show databases"), std::runtime_error);
     }
 
     TEST_CASE("Query is passed to transport", "[BoostSupportTest]")

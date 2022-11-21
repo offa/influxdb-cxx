@@ -142,6 +142,11 @@ namespace influxdb
         }
     }
 
+    std::string InfluxDB::execute(const std::string& cmd)
+    {
+        return mTransport->execute(cmd);
+    }
+
     void InfluxDB::addPointToBatch(Point&& point)
     {
         mPointBatch.emplace_back(std::move(point));

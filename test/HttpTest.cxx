@@ -549,4 +549,140 @@ namespace influxdb::test
         http.setProxy(Proxy{"https://proxy-server:1234", Proxy::Auth{"abc", "def"}});
     }
 
+    TEST_CASE("Execute configures curl", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        HTTP http{"http://localhost:8086?db=test"};
+
+        const std::string cmd{"show databases"};
+        std::string returnValue = cmd;
+        char* ptr = &returnValue[0];
+        REQUIRE_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
+        ALLOW_CALL(curlMock, curl_free(ptr));
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, "http://localhost:8086/query?q=show databases")).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
+            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "show-database-result")
+            .RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
+            .RETURN(CURLE_OK);
+
+        const auto result = http.execute(cmd);
+        CHECK(result == "show-database-result");
+    }
+
+    TEST_CASE("Execute fails on unsuccessful execution", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        HTTP http{"http://localhost:8086?db=test"};
+
+        const std::string cmd{"this is an invalid query"};
+        std::string returnValue = cmd;
+        char* ptr = &returnValue[0];
+        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
+        ALLOW_CALL(curlMock, curl_free(_));
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
+            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
+            .RETURN(CURLE_OK);
+        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_FAILED_INIT);
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 99)
+            .RETURN(CURLE_OK);
+
+        REQUIRE_THROWS_AS(http.execute(cmd), ConnectionError);
+    }
+
+    TEST_CASE("Execute accepts successful response", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        HTTP http{"http://localhost:8086?db=test"};
+
+        const std::string cmd{"show databases"};
+        std::string returnValue = cmd;
+        char* ptr = &returnValue[0];
+        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
+        ALLOW_CALL(curlMock, curl_free(_));
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
+            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
+            .RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
+            .RETURN(CURLE_OK);
+        http.execute(cmd);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 204)
+            .RETURN(CURLE_OK);
+
+        const auto result = http.execute(cmd);
+        CHECK(result == "query-result");
+    }
+
+    TEST_CASE("Execute throws on unsuccessful response", "[HttpTest]")
+    {
+        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
+        ALLOW_CALL(curlMock, curl_global_cleanup());
+
+        HTTP http{"http://localhost:8086?db=test"};
+
+        const std::string cmd{"query should fail"};
+        std::string returnValue = cmd;
+        char* ptr = &returnValue[0];
+        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
+        ALLOW_CALL(curlMock, curl_free(_));
+        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
+            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
+            .RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 404)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.execute(cmd), NonExistentDatabase);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.execute(cmd), BadRequest);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.execute(cmd), ServerError);
+
+        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
+            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
+            .RETURN(CURLE_OK);
+        REQUIRE_THROWS_AS(http.execute(cmd), ServerError);
+    }
+
 }

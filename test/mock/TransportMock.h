@@ -33,6 +33,7 @@ namespace influxdb::test
         MAKE_MOCK1(send, void(std::string&&), override);
         MAKE_MOCK1(query, std::string(const std::string&), override);
         MAKE_MOCK0(createDatabase, void(), override);
+        MAKE_MOCK1(execute, std::string(const std::string&), override);
     };
 
 
@@ -52,6 +53,11 @@ namespace influxdb::test
         std::string query(const std::string& query) override
         {
             return mockImpl->query(query);
+        }
+
+        std::string execute(const std::string& cmd) override
+        {
+            return mockImpl->execute(cmd);
         }
 
         void createDatabase() override
