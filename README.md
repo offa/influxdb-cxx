@@ -101,7 +101,16 @@ influxdb->flushBatch();
 // Available over HTTP only
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 /// Pass an IFQL to get list of points
-std::vector<influxdb::Point> points = idb->query("SELECT * FROM test");
+std::vector<influxdb::Point> points = influxdb->query("SELECT * FROM test");
+```
+
+### Execute cmd
+
+```cpp
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+
+// Execute a command and receive it's response
+const auto response = influxdb->execute("SHOW DATABASES");
 ```
 
 ## Transports
