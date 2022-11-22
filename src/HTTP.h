@@ -73,7 +73,7 @@ namespace influxdb::transports
         [[nodiscard]] std::string influxDbServiceUrl() const;
 
         /// Sets proxy
-        void setProxy(Proxy proxy) override;
+        void setProxy(const Proxy& proxy) override;
 
     private:
         /// Obtain InfluxDB service url from the url passed

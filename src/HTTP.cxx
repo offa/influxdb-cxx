@@ -221,7 +221,7 @@ namespace influxdb::transports
         return mInfluxDbServiceUrl;
     }
 
-    void HTTP::setProxy(Proxy proxy)
+    void HTTP::setProxy(const Proxy& proxy)
     {
         auto proxyServer = proxy.getProxy();
         curl_easy_setopt(writeHandle, CURLOPT_PROXY, proxyServer.c_str());

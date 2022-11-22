@@ -65,7 +65,7 @@ namespace influxdb
         }
 
         /// Sets proxy
-        virtual void setProxy([[maybe_unused]] Proxy proxy)
+        virtual void setProxy([[maybe_unused]] const Proxy& proxy)
         {
             throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
         }
