@@ -29,7 +29,7 @@ namespace http
 {
     struct url
     {
-        std::string protocol, user, password, host, path, search, url;
+        std::string protocol, user, password, host, path, search, url, authtoken;
         int port;
     };
 
@@ -93,6 +93,10 @@ namespace http
     {
         return HeadSlice(in, "://");
     }
+    static inline std::string ExtractAuthToken(std::string &in) 
+    {
+         return TailSlice(in, " --"); 
+    }
     static inline std::string ExtractSearch(std::string& in)
     {
         return TailSlice(in, "?");
@@ -110,6 +114,7 @@ namespace http
     //--- Public Interface -------------------------------------------------------------~
     static inline url ParseHttpUrl(std::string& in)
     {
+        const auto authtoken = ExtractAuthToken(in);
         const auto url = in;
         const auto protocol = ExtractProtocol(in);
         const auto search = ExtractSearch(in);
@@ -120,7 +125,7 @@ namespace http
         const auto port = ExtractPort(in);
         const auto host = in;
 
-        return {protocol, user, password, host, path, search, url, port};
+        return {protocol, user, password, host, path, search, url, authtoken, port};
     }
 }
 #endif

@@ -46,6 +46,10 @@ namespace influxdb
             {
                 transport->enableBasicAuth(uri.user + ":" + uri.password);
             }
+            else if (!uri.authtoken.empty())
+            {
+                transport->enableTokenAuth(uri.authtoken);
+            }
             return transport;
         }
 

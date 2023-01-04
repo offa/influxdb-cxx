@@ -63,6 +63,10 @@ namespace influxdb::transports
         void createDatabase() override;
 
         /// Enable Basic Auth
+        /// \param auth <API Token>
+        void enableTokenAuth(const std::string &auth);
+        
+        /// Enable Basic Auth
         /// \param auth <username>:<password>
         void enableBasicAuth(const std::string& auth);
 
