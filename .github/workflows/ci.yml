@@ -89,9 +89,9 @@ jobs:
             C:\.conan
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
-        uses: seanmiddleditch/gha-setup-ninja@master
+        uses: turtlesec-no/get-ninja@main
       - name: Setup MSVC
-        uses: seanmiddleditch/gha-setup-vsdevenv@master
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Install dependencies
         run: |
           pip install -U conan
