@@ -55,6 +55,7 @@ namespace influxdb
     {
         static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url&)>> map = {
             {"udp", internal::withUdpTransport},
+            {"tcp", internal::withTcpTransport},
             {"http", internal::withHttpTransport},
             {"https", internal::withHttpTransport},
             {"unix", internal::withUnixSocketTransport},
