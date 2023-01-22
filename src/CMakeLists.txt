@@ -4,10 +4,6 @@ set(INTERNAL_INCLUDE_DIRS
     ${PROJECT_BINARY_DIR}/src
     )
 
-add_library(InfluxDB-Http OBJECT HTTP.cxx)
-target_include_directories(InfluxDB-Http PRIVATE ${INTERNAL_INCLUDE_DIRS})
-target_include_directories(InfluxDB-Http SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
-
 
 add_library(InfluxDB-BoostSupport OBJECT
     $<$<NOT:$<BOOL:${INFLUXCXX_WITH_BOOST}>>:NoBoostSupport.cxx>
@@ -30,17 +26,27 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_
     set_source_files_properties(UDP.cxx TCP.cxx UnixSocket.cxx PROPERTIES COMPILE_OPTIONS "-Wno-null-dereference")
 endif()
 
-add_library(InfluxDB-Internal OBJECT LineProtocol.cxx)
+add_library(InfluxDB-Internal OBJECT LineProtocol.cxx HTTP.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
+target_link_libraries(InfluxDB-Internal PUBLIC cpr::cpr)
+
+
+add_library(InfluxDB-Core OBJECT
+  InfluxDB.cxx
+  Point.cxx
+  InfluxDBFactory.cxx
+  Proxy.cxx
+  )
+target_include_directories(InfluxDB-Core PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/src
+)
+target_link_libraries(InfluxDB-Core PRIVATE cpr::cpr)
 
 
 add_library(InfluxDB
-    InfluxDB.cxx
-    Point.cxx
-    InfluxDBFactory.cxx
-    Proxy.cxx
+    $<TARGET_OBJECTS:InfluxDB-Core>
     $<TARGET_OBJECTS:InfluxDB-Internal>
-    $<TARGET_OBJECTS:InfluxDB-Http>
     $<TARGET_OBJECTS:InfluxDB-BoostSupport>
     )
 add_library(InfluxData::InfluxDB ALIAS InfluxDB)
@@ -76,7 +82,7 @@ target_include_directories(InfluxDB
 # Link targets
 target_link_libraries(InfluxDB
   PRIVATE
-    CURL::libcurl
+    cpr::cpr
     Threads::Threads
     $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
     $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>

@@ -22,480 +22,213 @@
 
 #include "HTTP.h"
 #include "InfluxDBException.h"
-#include "mock/CurlMock.h"
+#include "mock/CprMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 
-
 namespace influxdb::test
 {
-    namespace
-    {
-        CurlHandleDummy dummy;
-        CURL* handle = &dummy;
-    }
-
-    CurlMock curlMock;
+    SessionMock sessionMock;
 
     using influxdb::transports::HTTP;
     using trompeloeil::_;
+    using trompeloeil::eq;
 
-    TEST_CASE("Construction initializes curl", "[HttpTest]")
+    using ParamMap = std::map<std::string, std::string>;
+
+    cpr::Response createResponse(const cpr::ErrorCode& code, std::int32_t statusCode, const std::string& text = "<text placeholder>")
     {
-        REQUIRE_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
+        cpr::Error error{};
+        error.code = code;
+        error.message = "<error message placeholder";
 
-        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
+        cpr::Response response{};
+        response.error = error;
+        response.status_code = statusCode;
+        response.text = text;
+        return response;
+    }
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT, long{10})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT, long{10})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE, long{120})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL, long{60})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
+    HTTP createHttp()
+    {
+        ALLOW_CALL(sessionMock, SetTimeout(_));
+        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
+        return HTTP{"http://localhost:8086?db=test"};
+    }
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_CONNECTTIMEOUT, long{10})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TIMEOUT, long{10})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPIDLE, long{120})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_TCP_KEEPINTVL, long{60})).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEFUNCTION, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, "http://localhost:8086/write?db=test")).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_POST, long{1})).RETURN(CURLE_OK);
 
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+    TEST_CASE("Construction fails on missing url part", "[HttpTest]")
+    {
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086"}, InfluxDBException);
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?"}, InfluxDBException);
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086!db=test"}, InfluxDBException);
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?dc=test"}, InfluxDBException);
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?dbtest"}, InfluxDBException);
+        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?db-test"}, InfluxDBException);
+    }
+
+    TEST_CASE("Construction sets session settings", "[HttpTest]")
+    {
+        REQUIRE_CALL(sessionMock, SetTimeout(_));
+        REQUIRE_CALL(sessionMock, SetConnectTimeout(_));
 
         HTTP http{"http://localhost:8086?db=test"};
     }
 
-    TEST_CASE("Construction throws if curl init fails", "[HttpTest]")
+    TEST_CASE("Send sets parameters", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_FAILED_INIT);
-
-        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
-    }
-
-    TEST_CASE("Construction throws if curl write handle init fails", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(nullptr);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
-
-        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
-    }
-
-    TEST_CASE("Construction throws if curl read handle init fails", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
-        trompeloeil::sequence seq;
-        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle).IN_SEQUENCE(seq);
-        REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(nullptr).IN_SEQUENCE(seq);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
-
-        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
-    }
-
-    TEST_CASE("Construction throws if no database parameter in url", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
-
-        CHECK_THROWS_AS(HTTP{"http://localhost:8086-db=test"}, InfluxDBException);
-    }
-
-    TEST_CASE("Destruction cleans up curl", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-
-        {
-            REQUIRE_CALL(curlMock, curl_easy_cleanup(handle)).TIMES(2);
-            REQUIRE_CALL(curlMock, curl_global_cleanup());
-
-            HTTP http{"http://localhost:8086?db=test"};
-        }
-    }
-
-    TEST_CASE("Send configures curl", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
-
+        auto http = createHttp();
         const std::string data{"content-to-send"};
-        HTTP http{"http://localhost:8086?db=test"};
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_POSTFIELDS, data)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_POSTFIELDSIZE, static_cast<long>(data.size()))).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/write")));
+        REQUIRE_CALL(sessionMock, SetHeader(_)).WITH(_1.at("Content-Type") == "application/json");
+        REQUIRE_CALL(sessionMock, SetBody(_)).WITH(_1.str() == data);
+        REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}}));
 
         http.send(std::string{data});
     }
 
     TEST_CASE("Send fails on unsuccessful execution", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
-
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_FAILED_INIT);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 99)
-            .RETURN(CURLE_OK);
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, SetBody(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
         REQUIRE_THROWS_AS(http.send("content"), ConnectionError);
     }
 
     TEST_CASE("Send accepts successful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, SetBody(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        ALLOW_CALL(curlMock, curl_easy_perform(_)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
-        http.send("content");
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 204)
-            .RETURN(CURLE_OK);
         http.send("content");
     }
 
     TEST_CASE("Send throws on unsuccessful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_NOT_FOUND));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, SetBody(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        ALLOW_CALL(curlMock, curl_easy_perform(_)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 404)
-            .RETURN(CURLE_OK);
         REQUIRE_THROWS_AS(http.send("content"), NonExistentDatabase);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.send("content"), BadRequest);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.send("content"), ServerError);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.send("content"), ServerError);
     }
 
-    TEST_CASE("Query configures curl", "[HttpTest]")
+    TEST_CASE("Query sets parameters", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
-
-        HTTP http{"http://localhost:8086?db=test"};
-
+        auto http = createHttp();
         const std::string query{"/12?ab=cd"};
-        std::string returnValue = query;
-        char* ptr = &returnValue[0];
-        REQUIRE_CALL(curlMock, curl_easy_escape(handle, query.c_str(), static_cast<int>(query.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(ptr));
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, "http://localhost:8086/query?db=test&q=/12?ab=cd")).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
 
-        const auto result = http.query(query);
-        CHECK(result == "query-result");
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
+        REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/query")));
+        REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}, {"q", query}}));
+
+        CHECK(http.query(query) == "query-result");
     }
 
     TEST_CASE("Query fails on unsuccessful execution", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string query{"/x?shouldfail=true"};
-        std::string returnValue = query;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, query.c_str(), static_cast<int>(query.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_FAILED_INIT);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 99)
-            .RETURN(CURLE_OK);
-
-        REQUIRE_THROWS_AS(http.query(query), ConnectionError);
+        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), ConnectionError);
     }
 
     TEST_CASE("Query accepts successful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string query{"/x?shouldfail=true"};
-        std::string returnValue = query;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, query.c_str(), static_cast<int>(query.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
-        http.query(query);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 204)
-            .RETURN(CURLE_OK);
-
-        const auto result = http.query(query);
-        CHECK(result == "query-result");
+        CHECK(http.query("/12?ab=cd") == "query-result");
     }
 
     TEST_CASE("Query throws on unsuccessful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_BAD_GATEWAY));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string query{"/x?shouldfail=true"};
-        std::string returnValue = query;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, query.c_str(), static_cast<int>(query.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 404)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.query(query), NonExistentDatabase);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.query(query), BadRequest);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.query(query), ServerError);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.query(query), ServerError);
+        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), ServerError);
     }
 
-    TEST_CASE("Create database configures curl", "[HttpTest]")
+    TEST_CASE("Create database sets parameters", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=example-to-create"};
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_URL, "http://localhost:8086/query")).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_POST, long{1})).RETURN(CURLE_OK);
-
-        const std::string data = "q=CREATE DATABASE example-to-create";
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_POSTFIELDS, data)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_POSTFIELDSIZE, static_cast<long>(data.size()))).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/query")));
+        REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"q", "CREATE DATABASE test"}}));
 
         http.createDatabase();
     }
 
     TEST_CASE("Create database fails on unsuccessful execution", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=example-to-create"};
-
-        const std::string data = "q=CREATE DATABASE example-to-create";
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_FAILED_INIT);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
         REQUIRE_THROWS_AS(http.createDatabase(), ConnectionError);
     }
 
     TEST_CASE("Create database accepts successful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=example-to-create"};
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string data = "q=CREATE DATABASE example-to-create";
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
-        http.createDatabase();
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 204)
-            .RETURN(CURLE_OK);
         http.createDatabase();
     }
 
     TEST_CASE("Create database throws on unsuccessful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=example-to-create"};
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_BAD_GATEWAY));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string data = "q=CREATE DATABASE example-to-create";
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 404)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.createDatabase(), NonExistentDatabase);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.createDatabase(), BadRequest);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.createDatabase(), ServerError);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
-            .RETURN(CURLE_OK);
         REQUIRE_THROWS_AS(http.createDatabase(), ServerError);
     }
 
-    TEST_CASE("Enabling basic auth sets curl options", "[HttpTest]")
+    TEST_CASE("Enable basic auth sets parameters", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=example-database-0"};
-
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC)).RETURN(CURLE_OK).TIMES(2);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(handle, CURLOPT_USERPWD, "user0:pass0")).RETURN(CURLE_OK).TIMES(2);
+        REQUIRE_CALL(sessionMock, SetAuth(_)).WITH(_1.GetAuthString() == std::string{"user0:pass0"});
         http.enableBasicAuth("user0:pass0");
     }
 
     TEST_CASE("Database name is returned if valid", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        ALLOW_CALL(sessionMock, SetTimeout(_));
+        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
 
         const HTTP http{"http://localhost:8086?db=example-database-0"};
         CHECK(http.databaseName() == "example-database-0");
@@ -503,13 +236,8 @@ namespace influxdb::test
 
     TEST_CASE("Database service url is returned if valid", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        ALLOW_CALL(sessionMock, SetTimeout(_));
+        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
 
         const HTTP http{"http://localhost:8086?db=example-database-1"};
         CHECK(http.influxDbServiceUrl() == "http://localhost:8086");
@@ -517,172 +245,65 @@ namespace influxdb::test
 
     TEST_CASE("Set proxy without authentication", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXY, "https://proxy-server:1234")).RETURN(CURLE_OK).TIMES(2);
-
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, SetProxies(_)).WITH(_1["http"] == std::string{"https://proxy-server:1234"} && _1["https"] == std::string{"https://proxy-server:1234"});
         http.setProxy(Proxy{"https://proxy-server:1234"});
     }
 
     TEST_CASE("Set proxy with authentication", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXY, "https://proxy-server:1234")).RETURN(CURLE_OK).TIMES(2);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXYUSERNAME, "abc")).RETURN(CURLE_OK).TIMES(2);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_PROXYPASSWORD, "def")).RETURN(CURLE_OK).TIMES(2);
+        REQUIRE_CALL(sessionMock, SetProxies(_)).WITH(_1["http"] == std::string{"https://auth-proxy-server:1234"} && _1["https"] == std::string{"https://auth-proxy-server:1234"});
+        REQUIRE_CALL(sessionMock, SetProxyAuth(_)).WITH(_1["http"] == std::string{"abc:def"} && _1["https"] == std::string{"abc:def"});
 
-        HTTP http{"http://localhost:8086?db=test"};
-        http.setProxy(Proxy{"https://proxy-server:1234", Proxy::Auth{"abc", "def"}});
+        http.setProxy(Proxy{"https://auth-proxy-server:1234", Proxy::Auth{"abc", "def"}});
     }
 
-    TEST_CASE("Execute configures curl", "[HttpTest]")
+    TEST_CASE("Execute sets parameters", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
-
-        HTTP http{"http://localhost:8086?db=test"};
-
+        auto http = createHttp();
         const std::string cmd{"show databases"};
-        std::string returnValue = cmd;
-        char* ptr = &returnValue[0];
-        REQUIRE_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(ptr));
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, "http://localhost:8086/query?q=show databases")).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "show-database-result")
-            .RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
 
-        const auto result = http.execute(cmd);
-        CHECK(result == "show-database-result");
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "response-of-execute"));
+        REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/query")));
+        REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}, {"q", cmd}}));
+
+        CHECK(http.execute(cmd) == "response-of-execute");
     }
 
     TEST_CASE("Execute fails on unsuccessful execution", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string cmd{"this is an invalid query"};
-        std::string returnValue = cmd;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        REQUIRE_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_FAILED_INIT);
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 99)
-            .RETURN(CURLE_OK);
-
-        REQUIRE_THROWS_AS(http.execute(cmd), ConnectionError);
+        REQUIRE_THROWS_AS(http.execute("fail-execution"), ConnectionError);
     }
 
     TEST_CASE("Execute accepts successful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "response-of-execute"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string cmd{"show databases"};
-        std::string returnValue = cmd;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 200)
-            .RETURN(CURLE_OK);
-        http.execute(cmd);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 204)
-            .RETURN(CURLE_OK);
-
-        const auto result = http.execute(cmd);
-        CHECK(result == "query-result");
+        CHECK(http.execute("show databases") == "response-of-execute");
     }
 
     TEST_CASE("Execute throws on unsuccessful response", "[HttpTest]")
     {
-        ALLOW_CALL(curlMock, curl_global_init(_)).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_init()).RETURN(handle);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_URL, ANY(std::string))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(long))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, _, ANY(WriteCallbackFn))).RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_cleanup(_));
-        ALLOW_CALL(curlMock, curl_global_cleanup());
+        auto http = createHttp();
 
-        HTTP http{"http://localhost:8086?db=test"};
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_NOT_FOUND));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, SetParameters(_));
 
-        const std::string cmd{"query should fail"};
-        std::string returnValue = cmd;
-        char* ptr = &returnValue[0];
-        ALLOW_CALL(curlMock, curl_easy_escape(handle, cmd.c_str(), static_cast<int>(cmd.size()))).RETURN(ptr);
-        ALLOW_CALL(curlMock, curl_free(_));
-        ALLOW_CALL(curlMock, curl_easy_setopt_(_, CURLOPT_WRITEDATA, ANY(void*)))
-            .LR_SIDE_EFFECT(*static_cast<std::string*>(_3) = "query-result")
-            .RETURN(CURLE_OK);
-        ALLOW_CALL(curlMock, curl_easy_perform(handle)).RETURN(CURLE_OK);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 404)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.execute(cmd), NonExistentDatabase);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 400)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.execute(cmd), BadRequest);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 500)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.execute(cmd), ServerError);
-
-        REQUIRE_CALL(curlMock, curl_easy_getinfo_(handle, CURLINFO_RESPONSE_CODE, _))
-            .LR_SIDE_EFFECT(*static_cast<long*>(_3) = 503)
-            .RETURN(CURLE_OK);
-        REQUIRE_THROWS_AS(http.execute(cmd), ServerError);
+        REQUIRE_THROWS_AS(http.execute("fail-execution"), NonExistentDatabase);
     }
 
 }

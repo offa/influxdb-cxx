@@ -12,7 +12,10 @@ cp -r script/include_library/* ${BASEPATH}/
 
 cd /tmp/influx-test-${PID}/
 mkdir build && cd build
-cmake "$@" ..
+
+conan install -g cmake_paths -g cmake_find_package cpr/1.9.3@
+
+cmake -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake "$@" ..
 cmake --build . -j
 
 #cleanup

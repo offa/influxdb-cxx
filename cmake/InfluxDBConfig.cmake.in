@@ -9,7 +9,7 @@ include(CMakeFindDependencyMacro)
 if(InfluxDB_WITH_BOOST)
   find_dependency(Boost COMPONENTS system REQUIRED)
 endif()
-find_dependency(CURL REQUIRED)
+find_dependency(cpr REQUIRED)
 find_dependency(Threads REQUIRED)
 
 if(NOT TARGET InfluxData::InfluxDB)

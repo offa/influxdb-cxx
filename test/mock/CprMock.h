@@ -22,36 +22,29 @@
 
 #pragma once
 
-#include <curl/curl.h>
+#include <cpr/cpr.h>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
-
+#include <map>
 
 namespace influxdb::test
 {
-    struct CurlHandleDummy
+
+    class SessionMock
     {
+    public:
+        MAKE_MOCK1(SetTimeout, void(const cpr::Timeout&));
+        MAKE_MOCK1(SetConnectTimeout, void(const cpr::ConnectTimeout&));
+        MAKE_MOCK0(Get, cpr::Response());
+        MAKE_MOCK0(Post, cpr::Response());
+        MAKE_MOCK1(SetUrl, void(const cpr::Url&));
+        MAKE_MOCK1(SetHeader, void(const cpr::Header&));
+        MAKE_MOCK1(SetBody, void(cpr::Body&&));
+        MAKE_MOCK1(SetParameters, void(std::map<std::string, std::string>));
+        MAKE_MOCK1(SetAuth, void(const cpr::Authentication&));
+        MAKE_MOCK1(SetProxies, void(cpr::Proxies&&));
+        MAKE_MOCK1(SetProxyAuth, void(cpr::ProxyAuthentication&&));
     };
 
-    using WriteCallbackFn = size_t (*)(void*, size_t, size_t, void*);
-
-
-    struct CurlMock
-    {
-        MAKE_MOCK1(curl_global_init, CURLcode(long));
-        MAKE_MOCK0(curl_easy_init, CURL*());
-        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, long));
-        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, unsigned long));
-        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, std::string));
-        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, void*));
-        MAKE_MOCK3(curl_easy_setopt_, CURLcode(CURL*, CURLoption, WriteCallbackFn));
-        MAKE_MOCK1(curl_easy_cleanup, void(CURL*));
-        MAKE_MOCK0(curl_global_cleanup, void());
-        MAKE_MOCK1(curl_easy_perform, CURLcode(CURL* easy_handle));
-        MAKE_MOCK3(curl_easy_getinfo_, CURLcode(CURL*, CURLINFO, long*));
-        MAKE_MOCK3(curl_easy_escape, char*(CURL*, const char*, int) );
-        MAKE_MOCK1(curl_free, void(void*));
-    };
-
-    extern CurlMock curlMock;
+    extern SessionMock sessionMock;
 }
