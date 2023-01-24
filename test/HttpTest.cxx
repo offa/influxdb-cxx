@@ -225,24 +225,6 @@ namespace influxdb::test
         http.enableBasicAuth("user0:pass0");
     }
 
-    TEST_CASE("Database name is returned if valid", "[HttpTest]")
-    {
-        ALLOW_CALL(sessionMock, SetTimeout(_));
-        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
-
-        const HTTP http{"http://localhost:8086?db=example-database-0"};
-        CHECK(http.databaseName() == "example-database-0");
-    }
-
-    TEST_CASE("Database service url is returned if valid", "[HttpTest]")
-    {
-        ALLOW_CALL(sessionMock, SetTimeout(_));
-        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
-
-        const HTTP http{"http://localhost:8086?db=example-database-1"};
-        CHECK(http.influxDbServiceUrl() == "http://localhost:8086");
-    }
-
     TEST_CASE("Set proxy without authentication", "[HttpTest]")
     {
         auto http = createHttp();

@@ -63,12 +63,6 @@ namespace influxdb::transports
         /// \param auth <username>:<password>
         void enableBasicAuth(const std::string& auth);
 
-        /// Get the database name managed by this transport
-        [[nodiscard]] std::string databaseName() const;
-
-        /// Get the influx service url which transport connects to
-        [[nodiscard]] std::string influxDbServiceUrl() const;
-
         /// Sets proxy
         void setProxy(const Proxy& proxy) override;
 

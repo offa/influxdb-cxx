@@ -119,16 +119,6 @@ namespace influxdb::transports
         checkResponse(response);
     }
 
-    std::string HTTP::databaseName() const
-    {
-        return mDatabaseName;
-    }
-
-    std::string HTTP::influxDbServiceUrl() const
-    {
-        return mInfluxDbServiceUrl;
-    }
-
     void HTTP::setProxy(const Proxy& proxy)
     {
         session.SetProxies(cpr::Proxies{{"http", proxy.getProxy()}, {"https", proxy.getProxy()}});
