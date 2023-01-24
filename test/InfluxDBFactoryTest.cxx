@@ -38,6 +38,11 @@ namespace influxdb::test
         CHECK(InfluxDBFactory::Get("https://localhost:8086/?db=test") != nullptr);
     }
 
+    TEST_CASE("Accepts http urls with authentication", "[InfluxDBFactoryTest]")
+    {
+        CHECK(InfluxDBFactory::Get("http://user:pass@localhost?db=test") != nullptr);
+    }
+
     TEST_CASE("Throws on unrecognised backend", "[InfluxDBFactoryTest]")
     {
         CHECK_THROWS_AS(InfluxDBFactory::Get("httpX://localhost:8086?db=test"), InfluxDBException);

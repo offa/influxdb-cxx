@@ -85,7 +85,7 @@ namespace influxdb::transports
 
 
     HTTP::HTTP(const std::string& url)
-        : mInfluxDbServiceUrl(parseUrl(url)), mDatabaseName(parseDatabaseName(url))
+        : endpointUrl(parseUrl(url)), databaseName(parseDatabaseName(url))
     {
         session.SetTimeout(cpr::Timeout{std::chrono::seconds{10}});
         session.SetConnectTimeout(cpr::ConnectTimeout{std::chrono::seconds{10}});
@@ -93,8 +93,8 @@ namespace influxdb::transports
 
     std::string HTTP::query(const std::string& query)
     {
-        session.SetUrl(cpr::Url{mInfluxDbServiceUrl + "/query"});
-        session.SetParameters(cpr::Parameters{{"db", mDatabaseName}, {"q", query}});
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}, {"q", query}});
 
         const auto response = session.Get();
         checkResponse(response);
@@ -102,17 +102,16 @@ namespace influxdb::transports
         return response.text;
     }
 
-    void HTTP::enableBasicAuth(const std::string& auth)
+    void HTTP::setBasicAuthentication(const std::string& user, const std::string& pass)
     {
-        const auto delim = auth.find(':');
-        session.SetAuth(cpr::Authentication{auth.substr(0, delim), auth.substr(delim + 1), cpr::AuthMode::BASIC});
+        session.SetAuth(cpr::Authentication{user, pass, cpr::AuthMode::BASIC});
     }
 
     void HTTP::send(std::string&& lineprotocol)
     {
-        session.SetUrl(cpr::Url{mInfluxDbServiceUrl + "/write"});
+        session.SetUrl(cpr::Url{endpointUrl + "/write"});
         session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
-        session.SetParameters(cpr::Parameters{{"db", mDatabaseName}});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}});
         session.SetBody(cpr::Body{lineprotocol});
 
         const auto response = session.Post();
@@ -132,8 +131,8 @@ namespace influxdb::transports
 
     std::string HTTP::execute(const std::string& cmd)
     {
-        session.SetUrl(cpr::Url{mInfluxDbServiceUrl + "/query"});
-        session.SetParameters(cpr::Parameters{{"db", mDatabaseName}, {"q", cmd}});
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}, {"q", cmd}});
 
         const auto response = session.Get();
         checkResponse(response);
@@ -143,8 +142,8 @@ namespace influxdb::transports
 
     void HTTP::createDatabase()
     {
-        session.SetUrl(cpr::Url{mInfluxDbServiceUrl + "/query"});
-        session.SetParameters(cpr::Parameters{{"q", "CREATE DATABASE " + mDatabaseName}});
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"q", "CREATE DATABASE " + databaseName}});
 
         const auto response = session.Post();
         checkResponse(response);

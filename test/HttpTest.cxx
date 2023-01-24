@@ -217,12 +217,12 @@ namespace influxdb::test
         REQUIRE_THROWS_AS(http.createDatabase(), ServerError);
     }
 
-    TEST_CASE("Enable basic auth sets parameters", "[HttpTest]")
+    TEST_CASE("Set authentication sets parameters", "[HttpTest]")
     {
         auto http = createHttp();
 
         REQUIRE_CALL(sessionMock, SetAuth(_)).WITH(_1.GetAuthString() == std::string{"user0:pass0"});
-        http.enableBasicAuth("user0:pass0");
+        http.setBasicAuthentication("user0", "pass0");
     }
 
     TEST_CASE("Set proxy without authentication", "[HttpTest]")

@@ -59,20 +59,17 @@ namespace influxdb::transports
         /// \throw InfluxDBException	when HTTP POST fails
         void createDatabase() override;
 
-        /// Enable Basic Auth
-        /// \param auth <username>:<password>
-        void enableBasicAuth(const std::string& auth);
+        /// Enable Basic Authentication
+        /// \param user username
+        /// \param pass password
+        void setBasicAuthentication(const std::string& user, const std::string& pass);
 
         /// Sets proxy
         void setProxy(const Proxy& proxy) override;
 
     private:
-        /// InfluxDB service URL
-        std::string mInfluxDbServiceUrl;
-
-        /// Database name used
-        std::string mDatabaseName;
-
+        std::string endpointUrl;
+        std::string databaseName;
         cpr::Session session;
     };
 

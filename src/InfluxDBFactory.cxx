@@ -44,7 +44,7 @@ namespace influxdb
             auto transport = std::make_unique<transports::HTTP>(uri.url);
             if (!uri.user.empty())
             {
-                transport->enableBasicAuth(uri.user + ":" + uri.password);
+                transport->setBasicAuthentication(uri.user, uri.password);
             }
             return transport;
         }
