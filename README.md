@@ -23,7 +23,7 @@ InfluxDB C++ client library
 
 __Dependencies__
  - CURL (required)
- - boost 1.57+ (optional – see [Transports](#transports))
+ - boost 1.66+ (optional – see [Transports](#transports))
 
 ### Generic
  ```bash
