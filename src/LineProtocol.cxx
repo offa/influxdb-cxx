@@ -50,8 +50,8 @@ namespace influxdb
         appendIfNotEmpty(line, globalTags, ',');
         appendIfNotEmpty(line, point.getTags(), ',');
         appendIfNotEmpty(line, point.getFields(), ' ');
-        return line;
-        // return line.append(" ")
-        //     .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
+
+        return line.append(" ")
+            .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
     }
 }
