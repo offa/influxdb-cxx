@@ -68,6 +68,7 @@ namespace influxdb
     void InfluxDB::flushBatch()
     {
 //        if (mIsBatchingActivated && !mPointBatch.empty())
+    std::cout << "flushing**********" << std::endl;
         if (!mPointBatch.empty())
         {
             transmit(joinLineProtocolBatch());
@@ -86,6 +87,7 @@ namespace influxdb
         }
 
         joinedBatch.erase(std::prev(joinedBatch.end()));
+        std::cout << "lines: " << joinedBatch << std::endl;
         return joinedBatch;
     }
 
