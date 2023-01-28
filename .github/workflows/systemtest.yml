@@ -7,25 +7,32 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler:
-          - gcc-12
         influx_version:
           - 1.8
+        auth_enabled:
+          - true
+          - false
     container:
-      image: "registry.gitlab.com/offa/docker-images/${{ matrix.compiler }}:stable"
+      image: "registry.gitlab.com/offa/docker-images/gcc-12:stable"
     services:
       influxdb:
         image: influxdb:${{ matrix.influx_version }}
+        env:
+          INFLUXDB_HTTP_AUTH_ENABLED: ${{ matrix.auth_enabled }}
+          INFLUXDB_ADMIN_USER: st_admin
+          INFLUXDB_ADMIN_PASSWORD: st_admin_pw
     env:
       INFLUXDBCXX_SYSTEMTEST_HOST: influxdb
-    name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
+      INFLUXDBCXX_SYSTEMTEST_USER: st_admin
+      INFLUXDBCXX_SYSTEMTEST_PASSWORD: st_admin_pw
+    name: "influxdb-${{ matrix.influx_version }} (auth tests: ${{ matrix.auth_enabled }})"
     steps:
       - uses: actions/checkout@main
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
           path: ~/.conan/data/
-          key: conan-${{ runner.os }}-${{ matrix.compiler }}-db${{ matrix.influx_version }}-${{ hashFiles('conanfile.py') }}
+          key: conan-${{ runner.os }}-systemtest-db${{ matrix.influx_version }}-${{ hashFiles('conanfile.py') }}
       - name: Setup
         run: |
           script/ci_setup.sh
@@ -33,4 +40,4 @@ jobs:
       - name: Build
         run: |
           script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
-          cmake --build build --target systemtest
+          cmake --build build --target ${{ matrix.auth_enabled == true && 'systemtest-auth' || 'systemtest' }}
