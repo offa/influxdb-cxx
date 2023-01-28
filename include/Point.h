@@ -46,35 +46,39 @@ namespace influxdb
     {
     public:
         /// Constructs point based on measurement name
-        explicit Point(const std::string& measurement);
+        //explicit Point(const std::string& measurement);
+
+        /// Constructs point based on the full line
+        explicit Point(const std::string& line);
 
         /// Adds a tags
-        Point&& addTag(std::string_view key, std::string_view value);
+        // Point&& addTag(std::string_view key, std::string_view value);
 
         /// Adds field
-        Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
+        // Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
 
         /// Generates current timestamp
-        static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
+        // static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
 
         /// Converts point to Influx Line Protocol
         /// \deprecated Will be removed in a later version
         [[deprecated("toLineProtocol() will be removed in a later version")]] std::string toLineProtocol() const;
 
+        void Point::setLine(std::string line);
         /// Sets custom timestamp
-        Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
+        // Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
 
         /// Name getter
-        std::string getName() const;
+        // std::string getName() const;
 
         /// Timestamp getter
-        std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
+        // std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
 
         /// Fields getter
-        std::string getFields() const;
+        // std::string getFields() const;
 
         /// Tags getter
-        std::string getTags() const;
+        // std::string getTags() const;
 
         /// Precision for float fields
         static inline int floatsPrecision{defaultFloatsPrecision};
@@ -83,16 +87,16 @@ namespace influxdb
         /// The line
         std::string mLine;
         /// A name
-        std::string mMeasurement;
+        // std::string mMeasurement;
 
         /// A timestamp
-        std::chrono::time_point<std::chrono::system_clock> mTimestamp;
+        // std::chrono::time_point<std::chrono::system_clock> mTimestamp;
 
         //// Tags
-        std::deque<std::pair<std::string, std::string>> mTags;
+        // std::deque<std::pair<std::string, std::string>> mTags;
 
         //// Fields
-        std::deque<std::pair<std::string, std::variant<int, long long int, std::string, double>>> mFields;
+        // std::deque<std::pair<std::string, std::variant<int, long long int, std::string, double>>> mFields;
     };
 
 } // namespace influxdb
