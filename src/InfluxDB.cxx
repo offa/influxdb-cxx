@@ -80,10 +80,10 @@ namespace influxdb
     {
         std::string joinedBatch;
 
-        LineProtocol formatter{mGlobalTags};
+        // LineProtocol formatter{mGlobalTags};
         for (const auto& point : mPointBatch)
         {
-            joinedBatch += formatter.format(point) + "\n";
+            joinedBatch += point.getLine() + "\n";
         }
 
         joinedBatch.erase(std::prev(joinedBatch.end()));
