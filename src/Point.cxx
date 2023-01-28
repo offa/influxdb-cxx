@@ -155,7 +155,7 @@ namespace influxdb
 
     void Point::setLine(std::string line)
     {
-        this.mLine = line;
+        this->mLine = line;
     }
 
     std::string Point::getLine() const
