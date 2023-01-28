@@ -65,6 +65,7 @@ namespace influxdb
         [[deprecated("toLineProtocol() will be removed in a later version")]] std::string toLineProtocol() const;
 
         void setLine(std::string line);
+        std::string getLine();
         /// Sets custom timestamp
         // Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
 
