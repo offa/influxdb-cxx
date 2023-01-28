@@ -17,7 +17,7 @@ jobs:
       influxdb:
         image: influxdb:${{ matrix.influx_version }}
     env:
-      INFLUXDB_SYSTEMTEST_HOST: influxdb
+      INFLUXDBCXX_SYSTEMTEST_HOST: influxdb
     name: "influxdb-${{ matrix.influx_version }} (${{ matrix.compiler }})"
     steps:
       - uses: actions/checkout@main

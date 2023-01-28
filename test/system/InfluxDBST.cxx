@@ -37,7 +37,7 @@ namespace influxdb::test
 
         std::string dbServerUrl()
         {
-            if (const auto host = std::getenv("INFLUXDB_SYSTEMTEST_HOST"); host != nullptr)
+            if (const auto host = std::getenv("INFLUXDBCXX_SYSTEMTEST_HOST"); host != nullptr)
             {
                 return host;
             }
