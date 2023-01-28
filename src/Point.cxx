@@ -158,7 +158,7 @@ namespace influxdb
         this.mLine = line;
     }
 
-    std::string Point::getLine()
+    std::string Point::getLine() const
     {
         return mLine;
     }
