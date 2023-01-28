@@ -29,6 +29,7 @@
 #include "LineProtocol.h"
 #include <chrono>
 #include <memory>
+#include <iostream>
 #include <sstream>
 #include <iomanip>
 
