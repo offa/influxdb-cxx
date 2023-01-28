@@ -110,10 +110,13 @@ namespace influxdb
 
     void InfluxDB::write(Point&& point)
     {
+        std::cout << "inside write***" << std::endl;
+
         mPointBatch.emplace_back(std::move(point));
 
         if (mPointBatch.size() >= mBatchSize)
         {
+        std::cout << "calling flush inside write***" << std::endl;
             flushBatch();
         }
         //if (mIsBatchingActivated)

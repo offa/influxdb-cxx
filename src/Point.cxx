@@ -50,6 +50,7 @@ namespace influxdb
     Point::Point(const std::string& line)
         : mLine(line)
     {
+        std::cout << "mLine is " << mLine << std::endl;
     }
 
     // Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value)
