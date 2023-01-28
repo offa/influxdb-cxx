@@ -149,4 +149,14 @@ namespace influxdb
         return tags.substr(1, tags.size());
     }
 
+    void Point::setLine(std::string line)
+    {
+        this.mLine = line;
+    }
+
+    std::string Point::getLine()
+    {
+        return mLine;
+    }
+
 } // namespace influxdb

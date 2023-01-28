@@ -67,7 +67,8 @@ namespace influxdb
 
     void InfluxDB::flushBatch()
     {
-        if (mIsBatchingActivated && !mPointBatch.empty())
+//        if (mIsBatchingActivated && !mPointBatch.empty())
+        if (!mPointBatch.empty())
         {
             transmit(joinLineProtocolBatch());
             mPointBatch.clear();
@@ -107,15 +108,21 @@ namespace influxdb
 
     void InfluxDB::write(Point&& point)
     {
-        if (mIsBatchingActivated)
+        mPointBatch.emplace_back(std::move(point));
+
+        if (mPointBatch.size() >= mBatchSize)
         {
-            addPointToBatch(std::move(point));
+            flushBatch();
         }
-        else
-        {
-            LineProtocol formatter{mGlobalTags};
-            transmit(formatter.format(point));
-        }
+        //if (mIsBatchingActivated)
+        //{
+         //   addPointToBatch(std::move(point));
+        //}
+        //else
+        //{
+        //    LineProtocol formatter{mGlobalTags};
+        //    transmit(formatter.format(point));
+       // }
     }
 
     void InfluxDB::write(std::vector<Point>&& points)
@@ -130,11 +137,11 @@ namespace influxdb
         else
         {
             std::string lineProtocol;
-            LineProtocol formatter{mGlobalTags};
+            // LineProtocol formatter{mGlobalTags};
 
             for (const auto& point : points)
             {
-                lineProtocol += formatter.format(point) + "\n";
+                lineProtocol += point.getLine() + "\n";
             }
 
             lineProtocol.erase(std::prev(lineProtocol.end()));

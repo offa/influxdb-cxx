@@ -80,6 +80,8 @@ namespace influxdb
         static inline int floatsPrecision{defaultFloatsPrecision};
 
     protected:
+        /// The line
+        std::string mLine;
         /// A name
         std::string mMeasurement;
 
