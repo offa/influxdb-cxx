@@ -49,6 +49,8 @@ namespace influxdb
 
         /// Disable copy constructor
         InfluxDB(const InfluxDB&) = delete;
+        /// Desctructor
+        ~InfluxDB();
 
         /// Constructor required valid transport
         explicit InfluxDB(std::unique_ptr<Transport> transport);
