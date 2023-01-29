@@ -175,7 +175,7 @@ namespace influxdb
         }
     }
 
-    ~influxdb()
+    ~InfluxDB()
     {
         std::cout << "InfluxDB destructor!!!!" << std::endl;
     }
