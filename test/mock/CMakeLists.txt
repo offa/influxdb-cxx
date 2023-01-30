@@ -1,16 +1,4 @@
-add_library(CurlMock STATIC CurlMock.cxx)
-target_include_directories(CurlMock PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(CurlMock PRIVATE Catch2::Catch2 trompeloeil::trompeloeil)
-
-target_include_directories(CurlMock SYSTEM PUBLIC $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_INCLUDE_DIRECTORIES>)
-target_compile_definitions(CurlMock
-    PRIVATE
-        BUILDING_LIBCURL
-    PUBLIC
-        $<TARGET_PROPERTY:CURL::libcurl,INTERFACE_COMPILE_DEFINITIONS>
-        )
-
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-    target_compile_options(CurlMock PRIVATE -Wno-varargs)
-endif()
+add_library(CprMock STATIC CprMock.cxx)
+target_include_directories(CprMock PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(CprMock PRIVATE Catch2::Catch2 trompeloeil::trompeloeil)
+target_include_directories(CprMock SYSTEM PUBLIC $<TARGET_PROPERTY:cpr::cpr,INTERFACE_INCLUDE_DIRECTORIES>)

@@ -20,41 +20,51 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#pragma once
+
 #include "InfluxDBFactory.h"
 #include "InfluxDBException.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_all.hpp>
+#include <string>
+#include <optional>
+#include <cstdlib>
 
 namespace influxdb::test
 {
-    TEST_CASE("Accepts http urls", "[InfluxDBFactoryTest]")
+    struct User
     {
-        CHECK(InfluxDBFactory::Get("http://localhost?db=test") != nullptr);
-        CHECK(InfluxDBFactory::Get("https://localhost?db=test") != nullptr);
+        std::string name;
+        std::string pass;
+    };
 
-        CHECK(InfluxDBFactory::Get("http://localhost:8086?db=test") != nullptr);
-        CHECK(InfluxDBFactory::Get("https://localhost:8086?db=test") != nullptr);
 
-        CHECK(InfluxDBFactory::Get("https://localhost/?db=test") != nullptr);
-        CHECK(InfluxDBFactory::Get("https://localhost:8086/?db=test") != nullptr);
+    inline std::optional<std::string> getEnv(const std::string& name)
+    {
+        if (const auto value = std::getenv(name.c_str()); value != nullptr)
+        {
+            return value;
+        }
+        return {};
     }
 
-    TEST_CASE("Accepts http urls with authentication", "[InfluxDBFactoryTest]")
+    inline User getUserFromEnv()
     {
-        CHECK(InfluxDBFactory::Get("http://user:pass@localhost?db=test") != nullptr);
+        const auto user = getEnv("INFLUXDBCXX_SYSTEMTEST_USER");
+        const auto pass = getEnv("INFLUXDBCXX_SYSTEMTEST_PASSWORD");
+
+        if (!user || !pass)
+        {
+            SKIP("No authentication configured: 'INFLUXDBCXX_SYSTEMTEST_USER' and/or 'INFLUXDBCXX_SYSTEMTEST_PASSWORD' not set");
+            return {"", ""};
+        }
+        return {*user, *pass};
     }
 
-    TEST_CASE("Throws on unrecognised backend", "[InfluxDBFactoryTest]")
+    inline std::unique_ptr<InfluxDB> configure(const std::string& db, std::optional<User> user = {})
     {
-        CHECK_THROWS_AS(InfluxDBFactory::Get("httpX://localhost:8086?db=test"), InfluxDBException);
-    }
-
-    TEST_CASE("Throws on malformed url", "[InfluxDBFactoryTest]")
-    {
-        CHECK_THROWS_AS(InfluxDBFactory::Get("localhost:8086?db=test"), InfluxDBException);
-    }
-
-    TEST_CASE("Throws on missing database", "[InfluxDBFactoryTest]")
-    {
-        CHECK_THROWS_AS(InfluxDBFactory::Get("http://localhost:8086"), InfluxDBException);
+        const auto host = getEnv("INFLUXDBCXX_SYSTEMTEST_HOST").value_or("localhost");
+        const std::string authString{user ? (user->name + ":" + user->pass + "@") : ""};
+        return InfluxDBFactory::Get("http://" + authString + host + ":8086?db=" + db);
     }
 }

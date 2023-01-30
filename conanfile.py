@@ -26,7 +26,6 @@ class InfluxdbCxxConan(ConanFile):
         "system": False,
         "boost": True,
         "boost:shared": True,
-        "libcurl:shared": True
     }
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*",
@@ -54,10 +53,9 @@ class InfluxdbCxxConan(ConanFile):
             f"Project version from CMakeLists.txt: '{self.version}'")
 
     def requirements(self):
-        if not self.options.system:
-            self.requires("libcurl/7.84.0")
-            if self.options.boost:
-                self.requires("boost/1.79.0")
+        self.requires("cpr/1.9.3")
+        if not self.options.system and self.options.boost:
+            self.requires("boost/1.81.0")
         if self.options.tests:
             self.requires("catch2/3.3.0")
             self.requires("trompeloeil/43")

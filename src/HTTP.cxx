@@ -28,245 +28,125 @@
 #include "HTTP.h"
 #include "InfluxDBException.h"
 
-
 namespace influxdb::transports
 {
     namespace
     {
-        size_t WriteCallback(void* contents, size_t size, size_t nmemb, void* userp)
+        void checkResponse(const cpr::Response& resp)
         {
-            static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
-            return size * nmemb;
-        }
-
-        size_t noopWriteCallBack([[maybe_unused]] char* ptr, size_t size,
-                                 size_t nmemb, [[maybe_unused]] void* userdata)
-        {
-            return size * nmemb;
-        }
-
-        void setConnectionOptions(CURL* handle)
-        {
-            curl_easy_setopt(handle, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_easy_setopt(handle, CURLOPT_TIMEOUT, 10);
-            curl_easy_setopt(handle, CURLOPT_TCP_KEEPIDLE, 120L);
-            curl_easy_setopt(handle, CURLOPT_TCP_KEEPINTVL, 60L);
-            curl_easy_setopt(handle, CURLOPT_WRITEFUNCTION, noopWriteCallBack);
-        }
-
-        CURL* createReadHandle()
-        {
-            if (CURL* readHandle = curl_easy_init(); readHandle != nullptr)
+            if (resp.error)
             {
-                setConnectionOptions(readHandle);
-                curl_easy_setopt(readHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
-                return readHandle;
+                throw ConnectionError(__func__, resp.error.message);
             }
-
-            throw InfluxDBException{__func__, "Failed to initialize write handle"};
+            if (resp.status_code == 404)
+            {
+                throw NonExistentDatabase(__func__, "Nonexistent database: " + std::to_string(resp.status_code));
+            }
+            if (cpr::status::is_client_error(resp.status_code))
+            {
+                throw BadRequest(__func__, "Bad request: " + std::to_string(resp.status_code));
+            }
+            if (cpr::status::is_server_error(resp.status_code))
+            {
+                throw ServerError(__func__, "Influx server error: " + std::to_string(resp.status_code));
+            }
+            if (!cpr::status::is_success(resp.status_code))
+            {
+                throw ConnectionError(__func__, "(" + std::to_string(resp.status_code) + ") " + resp.reason);
+            }
         }
 
-        CURL* createWriteHandle(const std::string& url)
+        std::string parseUrl(const std::string& url)
         {
-            if (CURL* writeHandle = curl_easy_init(); writeHandle != nullptr)
-            {
-                setConnectionOptions(writeHandle);
-                curl_easy_setopt(writeHandle, CURLOPT_URL, url.c_str());
-                curl_easy_setopt(writeHandle, CURLOPT_POST, 1);
-                return writeHandle;
-            }
+            const auto questionMarkPosition = url.find('?');
 
-            throw InfluxDBException{__func__, "Failed to initialize write handle"};
+            if (questionMarkPosition == std::string::npos)
+            {
+                return url;
+            }
+            if (url.at(questionMarkPosition - 1) == '/')
+            {
+                return url.substr(0, questionMarkPosition - 1);
+            }
+            return url.substr(0, questionMarkPosition);
+        }
+
+        std::string parseDatabaseName(const std::string& url)
+        {
+            const auto dbParameterPosition = url.find("?db=");
+
+            if (dbParameterPosition == std::string::npos)
+            {
+                throw InfluxDBException{__func__, "Database not specified"};
+            }
+            return url.substr(dbParameterPosition + 4);
         }
     }
+
 
     HTTP::HTTP(const std::string& url)
+        : endpointUrl(parseUrl(url)), databaseName(parseDatabaseName(url))
     {
-        initCurl(url);
-        initCurlRead(url);
-        obtainInfluxServiceUrl(url);
-        obtainDatabaseName(url);
-    }
-
-    HTTP::~HTTP()
-    {
-        curl_easy_cleanup(writeHandle);
-        curl_easy_cleanup(readHandle);
-        curl_global_cleanup();
-    }
-
-    void HTTP::initCurl(const std::string& url)
-    {
-        if (const CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL); globalInitResult != CURLE_OK)
-        {
-            throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
-        }
-
-        std::string writeUrl = url;
-        auto position = writeUrl.find('?');
-        if (position == std::string::npos)
-        {
-            throw InfluxDBException(__func__, "Database not specified");
-        }
-        if (writeUrl.at(position - 1) != '/')
-        {
-            writeUrl.insert(position, "/write");
-        }
-        else
-        {
-            writeUrl.insert(position, "write");
-        }
-        writeHandle = createWriteHandle(writeUrl);
-    }
-
-    void HTTP::initCurlRead(const std::string& url)
-    {
-        mReadUrl = url + "&q=";
-        const auto pos = mReadUrl.find('?');
-        std::string cmd{"query"};
-
-        if (mReadUrl[pos - 1] != '/')
-        {
-            cmd.insert(0, 1, '/');
-        }
-
-        mReadUrl.insert(pos, cmd);
-        readHandle = createReadHandle();
+        session.SetTimeout(cpr::Timeout{std::chrono::seconds{10}});
+        session.SetConnectTimeout(cpr::ConnectTimeout{std::chrono::seconds{10}});
     }
 
     std::string HTTP::query(const std::string& query)
     {
-        std::string buffer;
-        char* encodedQuery = curl_easy_escape(readHandle, query.c_str(), static_cast<int>(query.size()));
-        auto fullUrl = mReadUrl + std::string(encodedQuery);
-        curl_free(encodedQuery);
-        curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
-        curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
-        const CURLcode response = curl_easy_perform(readHandle);
-        long responseCode{0};
-        curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
-        treatCurlResponse(response, responseCode);
-        return buffer;
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}, {"q", query}});
+
+        const auto response = session.Get();
+        checkResponse(response);
+
+        return response.text;
     }
 
-    void HTTP::enableBasicAuth(const std::string& auth)
+    void HTTP::setBasicAuthentication(const std::string& user, const std::string& pass)
     {
-        curl_easy_setopt(writeHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(writeHandle, CURLOPT_USERPWD, auth.c_str());
-        curl_easy_setopt(readHandle, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_easy_setopt(readHandle, CURLOPT_USERPWD, auth.c_str());
+        session.SetAuth(cpr::Authentication{user, pass, cpr::AuthMode::BASIC});
     }
 
     void HTTP::send(std::string&& lineprotocol)
     {
-        curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDS, lineprotocol.c_str());
-        curl_easy_setopt(writeHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(lineprotocol.length()));
-        const CURLcode response = curl_easy_perform(writeHandle);
-        long responseCode{0};
-        curl_easy_getinfo(writeHandle, CURLINFO_RESPONSE_CODE, &responseCode);
-        treatCurlResponse(response, responseCode);
-    }
+        session.SetUrl(cpr::Url{endpointUrl + "/write"});
+        session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}});
+        session.SetBody(cpr::Body{lineprotocol});
 
-    void HTTP::treatCurlResponse(const CURLcode& response, long responseCode) const
-    {
-        if (response != CURLE_OK)
-        {
-            throw ConnectionError(__func__, curl_easy_strerror(response));
-        }
-        //
-        // Influx API response codes:
-        // https://docs.influxdata.com/influxdb/v1.7/tools/api/#status-codes-and-responses-2
-        //
-        if (responseCode == 404)
-        {
-            throw NonExistentDatabase(__func__, "Nonexistent database: " + std::to_string(responseCode));
-        }
-        if ((responseCode >= 400) && (responseCode < 500))
-        {
-            throw BadRequest(__func__, "Bad request: " + std::to_string(responseCode));
-        }
-        if (responseCode >= 500)
-        {
-            throw ServerError(__func__, "Influx server error: " + std::to_string(responseCode));
-        }
-    }
-
-    void HTTP::obtainInfluxServiceUrl(const std::string& url)
-    {
-        const auto questionMarkPosition = url.find('?');
-
-        if (url.at(questionMarkPosition - 1) == '/')
-        {
-            mInfluxDbServiceUrl = url.substr(0, questionMarkPosition - 1);
-        }
-        else
-        {
-            mInfluxDbServiceUrl = url.substr(0, questionMarkPosition);
-        }
-    }
-
-    void HTTP::obtainDatabaseName(const std::string& url)
-    {
-        const auto dbParameterPosition = url.find("db=");
-        mDatabaseName = url.substr(dbParameterPosition + 3);
-    }
-
-    std::string HTTP::databaseName() const
-    {
-        return mDatabaseName;
-    }
-
-    std::string HTTP::influxDbServiceUrl() const
-    {
-        return mInfluxDbServiceUrl;
+        const auto response = session.Post();
+        checkResponse(response);
     }
 
     void HTTP::setProxy(const Proxy& proxy)
     {
-        auto proxyServer = proxy.getProxy();
-        curl_easy_setopt(writeHandle, CURLOPT_PROXY, proxyServer.c_str());
-        curl_easy_setopt(readHandle, CURLOPT_PROXY, proxyServer.c_str());
+        session.SetProxies(cpr::Proxies{{"http", proxy.getProxy()}, {"https", proxy.getProxy()}});
 
-        if (auto auth = proxy.getAuthentication(); auth.has_value())
+        if (const auto& auth = proxy.getAuthentication(); auth.has_value())
         {
-            curl_easy_setopt(writeHandle, CURLOPT_PROXYUSERNAME, auth->user.c_str());
-            curl_easy_setopt(writeHandle, CURLOPT_PROXYPASSWORD, auth->password.c_str());
-
-            curl_easy_setopt(readHandle, CURLOPT_PROXYUSERNAME, auth->user.c_str());
-            curl_easy_setopt(readHandle, CURLOPT_PROXYPASSWORD, auth->password.c_str());
+            session.SetProxyAuth(cpr::ProxyAuthentication{{"http", cpr::EncodedAuthentication{auth->user, auth->password}},
+                                                          {"https", cpr::EncodedAuthentication{auth->user, auth->password}}});
         }
     }
 
     std::string HTTP::execute(const std::string& cmd)
     {
-        std::string buffer;
-        char* encodedQuery = curl_easy_escape(readHandle, cmd.c_str(), static_cast<int>(cmd.size()));
-        auto fullUrl = mInfluxDbServiceUrl + "/query?q=" + std::string(encodedQuery);
-        curl_free(encodedQuery);
-        curl_easy_setopt(readHandle, CURLOPT_URL, fullUrl.c_str());
-        curl_easy_setopt(readHandle, CURLOPT_WRITEDATA, &buffer);
-        const CURLcode response = curl_easy_perform(readHandle);
-        long responseCode{0};
-        curl_easy_getinfo(readHandle, CURLINFO_RESPONSE_CODE, &responseCode);
-        treatCurlResponse(response, responseCode);
-        return buffer;
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"db", databaseName}, {"q", cmd}});
+
+        const auto response = session.Get();
+        checkResponse(response);
+
+        return response.text;
     }
 
     void HTTP::createDatabase()
     {
-        const std::string createUrl = mInfluxDbServiceUrl + "/query";
-        const std::string postFields = "q=CREATE DATABASE " + mDatabaseName;
+        session.SetUrl(cpr::Url{endpointUrl + "/query"});
+        session.SetParameters(cpr::Parameters{{"q", "CREATE DATABASE " + databaseName}});
 
-        CURL* createHandle = createWriteHandle(createUrl);
-
-        curl_easy_setopt(createHandle, CURLOPT_POSTFIELDS, postFields.c_str());
-        curl_easy_setopt(createHandle, CURLOPT_POSTFIELDSIZE, static_cast<long>(postFields.length()));
-
-        const CURLcode response = curl_easy_perform(createHandle);
-        long responseCode;
-        curl_easy_getinfo(createHandle, CURLINFO_RESPONSE_CODE, &responseCode);
-        treatCurlResponse(response, responseCode);
-        curl_easy_cleanup(createHandle);
+        const auto response = session.Post();
+        checkResponse(response);
     }
 
 } // namespace influxdb

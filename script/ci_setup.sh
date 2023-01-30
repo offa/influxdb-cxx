@@ -3,7 +3,7 @@
 set -ex
 
 apt-get update
-apt-get install -y python3-pip libcurl4-openssl-dev
+apt-get install -y python3-pip
 pip3 install -U conan
 
 mkdir -p build && cd build

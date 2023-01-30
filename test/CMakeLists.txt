@@ -11,8 +11,15 @@ add_subdirectory("mock")
 
 
 function(add_unittest name)
+    set(multiValueArgs DEPENDS)
+    cmake_parse_arguments(TEST_OPTION "" "" ${multiValueArgs} ${ARGN})
+
     add_executable(${name} ${name}.cxx)
-    target_link_libraries(${name} PRIVATE InfluxDB Catch2::Catch2WithMain trompeloeil::trompeloeil)
+    target_link_libraries(${name} PRIVATE
+        ${TEST_OPTION_DEPENDS}
+        Catch2::Catch2WithMain
+        trompeloeil::trompeloeil
+        )
     target_include_directories(${name}
         PRIVATE
             ${CMAKE_SOURCE_DIR}/src
@@ -21,25 +28,21 @@ function(add_unittest name)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()
 
-add_unittest(PointTest)
+add_unittest(PointTest DEPENDS InfluxDB)
 target_compile_options(PointTest PRIVATE $<$<NOT:$<BOOL:${MSVC}>>:-Wno-deprecated-declarations>)
 
-add_unittest(LineProtocolTest)
-target_link_libraries(LineProtocolTest PRIVATE InfluxDB-Internal)
-
-add_unittest(InfluxDBTest)
-add_unittest(InfluxDBFactoryTest)
-add_unittest(ProxyTest)
-
-add_unittest(HttpTest)
-target_link_libraries(HttpTest PRIVATE InfluxDB-Http CurlMock)
+add_unittest(LineProtocolTest DEPENDS InfluxDB InfluxDB-Internal)
+add_unittest(InfluxDBTest DEPENDS InfluxDB)
+add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
+add_unittest(ProxyTest DEPENDS InfluxDB)
+add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock)
 
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
+target_link_libraries(NoBoostSupportTest PRIVATE InfluxDB)
 
 if (INFLUXCXX_WITH_BOOST)
-    add_unittest(BoostSupportTest)
-    target_link_libraries(BoostSupportTest PRIVATE InfluxDB-BoostSupport Threads::Threads Boost::system date)
+    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Threads::Threads Boost::system date)
 endif()
 
 

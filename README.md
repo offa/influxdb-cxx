@@ -23,7 +23,7 @@ InfluxDB C++ client library
  - C++17 compiler
 
 __Dependencies__
- - CURL (required)
+ - [cpr](https://github.com/libcpr/cpr) (required)
  - boost 1.66+ (optional – see [Transports](#transports))
 
 ### Generic
@@ -125,7 +125,7 @@ List of supported transport is following:
 
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
-| HTTP        | cURL<sup>i)</sup> | `http`/`https` | `http://localhost:8086?db=<db>`      |
+| HTTP        | cpr<sup>i)</sup> | `http`/`https` | `http://localhost:8086?db=<db>`  |
 | TCP         | boost       | `tcp`          | `tcp://localhost:8094`                |
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |

@@ -20,11 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDBFactory.h"
-#include "InfluxDBException.h"
-#include <cstdlib>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_all.hpp>
+#include "SystemTest.h"
 
 namespace influxdb::test
 {
@@ -34,24 +30,13 @@ namespace influxdb::test
         {
             return db.query("select * from x where type='" + tag + "'").size();
         }
-
-        std::string dbServerUrl()
-        {
-            if (const auto host = std::getenv("INFLUXDBCXX_SYSTEMTEST_HOST"); host != nullptr)
-            {
-                return host;
-            }
-            return "localhost";
-        }
     }
 
     TEST_CASE("InfluxDB system test", "[InfluxDBST]")
     {
-        using namespace influxdb;
         using namespace Catch::Matchers;
 
-        const std::string url{"http://" + dbServerUrl() + ":8086?db=st_db"};
-        auto db = InfluxDBFactory::Get(url);
+        auto db = configure("st_db");
 
 
         SECTION("Database does not exist")
@@ -198,7 +183,7 @@ namespace influxdb::test
 
         SECTION("Write to nonexistent database throws")
         {
-            auto invalidDb = influxdb::InfluxDBFactory::Get(url + "_nonexistent");
+            auto invalidDb = configure("not_existing_db");
             CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), NonExistentDatabase);
         }
 
