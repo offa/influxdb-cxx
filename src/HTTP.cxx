@@ -27,6 +27,7 @@
 
 #include "HTTP.h"
 #include "InfluxDBException.h"
+#include <mutex>
 
 
 namespace influxdb::transports
@@ -92,16 +93,17 @@ namespace influxdb::transports
     {
         curl_easy_cleanup(writeHandle);
         curl_easy_cleanup(readHandle);
-        curl_global_cleanup();
     }
 
     void HTTP::initCurl(const std::string& url)
     {
-        if (const CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL); globalInitResult != CURLE_OK)
-        {
-            throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
-        }
-
+        static std::once_flag curl_global_inited_flag;
+        std::call_once(curl_global_inited_flag, []()
+                       {
+            if (const CURLcode globalInitResult = curl_global_init(CURL_GLOBAL_ALL); globalInitResult != CURLE_OK)
+            {
+              throw InfluxDBException(__func__, curl_easy_strerror(globalInitResult));
+            }; });
         std::string writeUrl = url;
         auto position = writeUrl.find('?');
         if (position == std::string::npos)

@@ -42,7 +42,7 @@ namespace influxdb::test
 
     TEST_CASE("Construction initializes curl", "[HttpTest]")
     {
-        REQUIRE_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
+        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_OK);
 
         REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
         REQUIRE_CALL(curlMock, curl_easy_init()).RETURN(handle);
@@ -66,13 +66,6 @@ namespace influxdb::test
         ALLOW_CALL(curlMock, curl_global_cleanup());
 
         HTTP http{"http://localhost:8086?db=test"};
-    }
-
-    TEST_CASE("Construction throws if curl init fails", "[HttpTest]")
-    {
-        ALLOW_CALL(curlMock, curl_global_init(CURL_GLOBAL_ALL)).RETURN(CURLE_FAILED_INIT);
-
-        CHECK_THROWS_AS(HTTP{"http://localhost:8086?db=test"}, InfluxDBException);
     }
 
     TEST_CASE("Construction throws if curl write handle init fails", "[HttpTest]")
@@ -117,7 +110,6 @@ namespace influxdb::test
 
         {
             REQUIRE_CALL(curlMock, curl_easy_cleanup(handle)).TIMES(2);
-            REQUIRE_CALL(curlMock, curl_global_cleanup());
 
             HTTP http{"http://localhost:8086?db=test"};
         }
