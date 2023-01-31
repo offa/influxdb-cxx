@@ -7,17 +7,13 @@ set(INTERNAL_INCLUDE_DIRS
 
 add_library(InfluxDB-BoostSupport OBJECT
     $<$<NOT:$<BOOL:${INFLUXCXX_WITH_BOOST}>>:NoBoostSupport.cxx>
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:BoostSupport.cxx>
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UDP.cxx>
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:TCP.cxx>
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:UnixSocket.cxx>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:BoostSupport.cxx UDP.cxx TCP.cxx UnixSocket.cxx>
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
 
 target_link_libraries(InfluxDB-BoostSupport
     PRIVATE
-        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
-        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
+        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
         date
         )
 
@@ -84,8 +80,7 @@ target_link_libraries(InfluxDB
   PRIVATE
     cpr::cpr
     Threads::Threads
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost>
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::system>
+    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
 )
 
 # Use C++17
