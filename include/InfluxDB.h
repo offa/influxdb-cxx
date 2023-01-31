@@ -70,8 +70,8 @@ namespace influxdb
         /// Flushes points batched (this can also happens when buffer is full)
         void flushBatch();
 
-        /// \deprecated use \ref flushBatch() instead
-        [[deprecated("Use flushBatch() instead")]] inline void flushBuffer()
+        /// \deprecated use \ref flushBatch() instead - will be removed in v0.8.0
+        [[deprecated("Use flushBatch() instead - will be removed in v0.8.0")]] inline void flushBuffer()
         {
             flushBatch();
         }
