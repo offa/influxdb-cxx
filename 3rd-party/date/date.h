@@ -1316,7 +1316,7 @@ CONSTCD11
 std::chrono::duration<Rep, Period>
 abs(std::chrono::duration<Rep, Period> d)
 {
-    return d >= d.zero() ? d : -d;
+    return d >= d.zero() ? d : static_cast<decltype(d)>(-d);
 }
 
 // round down
@@ -4206,8 +4206,8 @@ template <class CharT, class Traits, class Duration>
 inline
 typename std::enable_if
 <
-    std::ratio_less<typename Duration::period, days::period>::value
-    , std::basic_ostream<CharT, Traits>&
+    !std::is_convertible<Duration, days>::value,
+    std::basic_ostream<CharT, Traits>&
 >::type
 operator<<(std::basic_ostream<CharT, Traits>& os, const sys_time<Duration>& tp)
 {
