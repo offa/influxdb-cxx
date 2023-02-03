@@ -15,6 +15,7 @@ InfluxDB C++ client library
    - Unix datagram socket
    - TCP
 
+*Fork of the unmaintained [awegrzyn/influxdb-cxx](https://github.com/awegrzyn/influxdb-cxx) project.*
 
 ## Installation
 
