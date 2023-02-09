@@ -28,21 +28,21 @@ namespace influxdb::internal
 {
     std::vector<Point> queryImpl([[maybe_unused]] Transport* transport, [[maybe_unused]] const std::string& query)
     {
-        throw InfluxDBException("InfluxDB", "Query requires Boost");
+        throw InfluxDBException("Query requires Boost");
     }
 
     std::unique_ptr<Transport> withUdpTransport([[maybe_unused]] const http::url& uri)
     {
-        throw InfluxDBException("InfluxDBFactory", "UDP transport requires Boost");
+        throw InfluxDBException("UDP transport requires Boost");
     }
 
     std::unique_ptr<Transport> withTcpTransport([[maybe_unused]] const http::url& uri)
     {
-        throw InfluxDBException("InfluxDBFactory", "TCP transport requires Boost");
+        throw InfluxDBException("TCP transport requires Boost");
     }
 
     std::unique_ptr<Transport> withUnixSocketTransport([[maybe_unused]] const http::url& uri)
     {
-        throw InfluxDBException("InfluxDBFactory", "Unix socket transport requires Boost");
+        throw InfluxDBException("Unix socket transport requires Boost");
     }
 }

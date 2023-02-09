@@ -31,7 +31,7 @@ namespace influxdb::test
         SECTION("Unauthenticated users fails")
         {
             auto db = configure("st_auth_db", {});
-            CHECK_THROWS_AS(db->execute("show users"), BadRequest);
+            CHECK_THROWS_AS(db->execute("show users"), InfluxDBException);
         }
 
         SECTION("Authenticated user has access")

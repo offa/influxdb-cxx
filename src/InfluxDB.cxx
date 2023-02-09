@@ -45,7 +45,7 @@ namespace influxdb
     {
         if (mTransport == nullptr)
         {
-            throw InfluxDBException{"[InfluxDB]", "Transport must not be nullptr"};
+            throw InfluxDBException{"Transport must not be nullptr"};
         }
     }
 
@@ -164,14 +164,7 @@ namespace influxdb
 
     void InfluxDB::createDatabaseIfNotExists()
     {
-        try
-        {
-            mTransport->createDatabase();
-        }
-        catch (const std::runtime_error&)
-        {
-            throw InfluxDBException(__func__, "Transport did not allow create database");
-        }
+        mTransport->createDatabase();
     }
 
 } // namespace influxdb

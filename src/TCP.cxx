@@ -63,12 +63,12 @@ namespace influxdb::transports
             const size_t written = mSocket.write_some(ba::buffer(message, message.size()));
             if (written != message.size())
             {
-                throw InfluxDBException(__func__, "error while transmitting data");
+                throw InfluxDBException("Error while transmitting data");
             }
         }
         catch (const boost::system::system_error& e)
         {
-            throw InfluxDBException(__func__, e.what());
+            throw InfluxDBException(e.what());
         }
     }
 

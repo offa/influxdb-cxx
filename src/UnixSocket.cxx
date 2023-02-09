@@ -47,7 +47,7 @@ namespace influxdb::transports
         }
         catch (const boost::system::system_error& e)
         {
-            throw InfluxDBException(__func__, e.what());
+            throw InfluxDBException(e.what());
         }
     }
 
@@ -55,12 +55,12 @@ namespace influxdb::transports
 
     UnixSocket::UnixSocket(const std::string&)
     {
-        throw InfluxDBException{__func__, "Unix socket not supported on this system"};
+        throw InfluxDBException{"Unix socket not supported on this system"};
     }
 
     void UnixSocket::send(std::string&&)
     {
-        throw InfluxDBException{__func__, "Unix socket not supported on this system"};
+        throw InfluxDBException{"Unix socket not supported on this system"};
     }
 
 #endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)

@@ -99,7 +99,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetBody(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.send("content"), ConnectionError);
+        REQUIRE_THROWS_AS(http.send("content"), InfluxDBException);
     }
 
     TEST_CASE("Send accepts successful response", "[HttpTest]")
@@ -125,7 +125,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetBody(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.send("content"), NonExistentDatabase);
+        REQUIRE_THROWS_AS(http.send("content"), InfluxDBException);
     }
 
     TEST_CASE("Query sets parameters", "[HttpTest]")
@@ -148,7 +148,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), ConnectionError);
+        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), InfluxDBException);
     }
 
     TEST_CASE("Query accepts successful response", "[HttpTest]")
@@ -170,7 +170,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), ServerError);
+        REQUIRE_THROWS_AS(http.query("/12?ab=cd"), InfluxDBException);
     }
 
     TEST_CASE("Create database sets parameters", "[HttpTest]")
@@ -192,7 +192,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.createDatabase(), ConnectionError);
+        REQUIRE_THROWS_AS(http.createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("Create database accepts successful response", "[HttpTest]")
@@ -214,7 +214,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.createDatabase(), ServerError);
+        REQUIRE_THROWS_AS(http.createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("Set authentication sets parameters", "[HttpTest]")
@@ -263,7 +263,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.execute("fail-execution"), ConnectionError);
+        REQUIRE_THROWS_AS(http.execute("fail-execution"), InfluxDBException);
     }
 
     TEST_CASE("Execute accepts successful response", "[HttpTest]")
@@ -285,7 +285,7 @@ namespace influxdb::test
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
-        REQUIRE_THROWS_AS(http.execute("fail-execution"), NonExistentDatabase);
+        REQUIRE_THROWS_AS(http.execute("fail-execution"), InfluxDBException);
     }
 
 }

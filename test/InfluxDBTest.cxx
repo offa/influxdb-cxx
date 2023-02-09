@@ -167,7 +167,7 @@ namespace influxdb::test
     TEST_CASE("Create database throws if unsupported by transport", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, createDatabase()).THROW(std::runtime_error{"Intentional"});
+        REQUIRE_CALL(*mock, createDatabase()).THROW(InfluxDBException{"Intentional"});
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         CHECK_THROWS_AS(db.createDatabaseIfNotExists(), InfluxDBException);

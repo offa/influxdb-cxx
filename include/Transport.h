@@ -49,25 +49,25 @@ namespace influxdb
         /// Sends request
         virtual std::string query([[maybe_unused]] const std::string& query)
         {
-            throw InfluxDBException{"Transport", "Queries are not supported by the selected transport"};
+            throw InfluxDBException{"Queries are not supported by the selected transport"};
         }
 
         /// Executes command
         virtual std::string execute([[maybe_unused]] const std::string& cmd)
         {
-            throw InfluxDBException{"Transport", "Execution is not supported by the selected transport"};
+            throw InfluxDBException{"Execution is not supported by the selected transport"};
         }
 
         /// Sends request
         virtual void createDatabase()
         {
-            throw InfluxDBException{"Transport", "Creation of database is not supported by the selected transport"};
+            throw InfluxDBException{"Creation of database is not supported by the selected transport"};
         }
 
         /// Sets proxy
         virtual void setProxy([[maybe_unused]] const Proxy& proxy)
         {
-            throw InfluxDBException{"Transport", "Proxy is not supported by the selected transport"};
+            throw InfluxDBException{"Proxy is not supported by the selected transport"};
         }
     };
 

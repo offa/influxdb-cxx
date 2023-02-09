@@ -97,7 +97,7 @@ namespace influxdb::test
 
         SECTION("Query point throws on invalid query")
         {
-            CHECK_THROWS_AS(db->query("select* from_INVALID"), BadRequest);
+            CHECK_THROWS_AS(db->query("select* from_INVALID"), InfluxDBException);
         }
 
         SECTION("Write multiple points")
@@ -172,19 +172,19 @@ namespace influxdb::test
 
         SECTION("Write of invalid line protocol throws")
         {
-            CHECK_THROWS_AS(db->write(Point{"test,this=is ,,====,, invalid"}), BadRequest);
+            CHECK_THROWS_AS(db->write(Point{"test,this=is ,,====,, invalid"}), InfluxDBException);
         }
 
         SECTION("Write to unreachable host throws")
         {
-            auto invalidDb = influxdb::InfluxDBFactory::Get("http://non_existing_host:123456?db=not_existing_db");
-            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), ConnectionError);
+            auto invalidDb = influxdb::InfluxDBFactory::Get("http://non_existing_host:1234?db=not_existing_db");
+            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
         }
 
         SECTION("Write to nonexistent database throws")
         {
             auto invalidDb = configure("not_existing_db");
-            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), NonExistentDatabase);
+            CHECK_THROWS_AS(invalidDb->write(Point{"test"}.addField("value", 10)), InfluxDBException);
         }
 
         SECTION("Cleanup")

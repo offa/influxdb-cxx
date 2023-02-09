@@ -36,23 +36,12 @@ namespace influxdb::transports
         {
             if (resp.error)
             {
-                throw ConnectionError(__func__, resp.error.message);
-            }
-            if (resp.status_code == 404)
-            {
-                throw NonExistentDatabase(__func__, "Nonexistent database: " + std::to_string(resp.status_code));
-            }
-            if (cpr::status::is_client_error(resp.status_code))
-            {
-                throw BadRequest(__func__, "Bad request: " + std::to_string(resp.status_code));
-            }
-            if (cpr::status::is_server_error(resp.status_code))
-            {
-                throw ServerError(__func__, "Influx server error: " + std::to_string(resp.status_code));
+                // TODO: message may be empty here
+                throw InfluxDBException{"Request error: (" + std::to_string(static_cast<int>(resp.error.code)) + ") " + resp.error.message};
             }
             if (!cpr::status::is_success(resp.status_code))
             {
-                throw ConnectionError(__func__, "(" + std::to_string(resp.status_code) + ") " + resp.reason);
+                throw InfluxDBException{"Request failed: (" + std::to_string(resp.status_code) + ") " + resp.reason};
             }
         }
 
@@ -77,7 +66,7 @@ namespace influxdb::transports
 
             if (dbParameterPosition == std::string::npos)
             {
-                throw InfluxDBException{__func__, "Database not specified"};
+                throw InfluxDBException{"No Database specified"};
             }
             return url.substr(dbParameterPosition + 4);
         }

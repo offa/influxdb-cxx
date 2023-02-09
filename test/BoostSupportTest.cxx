@@ -91,7 +91,7 @@ namespace influxdb::test
         using trompeloeil::_;
 
         TransportMock transport;
-        ALLOW_CALL(transport, query(_)).THROW(InfluxDBException{"unit test", "Intentional"});
+        ALLOW_CALL(transport, query(_)).THROW(InfluxDBException{"Intentional"});
 
         CHECK_THROWS_AS(internal::queryImpl(&transport, "select should throw"), InfluxDBException);
     }

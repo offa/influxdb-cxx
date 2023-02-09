@@ -49,7 +49,7 @@ namespace influxdb::transports
         }
         catch (const boost::system::system_error& e)
         {
-            throw InfluxDBException(__func__, e.what());
+            throw InfluxDBException(e.what());
         }
     }
 

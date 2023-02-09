@@ -65,13 +65,13 @@ namespace influxdb
         http::url parsedUrl = http::ParseHttpUrl(urlCopy);
         if (parsedUrl.protocol.empty())
         {
-            throw InfluxDBException(__func__, "Ill-formed URI");
+            throw InfluxDBException("Ill-formed URI");
         }
 
         const auto iterator = map.find(parsedUrl.protocol);
         if (iterator == map.end())
         {
-            throw InfluxDBException(__func__, "Unrecognized backend " + parsedUrl.protocol);
+            throw InfluxDBException("Unrecognized backend " + parsedUrl.protocol);
         }
 
         return iterator->second(parsedUrl);
