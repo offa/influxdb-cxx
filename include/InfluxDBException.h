@@ -39,41 +39,40 @@ namespace influxdb
     class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error
     {
     public:
-        InfluxDBException(const std::string& source, const std::string& message)
+        /// \deprecated Use InfluxDBException(const std::string&) instead - will be removed in v0.8.0
+        [[deprecated("Use InfluxDBException(const std::string&) instead - will be removed in v0.8.0")]] InfluxDBException(const std::string& source, const std::string& message)
             : std::runtime_error::runtime_error(
                   "influx-cxx [" + source + "]: " + message)
         {
         }
-    };
 
-    class NonExistentDatabase : public InfluxDBException
-    {
-    public:
-        NonExistentDatabase(const std::string& source, const std::string& message)
-            : InfluxDBException(source, message)
+        explicit InfluxDBException(const std::string& message)
+            : std::runtime_error::runtime_error(message)
         {
         }
     };
 
-    class BadRequest : public InfluxDBException
-    {
-    public:
-        BadRequest(const std::string& source, const std::string& message)
-            : InfluxDBException(source, message)
-        {
-        }
+
+    /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] NonExistentDatabase : public InfluxDBException{
+        public :
+            NonExistentDatabase(const std::string& source, const std::string& message) : InfluxDBException(source, message){}
     };
 
-    class ServerError : public InfluxDBException
-    {
-    public:
-        ServerError(const std::string& source, const std::string& message)
-            : InfluxDBException(source, message)
-        {
-        }
+    /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] BadRequest : public InfluxDBException{
+        public :
+            BadRequest(const std::string& source, const std::string& message) : InfluxDBException(source, message){}
     };
 
-    class ConnectionError : public InfluxDBException
+    /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] ServerError : public InfluxDBException{
+        public :
+            ServerError(const std::string& source, const std::string& message) : InfluxDBException(source, message){}
+    };
+
+    /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] ConnectionError : public InfluxDBException
     {
     public:
         ConnectionError(const std::string& source, const std::string& message)
