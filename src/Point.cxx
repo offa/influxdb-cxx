@@ -48,7 +48,7 @@ namespace influxdb
     {
     }
 
-    Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value)
+    Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double, char>& value)
     {
         if (name.empty())
         {
@@ -117,6 +117,8 @@ namespace influxdb
                            { convert << v << 'i'; },
                            [&convert](long long int v)
                            { convert << v << 'i'; },
+                           [&convert](long int v)
+                           { if (v==0) convert << 'f'; else convert << 't'; },
                            [&convert](double v)
                            { convert << std::fixed << v; },
                            [&convert](const std::string& v)
