@@ -48,7 +48,7 @@ namespace influxdb
     {
     }
 
-    Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double, char>& value)
+    Point&& Point::addField(std::string_view name, const std::variant<int, long long int, std::string, double, long int>& value)
     {
         if (name.empty())
         {
