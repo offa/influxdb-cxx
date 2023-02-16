@@ -39,7 +39,7 @@
 namespace influxdb
 {
 
-    static inline constexpr int defaultFloatsPrecision{18};
+    static inline constexpr int defaultFloatsPrecision{26};
 
     /// \brief Represents a point
     class INFLUXDB_EXPORT Point
