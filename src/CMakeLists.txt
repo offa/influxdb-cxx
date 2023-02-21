@@ -13,7 +13,10 @@ target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS
 
 target_link_libraries(InfluxDB-BoostSupport
     PRIVATE
-        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
+        if(INFLUXCXX_WITH_BOOST)
+          Boost::boost
+          Boost::system
+        endif()
         date::date
         )
 
@@ -84,7 +87,10 @@ target_link_libraries(InfluxDB
   PRIVATE
     cpr::cpr
     Threads::Threads
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
+    if(INFLUXCXX_WITH_BOOST)
+      Boost::boost
+      Boost::system
+    endif()
 )
 
 # Use C++17
