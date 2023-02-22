@@ -4,7 +4,7 @@ set -ex
 
 apt-get update
 apt-get install -y python3-pip
-pip3 install -U conan
+pip3 install -U conan==1.59.0
 
 mkdir -p build && cd build
 
