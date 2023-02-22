@@ -4,6 +4,7 @@
 set -ex
 PID=$$
 BASEPATH=/tmp/influx-test-${PID}
+BUILD_TYPE="Release"
 
 echo "perform deployment test in ${BASEPATH}"
 mkdir -p ${BASEPATH}/influxdb-cxx
@@ -13,9 +14,16 @@ cp -r script/include_library/* ${BASEPATH}/
 cd /tmp/influx-test-${PID}/
 mkdir build && cd build
 
-conan install -g cmake_paths -g cmake_find_package --build=missing cpr/1.10.0@
+conan install \
+    -of . \
+    -g CMakeToolchain \
+    -g CMakeDeps \
+    --build=missing \
+    -s build_type=${BUILD_TYPE} \
+    -s compiler.cppstd=17 \
+    --requires=cpr/1.10.0
 
-cmake -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake "$@" ..
+cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" "$@" ..
 cmake --build . -j
 
 #cleanup

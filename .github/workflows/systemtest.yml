@@ -31,7 +31,7 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: ~/.conan/data/
+          path: ~/.conan2/p/
           key: conan-${{ runner.os }}-systemtest-db${{ matrix.influx_version }}-${{ hashFiles('conanfile.py') }}
       - name: Setup
         run: |
@@ -39,5 +39,5 @@ jobs:
           apt-get install -y libboost-system-dev
       - name: Build
         run: |
-          script/ci_build.sh -DCMAKE_TOOLCHAIN_FILE=./conan_paths.cmake
+          cmake --preset conan-release
           cmake --build build --target ${{ matrix.auth_enabled == true && 'systemtest-auth' || 'systemtest' }}

@@ -54,7 +54,7 @@ add_custom_target(unittest PointTest
     COMMAND ProxyTest
     COMMAND HttpTest
     COMMAND NoBoostSupportTest
-    COMMAND $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:BoostSupportTest>
+    COMMAND $<$<AND:$<BOOL:${INFLUXCXX_WITH_BOOST}>,$<NOT:$<PLATFORM_ID:Windows>>>:BoostSupportTest>
 
     COMMENT "Running unit tests\n\n"
     VERBATIM

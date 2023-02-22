@@ -1,7 +1,9 @@
 import re
 import os
-from conans import ConanFile, CMake, tools
-from conans.errors import ConanInvalidConfiguration
+from conan import ConanFile
+from conan.tools.files import load, copy, collect_libs
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
+from conan.errors import ConanInvalidConfiguration
 
 
 class InfluxdbCxxConan(ConanFile):
@@ -13,7 +15,6 @@ class InfluxdbCxxConan(ConanFile):
     description = "InfluxDB C++ client library."
     topics = ("influxdb", "influxdb-client")
     settings = "os", "compiler", "build_type", "arch"
-    generators = ("cmake_find_package", "cmake_paths")
     options = {
         "shared": [True, False],
         "tests": [True, False],
@@ -25,15 +26,15 @@ class InfluxdbCxxConan(ConanFile):
         "tests": False,
         "system": False,
         "boost": True,
-        "boost:shared": True,
+        "boost/*:shared": True,
     }
     exports = ["LICENSE"]
     exports_sources = ("CMakeLists.txt", "src/*", "include/*", "test/*",
                        "cmake/*", "3rd-party/*")
 
     def set_version(self):
-        cmake_lists_content = tools.load(
-            os.path.join(self.recipe_folder, "CMakeLists.txt"))
+        cmake_lists_content = load(
+            self, os.path.join(self.recipe_folder, "CMakeLists.txt"))
         project_match = re.search(r'project\s*\((.+?)\)', cmake_lists_content,
                                   re.DOTALL)
 
@@ -60,6 +61,15 @@ class InfluxdbCxxConan(ConanFile):
             self.requires("catch2/3.3.1")
             self.requires("trompeloeil/43")
 
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.cache_variables["INFLUXCXX_TESTING"] = self.options.tests
+        tc.cache_variables["INFLUXCXX_WITH_BOOST"] = self.options.boost
+        tc.generate()
+
+        deps = CMakeDeps(self)
+        deps.generate()
+
     def build(self):
         cmake = self._configure_cmake()
         cmake.build()
@@ -70,14 +80,14 @@ class InfluxdbCxxConan(ConanFile):
     def package(self):
         cmake = self._configure_cmake()
         cmake.install()
-        self.copy("LICENSE", dst="licenses")
+        copy(self, pattern="LICENSE", dst="licenses", src=self.source_folder)
 
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.libs = collect_libs(self)
+        self.cpp_info.set_property("cmake_file_name", "InfluxDB")
+        self.cpp_info.set_property("cmake_target_name", "InfluxData::InfluxDB")
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        cmake.definitions["INFLUXCXX_TESTING"] = self.options.tests
-        cmake.definitions["INFLUXCXX_WITH_BOOST"] = self.options.boost
-        cmake.configure(build_folder="build")
+        cmake.configure()
         return cmake

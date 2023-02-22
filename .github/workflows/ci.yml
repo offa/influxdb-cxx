@@ -23,7 +23,7 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: ~/.conan/data/
+          path: ~/.conan2/p/
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Install dependencies
         run: script/ci_setup.sh
@@ -31,9 +31,7 @@ jobs:
         if: ${{ matrix.boost == true }}
         run: apt-get install -y libboost-system-dev
       - name: Build
-        run: |
-          script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
-          cmake --build build --target unittest
+        run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Install
@@ -55,18 +53,17 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: ~/.conan/data/
+          path: ~/.conan2/p/
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup
         run: |
-          pip install -U conan==1.59.0
+          pip install -U conan
+          sudo apt-get install -y libcurl4-openssl-dev
           echo "~/.local/bin" >> $GITHUB_PATH
       - name: Setup Conan
-        run: |
-          conan profile new default --detect
-          conan profile update settings.compiler.libcxx=libstdc++11 default
+        run: conan profile detect
       - name: Build
-        run: conan create -o influxdb-cxx:boost=${{ matrix.boost }} -o influxdb-cxx:tests=True .
+        run: conan create -o "influxdb-cxx/*":boost=${{ matrix.boost }} -o "influxdb-cxx/*":tests=True --build=missing .
 
 
   build_windows:
@@ -76,17 +73,18 @@ jobs:
         compiler:
           - msvc
         boost:
-          - true
-          - false
+          - "True"
+          - "False"
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@main
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: |
-            ~/.conan/data/
-            C:\.conan
+          path: ~/.conan2/p/
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
         uses: turtlesec-no/get-ninja@main
@@ -94,24 +92,18 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install dependencies
         run: |
-          pip install -U conan==1.59.0
-          conan install -o influxdb-cxx:boost=False -o influxdb-cxx:tests=True --build=missing .
-      - name: Install Boost
-        if: ${{ matrix.boost == true }}
-        run: conan install -o influxdb-cxx:boost=True --build=missing .
+          pip3 install -U conan
+          conan profile detect
+          echo "tools.cmake.cmaketoolchain:generator=Ninja" >> ~/.conan2/global.conf
+          mkdir build
+          conan install -o "influxdb-cxx/*":boost=${{ matrix.boost }} -o "influxdb-cxx/*":tests=True -s compiler.cppstd=17 --build=missing . -of build
+          conan install --build=missing -of build --requires "libcurl/7.87.0" --deploy full_deploy
       - name: Build
-        env:
-          CC: cl
-          CXX: cl
         run: |
-          script/ci_build.sh \
-            -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }} \
-            -DBUILD_SHARED_LIBS=OFF \
-            -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 \
-            -G Ninja
-        shell: bash
+          export CL="/ID:\a\influxdb-cxx\influxdb-cxx\build\host\libcurl\7.87.0\Release\x86_64\include"
+          script/ci_build.sh -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00
       - name: Install
-        run: cmake --build build --target install
+        run: cmake --build --preset conan-release --target install
 
 
   build_osx:
@@ -122,19 +114,19 @@ jobs:
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
-          path: ~/.conan/data/
+          path: ~/.conan2/p/
           key: conan-${{ runner.os }}-macos-${{ hashFiles('conanfile.py') }}
       - name: Install Dependencies
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
-          pip3 install -U conan==1.59.0
+          pip3 install -U conan
           brew install boost
-          conan install -o influxdb-cxx:system=True -o influxdb-cxx:tests=True --build=missing .
+          conan profile detect
+          mkdir build
+          conan install -o "influxdb-cxx/*":system=True -o "influxdb-cxx/*":tests=True -s compiler.cppstd=17 --build=missing . -of build
       - name: Build
-        run: |
-          script/ci_build.sh
-          cmake --build build --target unittest
+        run: script/ci_build.sh
       - name: Install
         run: cmake --build build --target install
 
