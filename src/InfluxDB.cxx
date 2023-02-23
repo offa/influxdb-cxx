@@ -87,7 +87,7 @@ namespace influxdb
         }
 
         joinedBatch.erase(std::prev(joinedBatch.end()));
-        std::cout << "lines: " << joinedBatch << std::endl;
+        //std::cout << "lines: " << joinedBatch << std::endl;
         return joinedBatch;
     }
 
