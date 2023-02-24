@@ -119,11 +119,11 @@ namespace influxdb
                            { convert << v; },
                            [&convert](const std::string& v)
                            { convert << '"' << v << '"'; },
-                           [&convert](const bool v)
+                           [&convert](bool v)
                            { convert << (v ? "true" : "false"); },
-                           [&convert](const unsigned int v)
+                           [&convert](unsigned int v)
                            { convert << v << 'u'; },
-                           [&convert](const unsigned long long int v)
+                           [&convert](unsigned long long int v)
                            { convert << v << 'u'; },
                        },
                        field.second);
