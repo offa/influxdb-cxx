@@ -99,16 +99,14 @@ namespace influxdb
 
     std::string Point::getFields() const
     {
-        std::string fields;
-
+        std::stringstream convert;
+        convert << std::setprecision(floatsPrecision) << std::fixed;
+        bool addComma{false};
         for (const auto& field : mFields)
         {
-            std::stringstream convert;
-            convert << std::setprecision(floatsPrecision);
-
-            if (!fields.empty())
+            if (addComma)
             {
-                convert << ",";
+                convert << ',';
             }
 
             convert << field.first << "=";
@@ -118,7 +116,7 @@ namespace influxdb
                            [&convert](long long int v)
                            { convert << v << 'i'; },
                            [&convert](double v)
-                           { convert << std::fixed << v; },
+                           { convert << v; },
                            [&convert](const std::string& v)
                            { convert << '"' << v << '"'; },
                            [&convert](const bool v)
@@ -129,11 +127,10 @@ namespace influxdb
                            { convert << v << 'u'; },
                        },
                        field.second);
-
-            fields += convert.str();
+            addComma = true;
         }
 
-        return fields;
+        return convert.str();
     }
 
     std::string Point::getTags() const
