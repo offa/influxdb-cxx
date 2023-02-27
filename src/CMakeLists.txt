@@ -11,11 +11,11 @@ add_library(InfluxDB-BoostSupport OBJECT
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
 
-target_link_libraries(InfluxDB-BoostSupport
-    PRIVATE
-        $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
-        date::date
-        )
+target_link_libraries(InfluxDB-BoostSupport PRIVATE date::date)
+
+if (INFLUXCXX_WITH_BOOST)
+    target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::boost Boost::system)
+endif()
 
 # #117: Workaround for Boost ASIO null-dereference
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "12")
@@ -84,7 +84,6 @@ target_link_libraries(InfluxDB
   PRIVATE
     cpr::cpr
     Threads::Threads
-    $<$<BOOL:${INFLUXCXX_WITH_BOOST}>:Boost::boost Boost::system>
 )
 
 # Use C++17
