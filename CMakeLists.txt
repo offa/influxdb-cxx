@@ -67,7 +67,7 @@ endif()
 message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
 message(STATUS "Boost support : ${INFLUXCXX_WITH_BOOST}")
 message(STATUS "Unit Tests : ${INFLUXCXX_TESTING}")
-message(STATUS "System Tests : ${INFLUXCXX_TESTING}")
+message(STATUS "System Tests : ${INFLUXCXX_SYSTEMTEST}")
 
 
 # Add coverage flags
