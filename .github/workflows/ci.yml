@@ -135,6 +135,8 @@ jobs:
         run: |
           script/ci_build.sh
           cmake --build build --target unittest
+      - name: Install
+        run: cmake --build build --target install
 
 
   formatting-check:
