@@ -55,7 +55,8 @@ namespace influxdb
         Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
 
         /// Generates current timestamp
-        static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
+        /// \deprecated Will be removed in v0.8.0
+        [[deprecated("getCurrentTimestamp() will be removed in v0.8.0")]] static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
 
         /// Converts point to Influx Line Protocol
         /// \deprecated Will be removed in v0.8.0

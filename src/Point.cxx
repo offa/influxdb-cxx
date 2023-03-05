@@ -44,7 +44,7 @@ namespace influxdb
     overloaded(Ts...) -> overloaded<Ts...>;
 
     Point::Point(const std::string& measurement)
-        : mMeasurement(measurement), mTimestamp(Point::getCurrentTimestamp()), mTags({}), mFields({})
+        : mMeasurement(measurement), mTimestamp(std::chrono::system_clock::now()), mTags({}), mFields({})
     {
     }
 
