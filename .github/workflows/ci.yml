@@ -47,7 +47,7 @@ jobs:
         boost:
           - "True"
           - "False"
-    name: "Conan (Boost: ${{ matrix.boost }})"
+    name: "conan (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
       - name: Cache Conan Packages
@@ -108,7 +108,7 @@ jobs:
 
   build_osx:
     runs-on: macOS-latest
-    name: "Mac OS X"
+    name: "mac os x"
     steps:
       - uses: actions/checkout@main
       - name: Cache Conan Packages
