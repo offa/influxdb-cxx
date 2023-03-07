@@ -52,7 +52,8 @@ namespace influxdb
         Point&& addTag(std::string_view key, std::string_view value);
 
         /// Adds field
-        Point&& addField(std::string_view name, const std::variant<int, long long int, std::string, double>& value);
+        using FieldValue = std::variant<int, long long int, std::string, double, bool, unsigned int, unsigned long long int>;
+        Point&& addField(std::string_view name, const FieldValue& value);
 
         /// Generates current timestamp
         /// \deprecated Will be removed in v0.8.0
@@ -91,7 +92,7 @@ namespace influxdb
         std::deque<std::pair<std::string, std::string>> mTags;
 
         //// Fields
-        std::deque<std::pair<std::string, std::variant<int, long long int, std::string, double>>> mFields;
+        std::deque<std::pair<std::string, FieldValue>> mFields;
     };
 
 } // namespace influxdb

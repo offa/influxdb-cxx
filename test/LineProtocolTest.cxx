@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "LineProtocol.h"
+#include <limits>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
 
@@ -55,6 +56,10 @@ namespace influxdb::test
                                .addField("longlong_value", 1234567890LL)
                                .addField("double_value", 123.4567)
                                .addField("string_value", "abc def ghi")
+                               .addField("bool_true_field", true)
+                               .addField("bool_false_field", false)
+                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
+                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max())
                                .setTimestamp(ignoreTimestamp);
 
         const LineProtocol lineProtocol;
@@ -62,7 +67,11 @@ namespace influxdb::test
                                                        "int_value=567i,"
                                                        "longlong_value=1234567890i,"
                                                        "double_value=123.45[0-9]*,"
-                                                       "string_value=\"abc def ghi\""
+                                                       "string_value=\"abc def ghi\","
+                                                       "bool_true_field=true,"
+                                                       "bool_false_field=false,"
+                                                       "uint_field=4294967295u,"
+                                                       "ulonglong_field=18446744073709551615u"
                                                        " 54000000"));
     }
 

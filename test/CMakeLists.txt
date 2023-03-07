@@ -36,7 +36,7 @@ add_unittest(LineProtocolTest DEPENDS InfluxDB InfluxDB-Internal)
 add_unittest(InfluxDBTest DEPENDS InfluxDB)
 add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
 add_unittest(ProxyTest DEPENDS InfluxDB)
-add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock)
+add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock Threads::Threads)
 
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)

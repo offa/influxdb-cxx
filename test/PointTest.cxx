@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "Point.h"
+#include <limits>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
 
@@ -53,12 +54,22 @@ namespace influxdb::test
                                .addField("int_field", 3)
                                .addField("longlong_field", 1234LL)
                                .addField("string_field", "string value")
-                               .addField("double_field", 3.859);
+                               .addField("double_field", double{3.859})
+                               .addField("bool_true_field", true)
+                               .addField("bool_false_field", false)
+                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
+                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max());
 
+        // Set float precision to default for this test to ensure the expected double field value
+        Point::floatsPrecision = defaultFloatsPrecision;
         CHECK_THAT(point.getFields(), Equals("int_field=3i,"
                                              "longlong_field=1234i,"
                                              "string_field=\"string value\","
-                                             "double_field=3.858999999999999986"));
+                                             "double_field=3.858999999999999986,"
+                                             "bool_true_field=true,"
+                                             "bool_false_field=false,"
+                                             "uint_field=4294967295u,"
+                                             "ulonglong_field=18446744073709551615u"));
     }
 
     TEST_CASE("Field with empty name is not added", "[PointTest]")
@@ -156,12 +167,20 @@ namespace influxdb::test
                                .addField("longlong_field", 123456790LL)
                                .addField("string_field", "str")
                                .addField("double_field", 1.81)
+                               .addField("bool_true_field", true)
+                               .addField("bool_false_field", false)
+                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
+                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max())
                                .setTimestamp(ignoreTimestamp);
 
         CHECK_THAT(point.toLineProtocol(), Equals("test int_field=12i,"
                                                   "longlong_field=123456790i,"
                                                   "string_field=\"str\","
-                                                  "double_field=1.81000 1230000000"));
+                                                  "double_field=1.81000,"
+                                                  "bool_true_field=true,"
+                                                  "bool_false_field=false,"
+                                                  "uint_field=4294967295u,"
+                                                  "ulonglong_field=18446744073709551615u 1230000000"));
     }
 
     TEST_CASE("Line protocol of measurement with tag", "[PointTest]")
