@@ -72,6 +72,45 @@ namespace influxdb::test
                                              "ulonglong_field=18446744073709551615u"));
     }
 
+    TEST_CASE("Measurement of signed int type", "[PointTest]")
+    {
+        const auto point = Point{"test"}
+                               .addField("int_f", static_cast<int>(-123))
+                               .addField("int0_f", static_cast<int>(0))
+                               .addField("longlongint_f", static_cast<long long int>(-1234567890LL));
+        CHECK_THAT(point.getFields(), Equals(R"(int_f=-123i,int0_f=0i,longlongint_f=-1234567890i)"));
+    }
+
+    TEST_CASE("Measurement of unsigned int type", "[PointTest]")
+    {
+        const auto point = Point{"test"}
+                               .addField("uint_f", static_cast<unsigned int>(321))
+                               .addField("ulonglongint_f", static_cast<unsigned long long int>(1234567890LL));
+        CHECK_THAT(point.getFields(), Equals(R"(uint_f=321u,ulonglongint_f=1234567890u)"));
+    }
+
+    TEST_CASE("Measurement of double type", "[PointTest]")
+    {
+        const auto point = Point{"test"}
+                               .addField("double_f", double{-456.78934345});
+        CHECK_THAT(point.getFields(), StartsWith(R"(double_f=-456.78)"));
+    }
+
+    TEST_CASE("Measurement of bool type", "[PointTest]")
+    {
+        const auto point = Point{"test"}
+                               .addField("bool_f", true);
+        CHECK_THAT(point.getFields(), Equals(R"(bool_f=true)"));
+    }
+
+    TEST_CASE("Measurement of string type", "[PointTest]")
+    {
+        const auto point = Point{"test"}
+                               .addField("stdstring_f", std::string{"aAa bBB Ccc"})
+                               .addField("cstr_f", "dD Ee");
+        CHECK_THAT(point.getFields(), Equals(R"(stdstring_f="aAa bBB Ccc",cstr_f="dD Ee")"));
+    }
+
     TEST_CASE("Field with empty name is not added", "[PointTest]")
     {
         const auto point = Point{"test"}.addField("", "not added");
