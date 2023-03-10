@@ -33,6 +33,7 @@
 #include <chrono>
 #include <variant>
 #include <deque>
+#include <type_traits>
 
 #include "influxdb_export.h"
 
@@ -54,6 +55,12 @@ namespace influxdb
         /// Adds field
         using FieldValue = std::variant<int, long long int, std::string, double, bool, unsigned int, unsigned long long int>;
         Point&& addField(std::string_view name, const FieldValue& value);
+
+        template <class T, class = std::enable_if_t<std::is_same_v<T, const char*>, int>>
+        Point&& addField(std::string_view name, T value)
+        {
+            return this->addField(name, std::string{value});
+        }
 
         /// Generates current timestamp
         /// \deprecated Will be removed in v0.8.0
