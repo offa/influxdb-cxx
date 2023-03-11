@@ -20,8 +20,8 @@ fi
 
 conan install \
     -of . \
-    -o "influxdb-cxx/*":system=True \
-    -o "influxdb-cxx/*":tests=True \
+    -o "influxdb_cxx/*":system=True \
+    -o "influxdb_cxx/*":tests=True \
     -s compiler.cppstd=17 \
     --build=missing \
     ..

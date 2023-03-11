@@ -7,7 +7,7 @@ from conan.errors import ConanInvalidConfiguration
 
 
 class InfluxdbCxxConan(ConanFile):
-    name = "influxdb-cxx"
+    name = "influxdb_cxx"
     license = "MIT"
     author = "offa <offa@github>"
     url = "https://github.com/offa/influxdb-cxx"
