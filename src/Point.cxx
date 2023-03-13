@@ -133,6 +133,11 @@ namespace influxdb
         return convert.str();
     }
 
+    const Point::FieldsDeque& Point::getFieldsDeque() const
+    {
+        return mFields;
+    }
+
     std::string Point::getTags() const
     {
         if (mTags.empty())
@@ -150,6 +155,11 @@ namespace influxdb
         }
 
         return tags.substr(1, tags.size());
+    }
+
+    const Point::TagsDeque& Point::getTagsDeque() const
+    {
+        return mTags;
     }
 
 } // namespace influxdb
