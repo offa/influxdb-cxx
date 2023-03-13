@@ -95,9 +95,9 @@ namespace influxdb
         {
             mGlobalTags += ",";
         }
-        mGlobalTags += name;
+        mGlobalTags += LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey,name);
         mGlobalTags += "=";
-        mGlobalTags += value;
+        mGlobalTags += LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue,value);
     }
 
     void InfluxDB::transmit(std::string&& point)

@@ -32,6 +32,7 @@ namespace influxdb
     {
     public:
         LineProtocol();
+        // Caller must ensure that the tags string is correctly escaped
         explicit LineProtocol(const std::string& tags);
 
         std::string format(const Point& point) const;
