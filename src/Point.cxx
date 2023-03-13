@@ -135,7 +135,7 @@ namespace influxdb
         return convert.str();
     }
 
-    const Point::FieldsDeque& Point::getFieldsDeque() const
+    const Point::FieldSet& Point::getFieldSet() const
     {
         return mFields;
     }
@@ -159,7 +159,7 @@ namespace influxdb
         return tags.substr(1, tags.size());
     }
 
-    const Point::TagsDeque& Point::getTagsDeque() const
+    const Point::TagSet& Point::getTagSet() const
     {
         return mTags;
     }

@@ -239,16 +239,16 @@ namespace influxdb::test
             CHECK(point.getName() == unescapedMeasurementName);
 
             // Tags
-            const Point::TagsDeque& tags{point.getTagsDeque()};
+            const Point::TagSet& tags{point.getTagSet()};
             CHECK(tags.size() == 3);
             // Should contain the unescaped tag key and value
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagsDeque::value_type{unescapedTagKey, unescapedTagValue}));
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagsDeque::value_type{"type", "escaped"}));
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedTagKey, unescapedTagValue}));
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{"type", "escaped"}));
             // Queried string values actually end up in the tags (see queryImpl)
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagsDeque::value_type{unescapedFieldKey, unescapedFieldValue}));
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedFieldKey, unescapedFieldValue}));
 
             // Fields
-            const Point::FieldsDeque& fields{point.getFieldsDeque()};
+            const Point::FieldSet& fields{point.getFieldSet()};
             // String fields are put in the tags (see above)
             CHECK(fields.size() == 0);
         }

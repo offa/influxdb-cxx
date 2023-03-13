@@ -71,7 +71,7 @@ namespace influxdb
             return output;
         }
 
-        std::string formatTags(const Point::TagsDeque& tagsDeque)
+        std::string formatTags(const Point::TagSet& tagsDeque)
         {
             std::string tags;
             bool addComma{false};
@@ -90,7 +90,7 @@ namespace influxdb
             return tags;
         }
 
-        std::string formatFields(const Point::FieldsDeque& fieldsDeque)
+        std::string formatFields(const Point::FieldSet& fieldsDeque)
         {
             std::stringstream convert;
             convert << std::setprecision(Point::floatsPrecision) << std::fixed;
@@ -140,8 +140,8 @@ namespace influxdb
     {
         std::string line{LineProtocol::EscapeStringElement(LineProtocol::ElementType::Measurement, point.getName())};
         appendIfNotEmpty(line, globalTags, ',');
-        appendIfNotEmpty(line, formatTags(point.getTagsDeque()), ',');
-        appendIfNotEmpty(line, formatFields(point.getFieldsDeque()), ' ');
+        appendIfNotEmpty(line, formatTags(point.getTagSet()), ',');
+        appendIfNotEmpty(line, formatFields(point.getFieldSet()), ' ');
 
         return line.append(" ")
             .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
