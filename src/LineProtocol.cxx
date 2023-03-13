@@ -33,6 +33,32 @@ namespace influxdb
                 dest.append(std::string{separator}).append(value);
             }
         }
+
+        std::string escapeCharacters(std::string_view input, const std::string& escapedChars)
+        {
+            static const std::string escapeCharacter{"\\"};
+            std::string output;
+            output.reserve(input.size());
+
+            std::size_t searchStartPos{0};
+            // Find the first character that needs to be escaped
+            std::size_t escapedCharacterPos{input.find_first_of(escapedChars, searchStartPos)};
+            while (escapedCharacterPos != std::string::npos)
+            {
+                // Append the characters between the previous escaped character and the current one
+                output.append(input, searchStartPos, escapedCharacterPos - searchStartPos);
+                // Append the escape character and the character to be escaped
+                output.append(escapeCharacter).append(1, input[escapedCharacterPos]);
+                // Update the search start index to the character after the escaped character
+                searchStartPos = escapedCharacterPos + 1;
+                // Find the next character that needs to be escaped
+                escapedCharacterPos = input.find_first_of(escapedChars, searchStartPos);
+            }
+            // Append remaining characters after the final escaped character
+            output.append(input, searchStartPos);
+
+            return output;
+        }
     }
     LineProtocol::LineProtocol()
         : LineProtocol(std::string{})
@@ -53,5 +79,26 @@ namespace influxdb
 
         return line.append(" ")
             .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
+    }
+
+    std::string LineProtocol::EscapeStringElement(LineProtocol::ElementType type, std::string_view element)
+    {
+        // https://docs.influxdata.com/influxdb/cloud/reference/syntax/line-protocol/#special-characters
+        static const std::string commaAndSpace{", "};
+        static const std::string commaEqualsAndSpace{",= "};
+        static const std::string doubleQuoteAndBackslash{R"("\)"};
+
+        switch (type)
+        {
+            case ElementType::Measurement:
+                return escapeCharacters(element, commaAndSpace);
+            case ElementType::TagKey:
+            case ElementType::TagValue:
+            case ElementType::FieldKey:
+                return escapeCharacters(element, commaEqualsAndSpace);
+            case ElementType::FieldValue:
+                return escapeCharacters(element, doubleQuoteAndBackslash);
+        }
+        return std::string{element};
     }
 }
