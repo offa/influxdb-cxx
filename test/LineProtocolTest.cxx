@@ -218,6 +218,7 @@ namespace influxdb::test
                                .addField("field,= key", R"("field\value")")
                                .setTimestamp(ignoreTimestamp);
         const LineProtocol lineProtocol{};
-        CHECK_THAT(lineProtocol.format(point), Equals(R"(measurement\,\ ,tag\,\=\ key=tag\,\=\ value field\,\=\ key="\"field\\value\"" 54000000)"));
+        const std::string expected{R"(measurement\,\ ,tag\,\=\ key=tag\,\=\ value field\,\=\ key="\"field\\value\"" 54000000)"};
+        CHECK_THAT(lineProtocol.format(point), Equals(expected));
     }
 }
