@@ -34,14 +34,16 @@
 
 namespace influxdb
 {
-
-    template <class... Ts>
-    struct overloaded : Ts...
+    namespace
     {
-        using Ts::operator()...;
-    };
-    template <class... Ts>
-    overloaded(Ts...) -> overloaded<Ts...>;
+        template <class... Ts>
+        struct overloaded : Ts...
+        {
+            using Ts::operator()...;
+        };
+        template <class... Ts>
+        overloaded(Ts...) -> overloaded<Ts...>;
+    }
 
     Point::Point(const std::string& measurement)
         : mMeasurement(measurement), mTimestamp(std::chrono::system_clock::now()), mTags({}), mFields({})

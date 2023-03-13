@@ -210,4 +210,14 @@ namespace influxdb::test
         CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldValue, R"(escape\"both)"),
                    Equals(R"(escape\\\"both)"));
     }
+
+    TEST_CASE("Escapes all element types", "[LineProtocolTest]")
+    {
+        const auto point = Point{"measurement, "}
+                               .addTag("tag,= key", "tag,= value")
+                               .addField("field,= key", R"("field\value")")
+                               .setTimestamp(ignoreTimestamp);
+        const LineProtocol lineProtocol{};
+        CHECK_THAT(lineProtocol.format(point), Equals(R"(measurement\,\ ,tag\,\=\ key=tag\,\=\ value field\,\=\ key="\"field\\value\"" 54000000)"));
+    }
 }
