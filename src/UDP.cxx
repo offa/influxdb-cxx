@@ -36,9 +36,16 @@ namespace influxdb::transports
         : mSocket(mIoService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
     {
         boost::asio::ip::udp::resolver resolver(mIoService);
-        boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), hostname, std::to_string(port));
-        boost::asio::ip::udp::resolver::iterator resolverInerator = resolver.resolve(query);
-        mEndpoint = *resolverInerator;
+        try
+        {
+            // "A successful call to this function is guaranteed to return a non-empty range."
+            // https://www.boost.org/doc/libs/1_81_0/doc/html/boost_asio/reference/ip__basic_resolver/resolve/overload7.html
+            mEndpoint = *(resolver.resolve(boost::asio::ip::udp::v4(), hostname, std::to_string(port)));
+        }
+        catch (const boost::system::system_error& e)
+        {
+            throw InfluxDBException(e.what());
+        }
     }
 
     void UDP::send(std::string&& message)
