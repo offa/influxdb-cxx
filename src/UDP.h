@@ -30,6 +30,7 @@
 
 #include "Transport.h"
 
+#include <cstdint>
 #include <boost/asio.hpp>
 #include <chrono>
 #include <string>
@@ -42,7 +43,7 @@ namespace influxdb::transports
     {
     public:
         /// Constructor
-        UDP(const std::string& hostname, int port);
+        UDP(const std::string& hostname, std::uint16_t port);
 
         /// Sends blob via UDP
         void send(std::string&& message) override;

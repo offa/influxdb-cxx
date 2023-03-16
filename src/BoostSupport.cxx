@@ -103,12 +103,19 @@ namespace influxdb::internal
 
     std::unique_ptr<Transport> withUdpTransport(const http::url& uri)
     {
-        return std::make_unique<transports::UDP>(uri.host, uri.port);
+        static constexpr std::uint16_t INFLUXDB_UDP_PORT{8089};
+        const std::uint16_t port{
+            http::url::PORT_NOT_SET == uri.port ? INFLUXDB_UDP_PORT : static_cast<std::uint16_t>(uri.port)};
+        return std::make_unique<transports::UDP>(uri.host, port);
     }
 
     std::unique_ptr<Transport> withTcpTransport(const http::url& uri)
     {
-        return std::make_unique<transports::TCP>(uri.host, uri.port);
+        // Default QuestDB TCP port (TCP support was added for this purpose)
+        static constexpr std::uint16_t QUESTDB_TCP_PORT{9009};
+        const std::uint16_t port{
+            http::url::PORT_NOT_SET == uri.port ? QUESTDB_TCP_PORT : static_cast<std::uint16_t>(uri.port)};
+        return std::make_unique<transports::TCP>(uri.host, port);
     }
 
     std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri)

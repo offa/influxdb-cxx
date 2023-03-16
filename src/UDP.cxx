@@ -32,7 +32,7 @@
 namespace influxdb::transports
 {
 
-    UDP::UDP(const std::string& hostname, int port)
+    UDP::UDP(const std::string& hostname, std::uint16_t port)
         : mSocket(mIoService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
     {
         boost::asio::ip::udp::resolver resolver(mIoService);

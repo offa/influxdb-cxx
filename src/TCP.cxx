@@ -32,7 +32,7 @@ namespace influxdb::transports
 {
     namespace ba = boost::asio;
 
-    TCP::TCP(const std::string& hostname, int port)
+    TCP::TCP(const std::string& hostname, std::uint16_t port)
         : mSocket(mIoService)
     {
         ba::ip::tcp::resolver resolver(mIoService);

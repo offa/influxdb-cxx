@@ -32,7 +32,7 @@ namespace influxdb::test
     using influxdb::transports::UDP;
     using Catch::Matchers::ContainsSubstring;
 
-    constexpr int DEFAULT_UDP_PORT{8089};
+    constexpr std::uint16_t DEFAULT_UDP_PORT{8089};
 
     UDP createUDP()
     {

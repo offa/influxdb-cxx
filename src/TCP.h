@@ -29,6 +29,7 @@
 
 #include "Transport.h"
 
+#include <cstdint>
 #include <boost/asio.hpp>
 #include <chrono>
 #include <string>
@@ -41,7 +42,7 @@ namespace influxdb::transports
     {
     public:
         /// Constructor
-        TCP(const std::string& hostname, int port);
+        TCP(const std::string& hostname, std::uint16_t port);
 
         /// Sends blob via TCP
         void send(std::string&& message) override;
