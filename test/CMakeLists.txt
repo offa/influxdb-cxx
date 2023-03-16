@@ -37,6 +37,7 @@ add_unittest(InfluxDBTest DEPENDS InfluxDB)
 add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
 add_unittest(ProxyTest DEPENDS InfluxDB)
 add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock Threads::Threads)
+add_unittest(UDPTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport Threads::Threads)
 
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
@@ -53,6 +54,7 @@ add_custom_target(unittest PointTest
     COMMAND InfluxDBFactoryTest
     COMMAND ProxyTest
     COMMAND HttpTest
+    COMMAND UDPTest
     COMMAND NoBoostSupportTest
     COMMAND $<$<AND:$<BOOL:${INFLUXCXX_WITH_BOOST}>,$<NOT:$<PLATFORM_ID:Windows>>>:BoostSupportTest>
 
