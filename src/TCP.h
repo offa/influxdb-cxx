@@ -47,6 +47,8 @@ namespace influxdb::transports
         /// Sends blob via TCP
         void send(std::string&& message) override;
 
+        std::size_t getMaxMessageSize() const override;
+
         /// check if socket is connected
         bool is_connected() const;
 

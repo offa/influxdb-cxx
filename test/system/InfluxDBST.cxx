@@ -304,7 +304,7 @@ namespace influxdb::test
                 udpTransport->write(Point{measurement}.addField("f" + std::to_string(i), kiloStr).addTag("type", "udp_batching"));
             }
             // Force flush
-            udpTransport->flushBatch();
+            CHECK_NOTHROW(udpTransport->flushBatch());
             // Check all points are written
             WaitForUDPBatchTimeout();
             CHECK(querySize(*httpTransport, "udp_batching") == numPoints);

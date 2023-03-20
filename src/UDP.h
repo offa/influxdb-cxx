@@ -48,6 +48,8 @@ namespace influxdb::transports
         /// Sends blob via UDP
         void send(std::string&& message) override;
 
+        std::size_t getMaxMessageSize() const override;
+
     private:
         /// Boost Asio I/O functionality
         boost::asio::io_service mIoService;

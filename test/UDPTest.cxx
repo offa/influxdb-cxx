@@ -33,10 +33,12 @@ namespace influxdb::test
     using Catch::Matchers::ContainsSubstring;
 
     constexpr std::uint16_t DEFAULT_UDP_PORT{8089};
+    // UDP port to use for test purposes
+    constexpr std::uint16_t TESTING_UDP_PORT{65432};
 
     UDP createUDP()
     {
-        return UDP{"localhost", DEFAULT_UDP_PORT};
+        return UDP{"localhost", TESTING_UDP_PORT};
     }
 
     TEST_CASE("Construction succeeds with resolvable host", "[UDPTest]")
@@ -48,5 +50,19 @@ namespace influxdb::test
     {
         // RFC2606 ".invalid" TLD should not resolve
         REQUIRE_THROWS_AS(UDP("hostname.invalid", DEFAULT_UDP_PORT), InfluxDBException);
+    }
+
+    TEST_CASE("Send largest valid UDP packet", "[UDPTest]")
+    {
+        auto udp{createUDP()};
+        std::string data(udp.getMaxMessageSize(), 'x');
+        REQUIRE_NOTHROW(udp.send(std::move(data)));
+    }
+
+    TEST_CASE("Send too-long UDP packet", "[UDPTest]")
+    {
+        auto udp{createUDP()};
+        std::string data(udp.getMaxMessageSize() + 1, 'x');
+        REQUIRE_THROWS_AS(udp.send(std::move(data)), InfluxDBException);
     }
 }

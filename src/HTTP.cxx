@@ -107,6 +107,11 @@ namespace influxdb::transports
         checkResponse(response);
     }
 
+    std::size_t HTTP::getMaxMessageSize() const
+    {
+        return std::numeric_limits<std::size_t>::max();
+    }
+
     void HTTP::setProxy(const Proxy& proxy)
     {
         session.SetProxies(cpr::Proxies{{"http", proxy.getProxy()}, {"https", proxy.getProxy()}});
