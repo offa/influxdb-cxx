@@ -289,6 +289,26 @@ namespace influxdb::test
             CHECK(querySize(*httpTransport, "sp") == 1);
         }
 
+        SECTION("UDP write is aware of UDP packet size limit")
+        {
+            // 1KB string
+            static const std::string kiloStr(std::size_t{1024}, 'k');
+
+            CHECK(querySize(*httpTransport, "udp_write") == 0);
+            // Add 100 points with 1KB string (too large for a single UDP packet)
+            constexpr std::size_t numPoints{100};
+            std::vector<Point> points;
+            points.reserve(numPoints);
+            for (std::size_t i{0}; i < numPoints; ++i)
+            {
+                points.emplace_back(Point{measurement}.addField("f" + std::to_string(i), kiloStr).addTag("type", "udp_write"));
+            }
+            CHECK_NOTHROW(udpTransport->write(std::move(points)));
+            // Check all points are written
+            WaitForUDPBatchTimeout();
+            CHECK(querySize(*httpTransport, "udp_write") == numPoints);
+        }
+
         SECTION("UDP batch flush is aware of UDP packet size limit")
         {
             // 1KB string

@@ -110,9 +110,6 @@ namespace influxdb
         /// Underlying transport UDP/HTTP/Unix socket
         std::unique_ptr<Transport> mTransport;
 
-        /// Transmits string over transport
-        void transmit(std::string&& point);
-
         /// List of global tags
         std::string mGlobalTags;
 

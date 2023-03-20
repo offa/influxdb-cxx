@@ -29,12 +29,74 @@
 #include "InfluxDBException.h"
 #include "LineProtocol.h"
 #include "BoostSupport.h"
-#include <iostream>
 #include <memory>
 #include <string>
 
 namespace influxdb
 {
+    namespace
+    {
+        /// Group the points into the largest possible line-protocol messages that can be sent using the transport.
+        template <typename PointContainer>
+        void TransmitBatch(std::unique_ptr<Transport>& transport, const std::string& globalTags, PointContainer& points)
+        {
+            LineProtocol formatter{globalTags};
+
+            const auto maxMessageSize{transport->getMaxMessageSize()};
+
+            const auto pointIterEnd{points.end()};
+            auto pointIter{points.begin()};
+            while (pointIter != pointIterEnd)
+            {
+                // Start of a new line protocol message (no initial newline).
+                std::string lineProtocol;
+                bool appendNewLine{false};
+                while (pointIter != pointIterEnd)
+                {
+                    auto formattedPoint{formatter.format(*pointIter)};
+                    if (formattedPoint.size() > maxMessageSize)
+                    {
+                        // Single point is too large to be sent using this transport.
+                        // Send any accumulated points and then throw.
+                        if (!lineProtocol.empty())
+                        {
+                            transport->send(std::move(lineProtocol));
+                        }
+                        throw InfluxDBException{"Point is too large to be sent using this transport"};
+                    }
+                    const std::size_t formattedPointSize{appendNewLine ? 1 + formattedPoint.size() : formattedPoint.size()};
+                    if (maxMessageSize < lineProtocol.size() + formattedPointSize)
+                    {
+                        // Appending the current point would exceed the transport's maximum message size.
+                        // Send the current message and start a new one.
+                        break;
+                    }
+                    if (appendNewLine)
+                    {
+                        lineProtocol += '\n';
+                    }
+                    lineProtocol += formattedPoint;
+                    appendNewLine = true;
+                    ++pointIter;
+                }
+                if (!lineProtocol.empty())
+                {
+                    transport->send(std::move(lineProtocol));
+                }
+            }
+        }
+
+        void TransmitPoint(std::unique_ptr<Transport>& transport, const std::string& globalTags, Point&& point)
+        {
+            LineProtocol formatter{globalTags};
+            std::string formattedPoint{formatter.format(point)};
+            if (formattedPoint.size() > transport->getMaxMessageSize())
+            {
+                throw InfluxDBException{"Point is too large to be sent using this transport"};
+            }
+            transport->send(std::move(formattedPoint));
+        }
+    }
 
     InfluxDB::InfluxDB(std::unique_ptr<Transport> transport)
         : mPointBatch{},
@@ -69,23 +131,9 @@ namespace influxdb
     {
         if (mIsBatchingActivated && !mPointBatch.empty())
         {
-            transmit(joinLineProtocolBatch());
+            TransmitBatch(mTransport, mGlobalTags, mPointBatch);
             mPointBatch.clear();
         }
-    }
-
-    std::string InfluxDB::joinLineProtocolBatch() const
-    {
-        std::string joinedBatch;
-
-        LineProtocol formatter{mGlobalTags};
-        for (const auto& point : mPointBatch)
-        {
-            joinedBatch += formatter.format(point) + "\n";
-        }
-
-        joinedBatch.erase(std::prev(joinedBatch.end()));
-        return joinedBatch;
     }
 
 
@@ -100,11 +148,6 @@ namespace influxdb
         mGlobalTags += LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, value);
     }
 
-    void InfluxDB::transmit(std::string&& point)
-    {
-        mTransport->send(std::move(point));
-    }
-
     void InfluxDB::write(Point&& point)
     {
         if (mIsBatchingActivated)
@@ -113,8 +156,7 @@ namespace influxdb
         }
         else
         {
-            LineProtocol formatter{mGlobalTags};
-            transmit(formatter.format(point));
+            TransmitPoint(mTransport, mGlobalTags, std::move(point));
         }
     }
 
@@ -129,16 +171,7 @@ namespace influxdb
         }
         else
         {
-            std::string lineProtocol;
-            LineProtocol formatter{mGlobalTags};
-
-            for (const auto& point : points)
-            {
-                lineProtocol += formatter.format(point) + "\n";
-            }
-
-            lineProtocol.erase(std::prev(lineProtocol.end()));
-            transmit(std::move(lineProtocol));
+            TransmitBatch(mTransport, mGlobalTags, points);
         }
     }
 
