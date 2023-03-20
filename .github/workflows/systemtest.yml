@@ -21,6 +21,9 @@ jobs:
           INFLUXDB_HTTP_AUTH_ENABLED: ${{ matrix.auth_enabled }}
           INFLUXDB_ADMIN_USER: st_admin
           INFLUXDB_ADMIN_PASSWORD: st_admin_pw
+          INFLUXDB_UDP_ENABLED: true
+          INFLUXDB_UDP_DATABASE: st_udp
+          INFLUXDB_UDP_BATCH_TIMEOUT: 10ms
     env:
       INFLUXDBCXX_SYSTEMTEST_HOST: influxdb
       INFLUXDBCXX_SYSTEMTEST_USER: st_admin

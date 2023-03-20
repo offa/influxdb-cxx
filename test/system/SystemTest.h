@@ -61,10 +61,13 @@ namespace influxdb::test
         return {*user, *pass};
     }
 
-    inline std::unique_ptr<InfluxDB> configure(const std::string& db, std::optional<User> user = {})
+    inline std::unique_ptr<InfluxDB> configure(const std::string& db,
+                                               std::optional<User> user = {},
+                                               const std::string& protocol = "http",
+                                               std::uint16_t port = 8086)
     {
         const auto host = getEnv("INFLUXDBCXX_SYSTEMTEST_HOST").value_or("localhost");
         const std::string authString{user ? (user->name + ":" + user->pass + "@") : ""};
-        return InfluxDBFactory::Get("http://" + authString + host + ":8086?db=" + db);
+        return InfluxDBFactory::Get(protocol + "://" + authString + host + ":" + std::to_string(port) + "?db=" + db);
     }
 }
