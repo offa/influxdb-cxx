@@ -61,14 +61,18 @@ namespace influxdb::test
     TEST_CASE("Write adds global tags", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
-        REQUIRE_CALL(*mock, send("p0,x=1 f0=11i 4567000000\n"
-                                 "p1,x=1,existing=yes f1=22i 4567000000\n"
-                                 "p2,x=1 f2=33i 4567000000"));
-        REQUIRE_CALL(*mock, send("p4,x=1 f3=44i 4567000000"));
-        REQUIRE_CALL(*mock, send("p5,x=1 f4=55i 4567000000"));
+        REQUIRE_CALL(*mock, send(R"(p0,x=1,t\,\=\ =v\,\=\  f0=11i 4567000000)"
+                                 "\n"
+                                 R"(p1,x=1,t\,\=\ =v\,\=\ ,existing=yes f1=22i 4567000000)"
+                                 "\n"
+                                 R"(p2,x=1,t\,\=\ =v\,\=\  f2=33i 4567000000)"));
+        REQUIRE_CALL(*mock, send(R"(p4,x=1,t\,\=\ =v\,\=\  f3=44i 4567000000)"));
+        REQUIRE_CALL(*mock, send(R"(p5,x=1,t\,\=\ =v\,\=\  f4=55i 4567000000)"));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
         db.addGlobalTag("x", "1");
+        // Special characters in global tags and values should be escaped
+        db.addGlobalTag("t,= ", "v,= ");
         db.write({Point{"p0"}.addField("f0", 11).setTimestamp(ignoreTimestamp),
                   Point{"p1"}.addField("f1", 22).addTag("existing", "yes").setTimestamp(ignoreTimestamp),
                   Point{"p2"}.addField("f2", 33).setTimestamp(ignoreTimestamp)});

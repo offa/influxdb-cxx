@@ -82,8 +82,16 @@ namespace influxdb
         /// Fields getter
         std::string getFields() const;
 
+        /// Get Field Set
+        using FieldSet = std::deque<std::pair<std::string, FieldValue>>;
+        const FieldSet& getFieldSet() const;
+
         /// Tags getter
         std::string getTags() const;
+
+        /// Get Tag Set
+        using TagSet = std::deque<std::pair<std::string, std::string>>;
+        const TagSet& getTagSet() const;
 
         /// Precision for float fields
         static inline int floatsPrecision{defaultFloatsPrecision};
@@ -96,10 +104,10 @@ namespace influxdb
         std::chrono::time_point<std::chrono::system_clock> mTimestamp;
 
         //// Tags
-        std::deque<std::pair<std::string, std::string>> mTags;
+        TagSet mTags;
 
         //// Fields
-        std::deque<std::pair<std::string, FieldValue>> mFields;
+        FieldSet mFields;
     };
 
 } // namespace influxdb

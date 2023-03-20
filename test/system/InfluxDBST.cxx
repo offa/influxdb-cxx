@@ -26,9 +26,15 @@ namespace influxdb::test
 {
     namespace
     {
+        std::size_t querySize(influxdb::InfluxDB& db, const std::string& measurement, const std::string& tag)
+        {
+            // Quote the measurement name to avoid escaped characters being incorrectly interpreted
+            return db.query(R"(select * from ")" + measurement + R"(" where type=')" + tag + "'").size();
+        }
+
         std::size_t querySize(influxdb::InfluxDB& db, const std::string& tag)
         {
-            return db.query("select * from x where type='" + tag + "'").size();
+            return querySize(db, "x", tag);
         }
     }
 
@@ -192,4 +198,65 @@ namespace influxdb::test
             db->execute("drop database st_db");
         }
     }
+
+    TEST_CASE("String Element Escaping", "[InfluxDBST]")
+    {
+        using namespace Catch::Matchers;
+
+        const std::string dbName{"st_escaped_db"};
+        const std::string pointType{"escaped"};
+        auto db = configure(dbName);
+
+        // String elements which need to be escaped in line protocol
+        const std::string unescapedMeasurementName{"esc, measurement"};
+        const std::string unescapedTagKey{"esc,= tag"};
+        const std::string unescapedTagValue{"esc,= value"};
+        const std::string unescapedFieldKey{"esc,= field"};
+        const std::string unescapedFieldValue{R"(esc"\value)"};
+
+        SECTION("Create test database")
+        {
+            db->createDatabaseIfNotExists();
+            CHECK_THAT(db->execute("show databases"), ContainsSubstring(dbName));
+        }
+
+        SECTION("Write point with escaped string elements")
+        {
+            db->createDatabaseIfNotExists();
+            CHECK(querySize(*db, unescapedMeasurementName, pointType) == 0);
+            db->write(Point{unescapedMeasurementName}.addTag(unescapedTagKey, unescapedTagValue).addField(unescapedFieldKey, unescapedFieldValue).addTag("type", pointType));
+            CHECK(querySize(*db, unescapedMeasurementName, pointType) == 1);
+        }
+
+        SECTION("Queried point string elements should be unescaped")
+        {
+            const auto response{db->query(R"(select * from ")" + unescapedMeasurementName + R"(" where type=')" + pointType + "'")};
+            CHECK(response.size() == 1);
+
+            const Point& point{response.at(0)};
+
+            // Measurement
+            CHECK(point.getName() == unescapedMeasurementName);
+
+            // Tags
+            const Point::TagSet& tags{point.getTagSet()};
+            CHECK(tags.size() == 3);
+            // Should contain the unescaped tag key and value
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedTagKey, unescapedTagValue}));
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{"type", "escaped"}));
+            // Queried string values actually end up in the tags (see queryImpl)
+            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedFieldKey, unescapedFieldValue}));
+
+            // Fields
+            const Point::FieldSet& fields{point.getFieldSet()};
+            // String fields are put in the tags (see above)
+            CHECK(fields.size() == 0);
+        }
+
+        SECTION("Cleanup")
+        {
+            db->execute("drop database " + dbName);
+        }
+    }
+
 }

@@ -139,4 +139,86 @@ namespace influxdb::test
         const LineProtocol lineProtocol{"a=0,b=1,c=2"};
         CHECK_THAT(lineProtocol.format(point), Equals(R"(p1,a=0,b=1,c=2,pointtag=3 n=1i 54000000)"));
     }
+
+    TEST_CASE("Escapes Measurement string element", "[LineProtocolTest]")
+    {
+        // Measurement must escape comma and space characters
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::Measurement, "no_escape"),
+                   Equals("no_escape"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::Measurement, "escape space"),
+                   Equals(R"(escape\ space)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::Measurement, "escape,comma"),
+                   Equals(R"(escape\,comma)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::Measurement, "escape, multiple"),
+                   Equals(R"(escape\,\ multiple)"));
+    }
+
+    TEST_CASE("Escapes Tag key string element", "[LineProtocolTest]")
+    {
+        // Tag key must escape comma, equals sign and space characters
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey, "no_escape"),
+                   Equals("no_escape"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey, "escape,comma"),
+                   Equals(R"(escape\,comma)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey, "escape space"),
+                   Equals(R"(escape\ space)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey, "escape=equal"),
+                   Equals(R"(escape\=equal)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagKey, "escape = multiple,"),
+                   Equals(R"(escape\ \=\ multiple\,)"));
+    }
+
+    TEST_CASE("Escapes Tag value string element", "[LineProtocolTest]")
+    {
+        // Tag value must escape comma, equals sign and space characters
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, "no_escape"),
+                   Equals("no_escape"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, "escape,comma"),
+                   Equals(R"(escape\,comma)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, "escape space"),
+                   Equals(R"(escape\ space)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, "escape=equal"),
+                   Equals(R"(escape\=equal)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::TagValue, "escape = multiple,"),
+                   Equals(R"(escape\ \=\ multiple\,)"));
+    }
+
+    TEST_CASE("Escapes Field key string element", "[LineProtocolTest]")
+    {
+        // Field key must escape comma, equals sign and space characters
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldKey, "no_escape"),
+                   Equals("no_escape"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldKey, "escape,comma"),
+                   Equals(R"(escape\,comma)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldKey, "escape space"),
+                   Equals(R"(escape\ space)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldKey, "escape=equal"),
+                   Equals(R"(escape\=equal)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldKey, "escape = multiple,"),
+                   Equals(R"(escape\ \=\ multiple\,)"));
+    }
+
+    TEST_CASE("Escapes Field value string element", "[LineProtocolTest]")
+    {
+        // Field value must escape double quote and backslash characters
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldValue, "no_escape"),
+                   Equals("no_escape"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldValue, R"(escape"quote)"),
+                   Equals(R"(escape\"quote)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldValue, R"(escape\backslash)"),
+                   Equals(R"(escape\\backslash)"));
+        CHECK_THAT(LineProtocol::EscapeStringElement(LineProtocol::ElementType::FieldValue, R"(escape\"both)"),
+                   Equals(R"(escape\\\"both)"));
+    }
+
+    TEST_CASE("Escapes all element types", "[LineProtocolTest]")
+    {
+        const auto point = Point{"measurement, "}
+                               .addTag("tag,= key", "tag,= value")
+                               .addField("field,= key", R"("field\value")")
+                               .setTimestamp(ignoreTimestamp);
+        const LineProtocol lineProtocol{};
+        const std::string expected{R"(measurement\,\ ,tag\,\=\ key=tag\,\=\ value field\,\=\ key="\"field\\value\"" 54000000)"};
+        CHECK_THAT(lineProtocol.format(point), Equals(expected));
+    }
 }

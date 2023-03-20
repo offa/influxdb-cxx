@@ -24,15 +24,32 @@
 
 #include "Point.h"
 
+#include <string>
+
 namespace influxdb
 {
     class LineProtocol
     {
     public:
         LineProtocol();
+        // Caller must ensure that the tags string is correctly escaped
         explicit LineProtocol(const std::string& tags);
 
         std::string format(const Point& point) const;
+
+        enum class ElementType
+        {
+            Measurement,
+            TagKey,
+            TagValue,
+            FieldKey,
+            FieldValue
+        };
+
+        // Escapes special characters in a string element according to the
+        // InfluxDB line protocol specification.
+        // https://docs.influxdata.com/influxdb/cloud/reference/syntax/line-protocol/#special-characters
+        static std::string EscapeStringElement(ElementType type, std::string_view stringElement);
 
     private:
         std::string globalTags;

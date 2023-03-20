@@ -34,14 +34,16 @@
 
 namespace influxdb
 {
-
-    template <class... Ts>
-    struct overloaded : Ts...
+    namespace
     {
-        using Ts::operator()...;
-    };
-    template <class... Ts>
-    overloaded(Ts...) -> overloaded<Ts...>;
+        template <class... Ts>
+        struct overloaded : Ts...
+        {
+            using Ts::operator()...;
+        };
+        template <class... Ts>
+        overloaded(Ts...) -> overloaded<Ts...>;
+    }
 
     Point::Point(const std::string& measurement)
         : mMeasurement(measurement), mTimestamp(std::chrono::system_clock::now()), mTags({}), mFields({})
@@ -133,6 +135,11 @@ namespace influxdb
         return convert.str();
     }
 
+    const Point::FieldSet& Point::getFieldSet() const
+    {
+        return mFields;
+    }
+
     std::string Point::getTags() const
     {
         if (mTags.empty())
@@ -150,6 +157,11 @@ namespace influxdb
         }
 
         return tags.substr(1, tags.size());
+    }
+
+    const Point::TagSet& Point::getTagSet() const
+    {
+        return mTags;
     }
 
 } // namespace influxdb
