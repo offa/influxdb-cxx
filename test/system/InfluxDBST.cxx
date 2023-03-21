@@ -272,8 +272,10 @@ namespace influxdb::test
         static constexpr std::chrono::milliseconds INFLUXDB_BATCH_TIMEOUT{10};
         auto WaitForUDPBatchTimeout{[]()
                                     {
-                                        // Make sure the batch is flushed
-                                        std::this_thread::sleep_for(10 * INFLUXDB_BATCH_TIMEOUT);
+                                        // Influx flushes points received over UDP at a configurable interval
+                                        // however, local testing show this to be somewhat unreliable.
+                                        // Therefore, we wait considerably longer than the configured interval.
+                                        std::this_thread::sleep_for(20 * INFLUXDB_BATCH_TIMEOUT);
                                     }};
 
         SECTION("Create database")
