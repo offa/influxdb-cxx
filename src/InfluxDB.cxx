@@ -38,11 +38,12 @@ namespace influxdb
     {
         /// Group the points into the largest possible line-protocol messages that can be sent using the transport.
         template <typename PointContainer>
-        void TransmitBatch(std::unique_ptr<Transport>& transport, const std::string& globalTags, PointContainer& points)
+        void TransmitBatch(std::unique_ptr<Transport>& transport, const std::string& globalTags, PointContainer&& points)
         {
             LineProtocol formatter{globalTags};
             std::string lineProtocol;
             bool appendNewLine{false};
+            bool messageSizeExceeded{false};
 
             const auto maxMessageSize{transport->getMaxMessageSize()};
             for (const auto& point: points)
@@ -70,22 +71,35 @@ namespace influxdb
                     else
                     {
                         // Message is empty, so the current point is too large to be sent using this transport.
-                        throw InfluxDBException{"Point exceeds maximum message size"};
+                        // Rather than throwing all the points away, we'll skip the current point and continue
+                        // then raise an exception at the end.
+                        messageSizeExceeded = true;
+                        formattedPoint.clear();
+                        break;
                     }
                 }
 
-                if (appendNewLine)
+                if (! formattedPoint.empty())
                 {
-                    lineProtocol += '\n';
+                    if (appendNewLine)
+                    {
+                        lineProtocol += '\n';
+                    }
+                    lineProtocol += formattedPoint;
+                    appendNewLine = true;
                 }
-                lineProtocol += formattedPoint;
-                appendNewLine = true;
             }
 
             // Send the last batch of points
             if (!lineProtocol.empty())
             {
                 transport->send(std::move(lineProtocol));
+            }
+
+            // If any points were too large to be sent using this transport, throw an exception.
+            if (messageSizeExceeded)
+            {
+                throw InfluxDBException{"One or more points exceeded the transport's maximum transmission size"};
             }
         }
 
@@ -134,8 +148,10 @@ namespace influxdb
     {
         if (mIsBatchingActivated && !mPointBatch.empty())
         {
-            TransmitBatch(mTransport, mGlobalTags, mPointBatch);
+            // Make sure that mPointBatch is cleared even if an exception is thrown during transmission.
+            auto transmissionBatch{std::move(mPointBatch)};
             mPointBatch.clear();
+            TransmitBatch(mTransport, mGlobalTags, std::move(transmissionBatch));
         }
     }
 

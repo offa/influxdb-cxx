@@ -70,23 +70,29 @@ namespace influxdb::test
                   Point{"p2"}.addField("f2", 2).setTimestamp(ignoreTimestamp)});
     }
 
-    TEST_CASE("Write throws when vector point too large", "[InfluxDBTest]")
+    TEST_CASE("Write vector transmits all possible points", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
         const std::string firstPoint{"p0 f0=0i 4567000000"};
         const std::string secondPoint{"p1 f1=1i 4567000000"};
+        const std::string fourthPoint{"p3 f3=3i 4567000000"};
 
-        // Make transport message size just large enough for the first two points
+        // Make transport max message size just large enough for one point
         CHECK(firstPoint.size() == secondPoint.size());
+        CHECK(secondPoint.size() == fourthPoint.size());
         REQUIRE_CALL(*mock, getMaxMessageSize()).RETURN(firstPoint.size());
-        // Expect the first two points to be sent
+        // Expect the points which fit in the message size to be sent
+        // i.e.: skip the third point which is too large
         REQUIRE_CALL(*mock, send(std::string{firstPoint}));
         REQUIRE_CALL(*mock, send(std::string{secondPoint}));
+        REQUIRE_CALL(*mock, send(std::string{fourthPoint}));
 
         InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        // Expect write to throw because the third point exceeds the max message size
         CHECK_THROWS_AS(db.write({Point{"p0"}.addField("f0", 0).setTimestamp(ignoreTimestamp),
                                   Point{"p1"}.addField("f1", 1).setTimestamp(ignoreTimestamp),
-                                  Point{"p2"}.addField("f2", std::string(20, 'x')).setTimestamp(ignoreTimestamp)}),
+                                  Point{"p2"}.addField("exceedlimit", true).setTimestamp(ignoreTimestamp),
+                                  Point{"p3"}.addField("f3", 3).setTimestamp(ignoreTimestamp)}),
                         InfluxDBException);
     }
 
@@ -144,7 +150,7 @@ namespace influxdb::test
                   Point{"z"}.setTimestamp(ignoreTimestamp),
                   Point{"not-transmitted"}.setTimestamp(ignoreTimestamp)});
 
-        ALLOW_CALL(*mock, send(_));
+        REQUIRE_CALL(*mock, send("not-transmitted 4567000000"));
         db.flushBatch();
     }
 
@@ -163,6 +169,60 @@ namespace influxdb::test
         REQUIRE_CALL(*mock, getMaxMessageSize()).RETURN(unlimitedMessageSize);
         REQUIRE_CALL(*mock, send("x 4567000000\ny 4567000000\nz 4567000000"));
         db.flushBatch();
+    }
+
+    TEST_CASE("Flush batch still clears batch on transmission error", "[InfluxDBTest]")
+    {
+        using trompeloeil::_;
+        auto mock = std::make_shared<TransportMock>();
+
+        auto MakePoint{[](const std::string& name) -> Point
+                       {
+                           Point p{name};
+                           p.setTimestamp(ignoreTimestamp);
+                           return p;
+                       }};
+        auto FormatPoint{[](const Point& p) -> std::string
+                         {
+                             return p.getName() + " " + std::to_string(p.getTimestamp().time_since_epoch().count());
+                         }};
+
+        Point p1{MakePoint("p1")}, p2{MakePoint("p2")}, p4{MakePoint("p4")};
+        std::string p1p2Line{FormatPoint(p1) + "\n" + FormatPoint(p2)};
+        std::string p4Line{FormatPoint(p4)};
+        // Set transport max message size to accommodate three test points (with newline delimiters)
+        const std::size_t maxMessageSize{(p4Line.size() * 3) + 2};
+        //
+        REQUIRE_CALL(*mock, getMaxMessageSize()).TIMES(2).RETURN(maxMessageSize);
+        // Create a point which is too large to be transmitted
+        Point p3{MakePoint("p3")};
+        p3.addField("exceedslimit", std::string(maxMessageSize + 1, 'x'));
+
+
+        // Set batch size too large to auto-flush
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.batchOf(300);
+
+        // Add points to first batch via single and vector write methods
+        db.write(std::move(p1));
+        db.write({p2, p3, p4});
+
+        // Flush batch and expect to write p1, p2 and p4 and throw on p3
+        REQUIRE_CALL(*mock, send(std::move(p1p2Line)));
+        REQUIRE_CALL(*mock, send(std::move(p4Line)));
+        CHECK_THROWS_AS(db.flushBatch(), InfluxDBException);
+
+        // Create points for second batch (max message size should be ok for these)
+        Point p5{MakePoint("p5")}, p6{MakePoint("p6")}, p7{MakePoint("p7")};
+        std::string p5p6p7Line{FormatPoint(p5) + "\n" + FormatPoint(p6) + "\n" + FormatPoint(p7)};
+
+        // Write points to second batch via single and vector write methods
+        db.write(std::move(p5));
+        db.write({p6, p7});
+
+        // Flush batch and check we only get the expected points and no exception
+        REQUIRE_CALL(*mock, send(std::move(p5p6p7Line)));
+        CHECK_NOTHROW(db.flushBatch());
     }
 
     TEST_CASE("Destructs cleanly with pending batches", "[InfluxDBTest]")
