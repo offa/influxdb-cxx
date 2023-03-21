@@ -41,48 +41,51 @@ namespace influxdb
         void TransmitBatch(std::unique_ptr<Transport>& transport, const std::string& globalTags, PointContainer& points)
         {
             LineProtocol formatter{globalTags};
+            std::string lineProtocol;
+            bool appendNewLine{false};
 
             const auto maxMessageSize{transport->getMaxMessageSize()};
-
-            const auto pointIterEnd{points.end()};
-            auto pointIter{points.begin()};
-            while (pointIter != pointIterEnd)
+            for (const auto& point: points)
             {
-                // Start of a new line protocol message (no initial newline).
-                std::string lineProtocol;
-                bool appendNewLine{false};
-                while (pointIter != pointIterEnd)
+                auto formattedPoint{formatter.format(point)};
+                auto GetRequiredSize{[&appendNewLine](const std::string& formattedPoint) -> std::size_t
                 {
-                    auto formattedPoint{formatter.format(*pointIter)};
-                    if (formattedPoint.size() > maxMessageSize)
-                    {
-                        // Single point is too large to be sent using this transport.
-                        // Send any accumulated points and then throw.
-                        if (!lineProtocol.empty())
-                        {
-                            transport->send(std::move(lineProtocol));
-                        }
-                        throw InfluxDBException{"Point is too large to be sent using this transport"};
-                    }
-                    const std::size_t formattedPointSize{appendNewLine ? 1 + formattedPoint.size() : formattedPoint.size()};
-                    if (maxMessageSize < lineProtocol.size() + formattedPointSize)
-                    {
-                        // Appending the current point would exceed the transport's maximum message size.
-                        // Send the current message and start a new one.
-                        break;
-                    }
-                    if (appendNewLine)
-                    {
-                        lineProtocol += '\n';
-                    }
-                    lineProtocol += formattedPoint;
-                    appendNewLine = true;
-                    ++pointIter;
-                }
-                if (!lineProtocol.empty())
+                    // Have to recalculate because the point may fit in a new message if
+                    // it doesn't have a preceding newline.
+                    return appendNewLine ? 1 + formattedPoint.size() : formattedPoint.size();
+                }};
+
+                while (maxMessageSize < lineProtocol.size() + GetRequiredSize(formattedPoint))
                 {
-                    transport->send(std::move(lineProtocol));
+                    // Appending the current point would exceed the maximum message size.
+                    // Flush the existing points and try again.
+                    if (!lineProtocol.empty())
+                    {
+                        // If there is some existing content perhaps the current point will
+                        // fit in a new message.
+                        transport->send(std::move(lineProtocol));
+                        lineProtocol.clear();
+                        appendNewLine = false;
+                    }
+                    else
+                    {
+                        // Message is empty, so the current point is too large to be sent using this transport.
+                        throw InfluxDBException{"Point exceeds maximum message size"};
+                    }
                 }
+
+                if (appendNewLine)
+                {
+                    lineProtocol += '\n';
+                }
+                lineProtocol += formattedPoint;
+                appendNewLine = true;
+            }
+
+            // Send the last batch of points
+            if (!lineProtocol.empty())
+            {
+                transport->send(std::move(lineProtocol));
             }
         }
 
