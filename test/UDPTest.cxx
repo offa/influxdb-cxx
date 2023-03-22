@@ -1,7 +1,6 @@
 // MIT License
 //
 // Copyright (c) 2020-2023 offa
-// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,54 +20,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///
-/// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
-///
-
-#include "UnixSocket.h"
+#include "UDP.h"
 #include "InfluxDBException.h"
-#include <limits>
-#include <string>
 
-namespace influxdb::transports
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_string.hpp>
+
+namespace influxdb::test
 {
-#if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
+    using Catch::Matchers::ContainsSubstring;
+    using influxdb::transports::UDP;
 
-    UnixSocket::UnixSocket(const std::string& socketPath)
-        : mSocket(mIoService), mEndpoint(socketPath)
+    constexpr std::uint16_t DEFAULT_UDP_PORT{8089};
+    // UDP port to use for test purposes
+    constexpr std::uint16_t TESTING_UDP_PORT{65432};
+
+    UDP createUDP()
     {
-        mSocket.open();
+        return UDP{"localhost", TESTING_UDP_PORT};
     }
 
-    std::size_t UnixSocket::getMaxMessageSize() const
+    TEST_CASE("Construction succeeds with resolvable host", "[UDPTest]")
     {
-        return (std::numeric_limits<std::size_t>::max)();
+        REQUIRE_NOTHROW(createUDP());
     }
 
-    void UnixSocket::send(std::string&& message)
+    TEST_CASE("Construction fails on name resolution error", "[UDPTest]")
     {
-        try
-        {
-            mSocket.send_to(boost::asio::buffer(message, message.size()), mEndpoint);
-        }
-        catch (const boost::system::system_error& e)
-        {
-            throw InfluxDBException(e.what());
-        }
+        // RFC2606 ".invalid" TLD should not resolve
+        REQUIRE_THROWS_AS(UDP("hostname.invalid", DEFAULT_UDP_PORT), InfluxDBException);
     }
 
-#else
-
-    UnixSocket::UnixSocket(const std::string&)
+    TEST_CASE("Send largest valid UDP packet", "[UDPTest]")
     {
-        throw InfluxDBException{"Unix socket not supported on this system"};
+        auto udp{createUDP()};
+        std::string data(udp.getMaxMessageSize(), 'x');
+        REQUIRE_NOTHROW(udp.send(std::move(data)));
     }
 
-    void UnixSocket::send(std::string&&)
+    TEST_CASE("Send too-long UDP packet", "[UDPTest]")
     {
-        throw InfluxDBException{"Unix socket not supported on this system"};
+        auto udp{createUDP()};
+        std::string data(udp.getMaxMessageSize() + 1, 'x');
+        REQUIRE_THROWS_AS(udp.send(std::move(data)), InfluxDBException);
     }
-
-#endif // defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
-
-} // namespace influxdb::transports
+}

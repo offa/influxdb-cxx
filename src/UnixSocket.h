@@ -45,6 +45,10 @@ namespace influxdb::transports
         /// \param message   r-value string formated
         void send(std::string&& message) override;
 
+        /// Returns maximum message size
+        /// \return maximum message size
+        std::size_t getMaxMessageSize() const override;
+
     private:
         /// Boost Asio I/O functionality
         boost::asio::io_service mIoService;

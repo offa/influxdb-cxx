@@ -62,11 +62,7 @@ namespace influxdb
         };
 
         auto urlCopy = url;
-        http::url parsedUrl = http::ParseHttpUrl(urlCopy);
-        if (parsedUrl.protocol.empty())
-        {
-            throw InfluxDBException("Ill-formed URI");
-        }
+        http::url parsedUrl{http::ParseHttpUrl(urlCopy)};
 
         const auto iterator = map.find(parsedUrl.protocol);
         if (iterator == map.end())

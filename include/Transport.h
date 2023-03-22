@@ -46,6 +46,9 @@ namespace influxdb
         /// Sends string blob
         virtual void send(std::string&& message) = 0;
 
+        /// Maximum message size which can be sent using the send method
+        virtual std::size_t getMaxMessageSize() const = 0;
+
         /// Sends request
         virtual std::string query([[maybe_unused]] const std::string& query)
         {

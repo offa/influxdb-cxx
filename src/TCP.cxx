@@ -26,13 +26,14 @@
 
 #include "TCP.h"
 #include "InfluxDBException.h"
+#include <limits>
 #include <string>
 
 namespace influxdb::transports
 {
     namespace ba = boost::asio;
 
-    TCP::TCP(const std::string& hostname, int port)
+    TCP::TCP(const std::string& hostname, std::uint16_t port)
         : mSocket(mIoService)
     {
         ba::ip::tcp::resolver resolver(mIoService);
@@ -70,6 +71,11 @@ namespace influxdb::transports
         {
             throw InfluxDBException(e.what());
         }
+    }
+
+    std::size_t TCP::getMaxMessageSize() const
+    {
+        return (std::numeric_limits<std::size_t>::max)();
     }
 
 } // namespace influxdb::transports

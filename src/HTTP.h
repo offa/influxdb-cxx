@@ -47,6 +47,9 @@ namespace influxdb::transports
         ///  \throw InfluxDBException	when send fails
         void send(std::string&& lineprotocol) override;
 
+        /// Returns maximum message size
+        std::size_t getMaxMessageSize() const override;
+
         /// Queries database
         /// \throw InfluxDBException	when query fails
         std::string query(const std::string& query) override;

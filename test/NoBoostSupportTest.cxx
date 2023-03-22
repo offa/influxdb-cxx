@@ -33,6 +33,11 @@ namespace influxdb::test
             void send([[maybe_unused]] std::string&& message) override
             {
             }
+
+            std::size_t getMaxMessageSize() const override
+            {
+                return (std::numeric_limits<std::size_t>::max)();
+            }
         };
 
         TransportDummy dummy;

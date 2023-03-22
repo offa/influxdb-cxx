@@ -28,6 +28,8 @@
 #include "HTTP.h"
 #include "InfluxDBException.h"
 
+#include <limits>
+
 namespace influxdb::transports
 {
     namespace
@@ -105,6 +107,11 @@ namespace influxdb::transports
 
         const auto response = session.Post();
         checkResponse(response);
+    }
+
+    std::size_t HTTP::getMaxMessageSize() const
+    {
+        return (std::numeric_limits<std::size_t>::max)();
     }
 
     void HTTP::setProxy(const Proxy& proxy)

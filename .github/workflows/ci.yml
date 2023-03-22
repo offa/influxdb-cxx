@@ -29,7 +29,9 @@ jobs:
         run: script/ci_setup.sh
       - name: Install Boost
         if: ${{ matrix.boost == true }}
-        run: apt-get install -y libboost-system-dev
+        run: |
+          apt update
+          apt -o Acquire::Retries=3 install -y libboost-system-dev
       - name: Build
         run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
@@ -58,7 +60,8 @@ jobs:
       - name: Setup
         run: |
           pip install -U conan
-          sudo apt-get install -y libcurl4-openssl-dev
+          sudo apt update
+          sudo apt -o Acquire::Retries=3 install -y libcurl4-openssl-dev
           echo "~/.local/bin" >> $GITHUB_PATH
       - name: Setup Conan
         run: conan profile detect

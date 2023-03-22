@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <thread>
 #include "SystemTest.h"
 
 namespace influxdb::test
@@ -251,12 +252,89 @@ namespace influxdb::test
             const Point::FieldSet& fields{point.getFieldSet()};
             // String fields are put in the tags (see above)
             CHECK(fields.size() == 0);
-        }
-
-        SECTION("Cleanup")
-        {
             db->execute("drop database " + dbName);
         }
     }
 
+    TEST_CASE("UDP Transport", "[InfluxDBST]")
+    {
+        using namespace Catch::Matchers;
+
+        const std::string dbName{"st_udp"};
+        // UDP transport for writing points
+        auto udpTransport{configure(dbName, std::nullopt, "udp", 8089)};
+        // HTTP transport for running queries
+        auto httpTransport{configure(dbName, std::nullopt, "http", 8086)};
+
+        const std::string measurement{"x"};
+
+        // Configured via INFLUXDB_UDP_BATCH_TIMEOUT in systemtest.yml
+        static constexpr std::chrono::milliseconds INFLUXDB_BATCH_TIMEOUT{10};
+        auto WaitForUDPBatchTimeout{[]()
+                                    {
+                                        // Influx flushes points received over UDP at a configurable interval
+                                        // however, local testing show this to be somewhat unreliable.
+                                        // Therefore, we wait considerably longer than the configured interval.
+                                        std::this_thread::sleep_for(20 * INFLUXDB_BATCH_TIMEOUT);
+                                    }};
+
+        SECTION("Create database")
+        {
+            httpTransport->createDatabaseIfNotExists();
+        }
+
+        SECTION("Write single point")
+        {
+            CHECK(querySize(*httpTransport, "sp") == 0);
+            udpTransport->write(Point{measurement}.addField("n", 0).addTag("type", "sp"));
+            WaitForUDPBatchTimeout();
+            CHECK(querySize(*httpTransport, "sp") == 1);
+        }
+
+        SECTION("UDP write is aware of UDP packet size limit")
+        {
+            // 1KB string
+            static const std::string kiloStr(std::size_t{1024}, 'k');
+
+            CHECK(querySize(*httpTransport, "udp_write") == 0);
+            // Add 100 points with 1KB string (too large for a single UDP packet)
+            constexpr std::size_t numPoints{100};
+            std::vector<Point> points;
+            points.reserve(numPoints);
+            for (std::size_t i{0}; i < numPoints; ++i)
+            {
+                points.emplace_back(Point{measurement}.addField("f" + std::to_string(i), kiloStr).addTag("type", "udp_write"));
+            }
+            CHECK_NOTHROW(udpTransport->write(std::move(points)));
+            // Check all points are written
+            WaitForUDPBatchTimeout();
+            CHECK(querySize(*httpTransport, "udp_write") == numPoints);
+        }
+
+        SECTION("UDP batch flush is aware of UDP packet size limit")
+        {
+            // 1KB string
+            static const std::string kiloStr(std::size_t{1024}, 'k');
+
+            CHECK(querySize(*httpTransport, "udp_batching") == 0);
+            // Add 64 points with 1KB string (too large for a single UDP packet)
+            constexpr std::size_t numPoints{64};
+            // Enable batching (enough that all points will be written in a single batch)
+            udpTransport->batchOf(numPoints + 1);
+            for (std::size_t i{0}; i < numPoints; ++i)
+            {
+                udpTransport->write(Point{measurement}.addField("f" + std::to_string(i), kiloStr).addTag("type", "udp_batching"));
+            }
+            // Force flush
+            CHECK_NOTHROW(udpTransport->flushBatch());
+            // Check all points are written
+            WaitForUDPBatchTimeout();
+            CHECK(querySize(*httpTransport, "udp_batching") == numPoints);
+        }
+
+        SECTION("Cleanup")
+        {
+            httpTransport->execute("drop database " + dbName);
+        }
+    }
 }

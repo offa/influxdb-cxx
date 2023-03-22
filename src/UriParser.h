@@ -20,16 +20,20 @@
 #ifndef INFLUXDATA_HTTPPARSER_H
 #define INFLUXDATA_HTTPPARSER_H
 
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <string>
-#include <stdlib.h>
 
+#include "InfluxDBException.h"
 
 namespace http
 {
     struct url
     {
         std::string protocol, user, password, host, path, search, url;
+        static constexpr int PORT_NOT_SET = -1;
         int port;
     };
 
@@ -72,17 +76,25 @@ namespace http
     //--- Extractors -------------------------------------------------------------------~
     static inline int ExtractPort(std::string& hostport)
     {
-        int port;
-        std::string portstring = TailSlice(hostport, ":");
-        try
+        const std::string portstring{TailSlice(hostport, ":")};
+        if (portstring.empty())
         {
-            port = atoi(portstring.c_str());
+            // If portstring is empty there was either:
+            //  * no colon delimiter
+            //  * a colon delimiter but no port
+            return url::PORT_NOT_SET;
         }
-        catch (const std::exception&)
+        errno = 0;
+        char* str_end{nullptr};
+        const long port{strtol(portstring.c_str(), &str_end, 10)};
+        if ((errno != 0) ||
+            (str_end == portstring.c_str()) ||
+            (port < (std::numeric_limits<std::uint16_t>::min)()) ||
+            (port > (std::numeric_limits<std::uint16_t>::max)()))
         {
-            port = -1;
+            throw influxdb::InfluxDBException("Ill-formed URI, invalid port");
         }
-        return port;
+        return static_cast<std::uint16_t>(port);
     }
 
     static inline std::string ExtractPath(std::string& in)
@@ -91,7 +103,12 @@ namespace http
     }
     static inline std::string ExtractProtocol(std::string& in)
     {
-        return HeadSlice(in, "://");
+        auto protocol{HeadSlice(in, "://")};
+        if (protocol.empty())
+        {
+            throw influxdb::InfluxDBException("Ill-formed URI, no protocol");
+        }
+        return protocol;
     }
     static inline std::string ExtractSearch(std::string& in)
     {
