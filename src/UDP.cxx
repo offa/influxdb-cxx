@@ -27,11 +27,23 @@
 
 #include "UDP.h"
 #include "InfluxDBException.h"
+#include <algorithm>
 #include <limits>
 #include <string>
 
 namespace influxdb::transports
 {
+    namespace
+    {
+        std::size_t GetSocketSendBufferSize(const boost::asio::ip::udp::socket& socket)
+        {
+            boost::asio::ip::udp::socket::send_buffer_size sendBufferSizeOption;
+            socket.get_option(sendBufferSizeOption);
+            int sendBufferSize{sendBufferSizeOption.value()};
+            return (sendBufferSize >= 0 ? static_cast<std::size_t>(sendBufferSize) : 0U);
+        }
+    } // namespace
+
 
     UDP::UDP(const std::string& hostname, std::uint16_t port)
         : mSocket(mIoService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
@@ -70,7 +82,12 @@ namespace influxdb::transports
         static constexpr std::size_t ipv4HeaderSize{20};
         // Max UDP data size for IPv4 is 65535 - 8 - 20 = 65507
         static constexpr std::size_t maxUDPDataSize{maxLengthValue - udpHeaderSize - ipv4HeaderSize};
-        return maxUDPDataSize;
+
+        // MacOS has a default UDP send buffer size which is smaller than maxUDPDataSize
+        // this can be changed by setting the sysctl net.inet.udp.maxdgram or setting the
+        // SO_SNDBUF option on a per socket basis. For our purposes we can just use the
+        // smaller of maxUDPDataSize and the send buffer size for the socket.
+        return std::min(maxUDPDataSize, GetSocketSendBufferSize(mSocket));
     }
 
 } // namespace influxdb::transports
