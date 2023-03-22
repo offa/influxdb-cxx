@@ -33,11 +33,10 @@ add_unittest(PointTest DEPENDS InfluxDB)
 target_compile_options(PointTest PRIVATE $<$<NOT:$<BOOL:${MSVC}>>:-Wno-deprecated-declarations>)
 
 add_unittest(LineProtocolTest DEPENDS InfluxDB InfluxDB-Internal)
-add_unittest(InfluxDBTest DEPENDS InfluxDB)
+add_unittest(InfluxDBTest DEPENDS InfluxDB InfluxDB-Internal)
 add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
 add_unittest(ProxyTest DEPENDS InfluxDB)
 add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock Threads::Threads)
-add_unittest(UDPTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport Threads::Threads)
 add_unittest(UriParserTest DEPENDS InfluxDB)
 
 add_unittest(NoBoostSupportTest)
@@ -46,6 +45,7 @@ target_link_libraries(NoBoostSupportTest PRIVATE InfluxDB)
 
 if (INFLUXCXX_WITH_BOOST)
     add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::system date::date)
+    add_unittest(UDPTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::system)
 endif()
 
 
@@ -55,10 +55,10 @@ add_custom_target(unittest PointTest
     COMMAND InfluxDBFactoryTest
     COMMAND ProxyTest
     COMMAND HttpTest
-    COMMAND UDPTest
     COMMAND UriParserTest
     COMMAND NoBoostSupportTest
     COMMAND $<$<AND:$<BOOL:${INFLUXCXX_WITH_BOOST}>,$<NOT:$<PLATFORM_ID:Windows>>>:BoostSupportTest>
+    COMMAND $<$<AND:$<BOOL:${INFLUXCXX_WITH_BOOST}>,$<NOT:$<PLATFORM_ID:Windows>>>:UDPTest>
 
     COMMENT "Running unit tests\n\n"
     VERBATIM

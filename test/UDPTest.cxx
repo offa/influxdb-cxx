@@ -25,12 +25,11 @@
 
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
-#include <catch2/trompeloeil.hpp>
 
 namespace influxdb::test
 {
-    using influxdb::transports::UDP;
     using Catch::Matchers::ContainsSubstring;
+    using influxdb::transports::UDP;
 
     constexpr std::uint16_t DEFAULT_UDP_PORT{8089};
     // UDP port to use for test purposes

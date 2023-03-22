@@ -46,15 +46,15 @@ namespace influxdb
             bool messageSizeExceeded{false};
 
             const auto maxMessageSize{transport->getMaxMessageSize()};
-            for (const auto& point: points)
+            for (const auto& point : points)
             {
                 auto formattedPoint{formatter.format(point)};
-                auto GetRequiredSize{[&appendNewLine](const std::string& formattedPoint) -> std::size_t
-                {
-                    // Have to recalculate because the point may fit in a new message if
-                    // it doesn't have a preceding newline.
-                    return appendNewLine ? 1 + formattedPoint.size() : formattedPoint.size();
-                }};
+                auto GetRequiredSize{[&appendNewLine](const std::string& fp) -> std::size_t
+                                     {
+                                         // Have to recalculate because the point may fit in a new message if
+                                         // it doesn't have a preceding newline.
+                                         return appendNewLine ? 1 + fp.size() : fp.size();
+                                     }};
 
                 while (maxMessageSize < lineProtocol.size() + GetRequiredSize(formattedPoint))
                 {
@@ -79,7 +79,7 @@ namespace influxdb
                     }
                 }
 
-                if (! formattedPoint.empty())
+                if (!formattedPoint.empty())
                 {
                     if (appendNewLine)
                     {

@@ -22,6 +22,7 @@
 
 #include "InfluxDB.h"
 #include "InfluxDBException.h"
+#include "LineProtocol.h"
 #include "mock/TransportMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
@@ -184,7 +185,8 @@ namespace influxdb::test
                        }};
         auto FormatPoint{[](const Point& p) -> std::string
                          {
-                             return p.getName() + " " + std::to_string(p.getTimestamp().time_since_epoch().count());
+                             LineProtocol formatter;
+                             return formatter.format(p);
                          }};
 
         Point p1{MakePoint("p1")}, p2{MakePoint("p2")}, p4{MakePoint("p4")};

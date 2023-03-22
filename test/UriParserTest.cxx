@@ -63,7 +63,8 @@ namespace influxdb::test
         REQUIRE(url.search == "");
     }
 
-    TEST_CASE("Invalid port", "[UriParserTest]") {
+    TEST_CASE("Invalid port", "[UriParserTest]")
+    {
         std::string colonButNoNumber{"udp://localhost:twelve"};
         CHECK_THROWS_AS(ParseHttpUrl(colonButNoNumber), InfluxDBException);
     }

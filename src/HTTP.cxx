@@ -28,6 +28,8 @@
 #include "HTTP.h"
 #include "InfluxDBException.h"
 
+#include <limits>
+
 namespace influxdb::transports
 {
     namespace

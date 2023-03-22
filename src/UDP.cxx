@@ -27,6 +27,7 @@
 
 #include "UDP.h"
 #include "InfluxDBException.h"
+#include <limits>
 #include <string>
 
 namespace influxdb::transports
