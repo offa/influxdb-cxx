@@ -58,8 +58,8 @@ namespace influxdb::test
                                .addField("string_value", "abc def ghi")
                                .addField("bool_true_field", true)
                                .addField("bool_false_field", false)
-                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
-                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max())
+                               .addField("uint_field", (std::numeric_limits<unsigned int>::max)())
+                               .addField("ulonglong_field", (std::numeric_limits<unsigned long long int>::max)())
                                .setTimestamp(ignoreTimestamp);
 
         const LineProtocol lineProtocol;

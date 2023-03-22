@@ -36,7 +36,7 @@ namespace influxdb::test
 
             std::size_t getMaxMessageSize() const override
             {
-                return std::numeric_limits<std::size_t>::max();
+                return (std::numeric_limits<std::size_t>::max)();
             }
         };
 

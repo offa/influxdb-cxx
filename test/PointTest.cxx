@@ -57,8 +57,8 @@ namespace influxdb::test
                                .addField("double_field", double{3.859})
                                .addField("bool_true_field", true)
                                .addField("bool_false_field", false)
-                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
-                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max());
+                               .addField("uint_field", (std::numeric_limits<unsigned int>::max)())
+                               .addField("ulonglong_field", (std::numeric_limits<unsigned long long int>::max)());
 
         // Set float precision to default for this test to ensure the expected double field value
         Point::floatsPrecision = defaultFloatsPrecision;
@@ -208,8 +208,8 @@ namespace influxdb::test
                                .addField("double_field", 1.81)
                                .addField("bool_true_field", true)
                                .addField("bool_false_field", false)
-                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
-                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max())
+                               .addField("uint_field", (std::numeric_limits<unsigned int>::max)())
+                               .addField("ulonglong_field", (std::numeric_limits<unsigned long long int>::max)())
                                .setTimestamp(ignoreTimestamp);
 
         CHECK_THAT(point.toLineProtocol(), Equals("test int_field=12i,"

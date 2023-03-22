@@ -32,7 +32,7 @@ namespace influxdb::test
     namespace
     {
         constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp(std::chrono::milliseconds(4567));
-        constexpr std::size_t unlimitedMessageSize{std::numeric_limits<std::size_t>::max()};
+        constexpr std::size_t unlimitedMessageSize{(std::numeric_limits<std::size_t>::max)()};
     }
 
     TEST_CASE("Ctor throws on nullptr transport", "[InfluxDBTest]")

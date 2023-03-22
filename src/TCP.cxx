@@ -75,7 +75,7 @@ namespace influxdb::transports
 
     std::size_t TCP::getMaxMessageSize() const
     {
-        return std::numeric_limits<std::size_t>::max();
+        return (std::numeric_limits<std::size_t>::max)();
     }
 
 } // namespace influxdb::transports

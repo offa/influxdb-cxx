@@ -42,7 +42,7 @@ namespace influxdb::transports
 
     std::size_t UnixSocket::getMaxMessageSize() const
     {
-        return std::numeric_limits<std::size_t>::max();
+        return (std::numeric_limits<std::size_t>::max)();
     }
 
     void UnixSocket::send(std::string&& message)

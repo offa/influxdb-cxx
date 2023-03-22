@@ -111,7 +111,7 @@ namespace influxdb::transports
 
     std::size_t HTTP::getMaxMessageSize() const
     {
-        return std::numeric_limits<std::size_t>::max();
+        return (std::numeric_limits<std::size_t>::max)();
     }
 
     void HTTP::setProxy(const Proxy& proxy)

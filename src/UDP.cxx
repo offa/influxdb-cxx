@@ -76,7 +76,7 @@ namespace influxdb::transports
     std::size_t UDP::getMaxMessageSize() const
     {
         // UDP header has a 16-bit length field
-        static constexpr std::size_t maxLengthValue{std::numeric_limits<std::uint16_t>::max()};
+        static constexpr std::size_t maxLengthValue{(std::numeric_limits<std::uint16_t>::max)()};
         static constexpr std::size_t udpHeaderSize{8};
         // Currently only IPv4 is supported
         static constexpr std::size_t ipv4HeaderSize{20};

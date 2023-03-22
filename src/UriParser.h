@@ -89,8 +89,8 @@ namespace http
         const long port{strtol(portstring.c_str(), &str_end, 10)};
         if ((errno != 0) ||
             (str_end == portstring.c_str()) ||
-            (port < std::numeric_limits<std::uint16_t>::min()) ||
-            (port > std::numeric_limits<std::uint16_t>::max()))
+            (port < (std::numeric_limits<std::uint16_t>::min)()) ||
+            (port > (std::numeric_limits<std::uint16_t>::max)()))
         {
             throw influxdb::InfluxDBException("Ill-formed URI, invalid port");
         }
