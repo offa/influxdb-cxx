@@ -56,6 +56,7 @@ namespace influxdb::transports
 
         /// UDP endpoint
         boost::asio::ip::udp::endpoint mEndpoint;
+        const std::size_t maxMessageSize;
     };
 
 } // namespace influxdb::transports
