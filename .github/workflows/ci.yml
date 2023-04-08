@@ -92,7 +92,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install dependencies
         run: |
-          pip3 install -U conan
+          pip3 install -U conan==2.0.2 # Workaround broken Conan v2.0.3 on MSVC (#193)
           conan profile detect
           echo "tools.cmake.cmaketoolchain:generator=Ninja" >> ~/.conan2/global.conf
           mkdir build
