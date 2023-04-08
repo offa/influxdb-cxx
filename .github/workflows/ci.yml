@@ -29,7 +29,10 @@ jobs:
         run: script/ci_setup.sh
       - name: Install Boost
         if: ${{ matrix.boost == true }}
-        run: apt-get install -y libboost-system-dev
+        run: |
+          add-apt-repository ppa:nicola-onorata/toolchain
+          apt-get update
+          apt-get install -y boost1.81
       - name: Build
         run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
