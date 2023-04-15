@@ -32,7 +32,7 @@ namespace cpr
         public:
             static std::map<std::string, std::string> toMap(const Parameters& p)
             {
-                auto& entries = static_cast<const ParametersSpy&>(p).containerList_;
+                const auto& entries = static_cast<const ParametersSpy&>(p).containerList_;
                 std::map<std::string, std::string> params{};
 
                 std::transform(entries.cbegin(), entries.cend(), std::inserter(params, params.end()), [](const auto& e)
