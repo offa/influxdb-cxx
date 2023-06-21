@@ -24,7 +24,7 @@ endif()
 
 add_library(InfluxDB-Internal OBJECT LineProtocol.cxx HTTP.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
-target_link_libraries(InfluxDB-Internal PUBLIC cpr::cpr)
+target_link_libraries(InfluxDB-Internal PRIVATE cpr::cpr)
 
 
 add_library(InfluxDB-Core OBJECT
@@ -81,7 +81,7 @@ target_include_directories(InfluxDB
 
 # Link targets
 target_link_libraries(InfluxDB
-  PRIVATE
+  PUBLIC
     cpr::cpr
     Threads::Threads
 )
