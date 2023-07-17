@@ -180,7 +180,7 @@ namespace influxdb::test
         CHECK(result[0].getTags() == "host=x");
     }
 
-    TEST_CASE("Query reads optional tags element", "[BoostSupportTest")
+    TEST_CASE("Query reads optional tags element", "[BoostSupportTest]")
     {
         using trompeloeil::_;
 
