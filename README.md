@@ -19,13 +19,16 @@ InfluxDB C++ client library
 
 ## Installation
 
- __Build requirements__
+### Build requirements
  - CMake 3.12+
  - C++17 compiler
 
-__Dependencies__
- - [cpr](https://github.com/libcpr/cpr) (required)
- - boost 1.66+ (optional – see [Transports](#transports))
+### Dependencies
+ - [**cpr**](https://github.com/libcpr/cpr) (required)<sup>i)</sup>
+ - **boost 1.66+** (optional – see [Transports](#transports))
+
+ <sup>i)</sup> *cpr* needs to provide [CMake support](https://github.com/libcpr/cpr#find_package); some systems need to call `ldconfig` after *.so* installation.
+
 
 ### Generic
  ```bash
