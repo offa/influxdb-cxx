@@ -41,7 +41,7 @@ namespace influxdb::transports
             }
             if (!cpr::status::is_success(resp.status_code))
             {
-                throw InfluxDBException{"Request failed: (" + std::to_string(resp.status_code) + ") " + resp.reason};
+                throw InfluxDBException{"Request failed: (" + std::to_string(resp.status_code) + ") " + resp.reason + " (message: '" + resp.text + "')"};
             }
         }
 
