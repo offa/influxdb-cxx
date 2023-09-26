@@ -54,7 +54,7 @@ class InfluxdbCxxConan(ConanFile):
             f"Project version from CMakeLists.txt: '{self.version}'")
 
     def requirements(self):
-        self.requires("cpr/1.10.0")
+        self.requires("cpr/1.10.4")
         if not self.options.system and self.options.boost:
             self.requires("boost/1.81.0")
         if self.options.tests:
