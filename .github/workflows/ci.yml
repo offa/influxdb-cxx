@@ -10,8 +10,8 @@ jobs:
         compiler:
           - gcc:13
           - gcc:12
+          - clang:17
           - clang:16
-          - clang:15
         boost:
           - true
           - false
