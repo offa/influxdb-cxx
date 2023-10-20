@@ -225,6 +225,14 @@ namespace influxdb::test
         http.setBasicAuthentication("user0", "pass0");
     }
 
+    TEST_CASE("Set auth token sets auth header", "[HttpTest]")
+    {
+        auto http = createHttp();
+
+        REQUIRE_CALL(sessionMock, SetHeader(_)).WITH(_1.at("Authorization") == "Token not-a-real-api-token");
+        http.setAuthToken("not-a-real-api-token");
+    }
+
     TEST_CASE("Set proxy without authentication", "[HttpTest]")
     {
         auto http = createHttp();
