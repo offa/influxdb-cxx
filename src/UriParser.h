@@ -115,8 +115,15 @@ namespace http
         const auto search = ExtractSearch(in);
         const auto path = ExtractPath(in);
         std::string userpass = ExtractUserpass(in);
-        const auto password = ExtractPassword(userpass);
-        const auto user = userpass;
+
+        auto [password, user] = [](auto str)
+        {
+            if (str.find(":") != std::string::npos)
+            {
+                return std::make_pair(ExtractPassword(str), str);
+            }
+            return std::make_pair(str, std::string{""});
+        }(userpass);
         const auto port = ExtractPort(in);
         const auto host = in;
 

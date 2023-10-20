@@ -64,6 +64,10 @@ namespace influxdb::transports
         /// \param pass password
         void setBasicAuthentication(const std::string& user, const std::string& pass);
 
+        /// Sets the API token for authentication
+        /// \param token API token
+        void setAuthToken(const std::string& token);
+
         /// Sets proxy
         void setProxy(const Proxy& proxy) override;
 
