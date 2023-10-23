@@ -82,7 +82,7 @@ namespace influxdb::test
 
         REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
         REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/write")));
-        REQUIRE_CALL(sessionMock, SetHeader(_)).WITH(_1.at("Content-Type") == "application/json");
+        REQUIRE_CALL(sessionMock, UpdateHeader(_)).WITH(_1.at("Content-Type") == "application/json");
         REQUIRE_CALL(sessionMock, SetBody(_)).WITH(_1.str() == data);
         REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}}));
 
@@ -95,7 +95,7 @@ namespace influxdb::test
 
         REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
-        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -108,7 +108,7 @@ namespace influxdb::test
 
         REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
-        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -121,7 +121,7 @@ namespace influxdb::test
 
         REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_NOT_FOUND));
         ALLOW_CALL(sessionMock, SetUrl(_));
-        ALLOW_CALL(sessionMock, SetHeader(_));
+        ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -229,7 +229,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, SetHeader(_)).WITH(_1.at("Authorization") == "Token not-a-real-api-token");
+        REQUIRE_CALL(sessionMock, UpdateHeader(_)).WITH(_1.at("Authorization") == "Token not-a-real-api-token");
         http.setAuthToken("not-a-real-api-token");
     }
 

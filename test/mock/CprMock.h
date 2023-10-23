@@ -39,6 +39,7 @@ namespace influxdb::test
         MAKE_MOCK0(Post, cpr::Response());
         MAKE_MOCK1(SetUrl, void(const cpr::Url&));
         MAKE_MOCK1(SetHeader, void(const cpr::Header&));
+        MAKE_MOCK1(UpdateHeader, void(const cpr::Header&));
         MAKE_MOCK1(SetBody, void(cpr::Body&&));
         MAKE_MOCK1(SetParameters, void(std::map<std::string, std::string>));
         MAKE_MOCK1(SetAuth, void(const cpr::Authentication&));

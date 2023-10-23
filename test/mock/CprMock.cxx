@@ -105,6 +105,10 @@ namespace cpr
         influxdb::test::sessionMock.SetHeader(header);
     }
 
+    void Session::UpdateHeader(const Header& header)
+    {
+        influxdb::test::sessionMock.UpdateHeader(header);
+    }
 
     Parameters::Parameters(const std::initializer_list<Parameter>& parameters)
         : CurlContainer<Parameter>(parameters)
