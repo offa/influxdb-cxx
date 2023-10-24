@@ -123,6 +123,9 @@ const auto response = influxdb->execute("SHOW DATABASES");
 An underlying transport is fully configurable by passing an URI:
 ```
 [protocol]://[username:password@]host:port[?db=database]
+
+# Auth token:
+[protocol]://[token@]host:port[?db=database]
 ```
 <br>
 List of supported transport is following:
