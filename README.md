@@ -10,7 +10,7 @@ InfluxDB C++ client library
  - Batch write
  - Data exploration
  - Supported transports
-   - HTTP/HTTPS with Basic Auth
+   - HTTP/HTTPS
    - UDP
    - Unix datagram socket
    - TCP
