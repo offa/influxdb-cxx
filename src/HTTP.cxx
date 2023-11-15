@@ -36,7 +36,6 @@ namespace influxdb::transports
         {
             if (resp.error)
             {
-                // TODO: message may be empty here
                 throw InfluxDBException{"Request error: (" + std::to_string(static_cast<int>(resp.error.code)) + ") " + resp.error.message};
             }
             if (!cpr::status::is_success(resp.status_code))
