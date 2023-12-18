@@ -45,6 +45,7 @@ namespace influxdb::test
         MAKE_MOCK1(SetAuth, void(const cpr::Authentication&));
         MAKE_MOCK1(SetProxies, void(cpr::Proxies&&));
         MAKE_MOCK1(SetProxyAuth, void(cpr::ProxyAuthentication&&));
+        MAKE_MOCK1(SetVerifySsl, void(const cpr::VerifySsl&));
     };
 
     extern SessionMock sessionMock;

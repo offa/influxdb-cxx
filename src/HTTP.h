@@ -31,6 +31,7 @@
 #include "Transport.h"
 #include <memory>
 #include <string>
+#include <chrono>
 #include <cpr/cpr.h>
 
 namespace influxdb::transports
@@ -70,6 +71,9 @@ namespace influxdb::transports
 
         /// Sets proxy
         void setProxy(const Proxy& proxy) override;
+
+        void setVerifyCertificate(bool verify);
+        void setTimeout(std::chrono::milliseconds timeout);
 
     private:
         std::string endpointUrl;

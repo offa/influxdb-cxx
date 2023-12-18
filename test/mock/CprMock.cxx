@@ -85,6 +85,11 @@ namespace cpr
         influxdb::test::sessionMock.SetProxyAuth(std::move(proxy_auth));
     }
 
+    void Session::SetVerifySsl(const VerifySsl& verify)
+    {
+        influxdb::test::sessionMock.SetVerifySsl(verify);
+    }
+
     void Session::SetParameters(Parameters&& parameters)
     {
         influxdb::test::sessionMock.SetParameters(ParametersSpy::toMap(parameters));

@@ -122,6 +122,17 @@ namespace influxdb::transports
         }
     }
 
+    void HTTP::setVerifyCertificate(bool verify)
+    {
+        session.SetVerifySsl(verify);
+    }
+
+    void HTTP::setTimeout(std::chrono::milliseconds timeout)
+    {
+        session.SetTimeout(timeout);
+        session.SetConnectTimeout(timeout);
+    }
+
     std::string HTTP::execute(const std::string& cmd)
     {
         session.SetUrl(cpr::Url{endpointUrl + "/query"});
