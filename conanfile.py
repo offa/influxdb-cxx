@@ -59,7 +59,7 @@ class InfluxdbCxxConan(ConanFile):
             self.requires("boost/1.83.0")
         if self.options.tests:
             self.requires("catch2/3.5.1")
-            self.requires("trompeloeil/46")
+            self.requires("trompeloeil/47")
 
     def generate(self):
         tc = CMakeToolchain(self)
