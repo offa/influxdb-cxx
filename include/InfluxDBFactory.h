@@ -49,18 +49,18 @@ namespace influxdb
         /// Provides InfluxDB instance with given transport
         /// \param url   URL defining transport details
         /// \throw InfluxDBException     if unrecognised backend or missing protocol
-        static std::unique_ptr<InfluxDB> Get(const std::string& url) noexcept(false);
+        static std::unique_ptr<InfluxDB> Get(const std::string& url, uint32_t timeout = 10) noexcept(false);
 
         /// InfluxDB factory
         /// Provides InfluxDB instance with given transport and proxy
         /// \param url   URL defining transport details
         /// \param proxy   Proxy
         /// \throw InfluxDBException     if unrecognised backend, missing protocol or unsupported proxy
-        static std::unique_ptr<InfluxDB> Get(const std::string& url, const Proxy& proxy);
+        static std::unique_ptr<InfluxDB> Get(const std::string& url, const Proxy& proxy, uint32_t timeout = 10);
 
     private:
         ///\return  backend based on provided URL
-        static std::unique_ptr<Transport> GetTransport(const std::string& url);
+        static std::unique_ptr<Transport> GetTransport(const std::string& url, uint32_t timeout);
 
         /// Private constructor disallows to create instance of Factory
         InfluxDBFactory() = default;

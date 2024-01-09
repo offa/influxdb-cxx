@@ -41,7 +41,7 @@ namespace influxdb::transports
     {
     public:
         /// Constructor
-        explicit HTTP(const std::string& url);
+        explicit HTTP(const std::string& url, uint32_t timeout = 10);
 
         /// Sends point via HTTP POST
         ///  \throw InfluxDBException	when send fails
