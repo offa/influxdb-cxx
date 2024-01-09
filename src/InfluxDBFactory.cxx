@@ -39,9 +39,9 @@ namespace influxdb
 {
     namespace internal
     {
-        std::unique_ptr<Transport> withHttpTransport(const http::url& uri)
+        std::unique_ptr<Transport> withHttpTransport(const http::url& uri, uint32_t timeout)
         {
-            auto transport = std::make_unique<transports::HTTP>(uri.url);
+            auto transport = std::make_unique<transports::HTTP>(uri.url, timeout);
             if (!uri.user.empty() && !uri.password.empty())
             {
                 transport->setBasicAuthentication(uri.user, uri.password);
@@ -55,13 +55,14 @@ namespace influxdb
 
     }
 
-    std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
+    std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url, uint32_t timeout)
     {
+		auto httpTransport = std::bind(&internal::withHttpTransport, std::placeholders::_1, timeout);
         static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url&)>> map = {
             {"udp", internal::withUdpTransport},
             {"tcp", internal::withTcpTransport},
-            {"http", internal::withHttpTransport},
-            {"https", internal::withHttpTransport},
+            {"http", httpTransport},
+            {"https", httpTransport},
             {"unix", internal::withUnixSocketTransport},
         };
 
@@ -81,14 +82,14 @@ namespace influxdb
         return iterator->second(parsedUrl);
     }
 
-    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)
+    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, uint32_t timeout)
     {
-        return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url));
+        return std::make_unique<InfluxDB>(InfluxDBFactory::GetTransport(url, timeout));
     }
 
-    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, const Proxy& proxy)
+    std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url, const Proxy& proxy, uint32_t timeout)
     {
-        auto transport = InfluxDBFactory::GetTransport(url);
+        auto transport = InfluxDBFactory::GetTransport(url, timeout);
         transport->setProxy(proxy);
         return std::make_unique<InfluxDB>(std::move(transport));
     }
