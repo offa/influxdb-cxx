@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "SystemTest.h"
+#include "InfluxDBBuilder.h"
 
 namespace influxdb::test
 {
@@ -38,6 +39,31 @@ namespace influxdb::test
         {
             const auto user = getUserFromEnv();
             auto db = configure("st_auth_db", user);
+
+            const auto response = db->execute("show users");
+            CHECK_THAT(response, ContainsSubstring(user.name));
+        }
+    }
+
+    TEST_CASE("Http authentication methods", "[HttpAuthTest]")
+    {
+        using Catch::Matchers::ContainsSubstring;
+
+        const auto user = getUserFromEnv();
+
+        SECTION("Authenticate through factory")
+        {
+            auto db = InfluxDBFactory::Get("http://" + (user.name + ":" + user.pass + "@") + getHostFromEnv() + ":8086?db=ignore");
+
+            const auto response = db->execute("show users");
+            CHECK_THAT(response, ContainsSubstring(user.name));
+        }
+
+        SECTION("Authenticate through builder")
+        {
+            auto db = InfluxDBBuilder::http("http://" + getHostFromEnv() + ":8086?db=ignore")
+                          .setBasicAuthentication(user.name, user.pass)
+                          .connect();
 
             const auto response = db->execute("show users");
             CHECK_THAT(response, ContainsSubstring(user.name));
