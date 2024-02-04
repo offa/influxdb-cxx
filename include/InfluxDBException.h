@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2023 offa
+// Copyright (c) 2020-2024 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -54,21 +54,33 @@ namespace influxdb
 
 
     /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
-    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] NonExistentDatabase : public InfluxDBException{
-        public :
-            NonExistentDatabase(const std::string& source, const std::string& message) : InfluxDBException("influx-cxx [" + source + "]: " + message){}
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] NonExistentDatabase : public InfluxDBException
+    {
+    public:
+        NonExistentDatabase(const std::string& source, const std::string& message)
+            : InfluxDBException("influx-cxx [" + source + "]: " + message)
+        {
+        }
     };
 
     /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
-    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] BadRequest : public InfluxDBException{
-        public :
-            BadRequest(const std::string& source, const std::string& message) : InfluxDBException("influx-cxx [" + source + "]: " + message){}
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] BadRequest : public InfluxDBException
+    {
+    public:
+        BadRequest(const std::string& source, const std::string& message)
+            : InfluxDBException("influx-cxx [" + source + "]: " + message)
+        {
+        }
     };
 
     /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
-    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] ServerError : public InfluxDBException{
-        public :
-            ServerError(const std::string& source, const std::string& message) : InfluxDBException("influx-cxx [" + source + "]: " + message){}
+    class [[deprecated("Use InfluxDBException instead - will be removed in v0.8.0")]] ServerError : public InfluxDBException
+    {
+    public:
+        ServerError(const std::string& source, const std::string& message)
+            : InfluxDBException("influx-cxx [" + source + "]: " + message)
+        {
+        }
     };
 
     /// \deprecated Use InfluxDBException instead - will be removed in v0.8.0
