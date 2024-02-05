@@ -30,8 +30,6 @@ function(add_unittest name)
 endfunction()
 
 add_unittest(PointTest DEPENDS InfluxDB)
-target_compile_options(PointTest PRIVATE $<$<NOT:$<BOOL:${MSVC}>>:-Wno-deprecated-declarations>)
-
 add_unittest(LineProtocolTest DEPENDS InfluxDB InfluxDB-Internal)
 add_unittest(InfluxDBTest DEPENDS InfluxDB)
 add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)

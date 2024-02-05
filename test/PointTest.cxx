@@ -29,11 +29,6 @@ namespace influxdb::test
 {
     using namespace Catch::Matchers;
 
-    namespace
-    {
-        constexpr std::chrono::time_point<std::chrono::system_clock> ignoreTimestamp(std::chrono::milliseconds(1230));
-    }
-
     TEST_CASE("Empty measurement", "[PointTest]")
     {
         const Point point{"test"};
@@ -186,60 +181,4 @@ namespace influxdb::test
         const auto point3 = Point{"test"}.addField("float_field", 1.23456789E-6);
         CHECK_THAT(point3.getFields(), Equals("float_field=0.00000"));
     }
-
-    TEST_CASE("Line protocol of empty measurement", "[PointTest]")
-    {
-        const auto point = Point{"test"}.setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals("test 1230000000"));
-    }
-
-    TEST_CASE("Line protocol of measurement with value", "[PointTest]")
-    {
-        const auto point = Point{"test"}.addField("x", "y").setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test x="y" 1230000000)"));
-    }
-
-    TEST_CASE("Line protocol of measurement with multiple values", "[PointTest]")
-    {
-        const auto point = Point{"test"}
-                               .addField("int_field", 12)
-                               .addField("longlong_field", 123456790LL)
-                               .addField("string_field", "str")
-                               .addField("double_field", 1.81)
-                               .addField("bool_true_field", true)
-                               .addField("bool_false_field", false)
-                               .addField("uint_field", std::numeric_limits<unsigned int>::max())
-                               .addField("ulonglong_field", std::numeric_limits<unsigned long long int>::max())
-                               .setTimestamp(ignoreTimestamp);
-
-        CHECK_THAT(point.toLineProtocol(), Equals("test int_field=12i,"
-                                                  "longlong_field=123456790i,"
-                                                  "string_field=\"str\","
-                                                  "double_field=1.81000,"
-                                                  "bool_true_field=true,"
-                                                  "bool_false_field=false,"
-                                                  "uint_field=4294967295u,"
-                                                  "ulonglong_field=18446744073709551615u 1230000000"));
-    }
-
-    TEST_CASE("Line protocol of measurement with tag", "[PointTest]")
-    {
-        const auto point = Point{"test"}
-                               .addField("v", 3)
-                               .addTag("t0", "tv0")
-                               .setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0 v=3i 1230000000)"));
-    }
-
-    TEST_CASE("Line protocol of measurement with multiple tags", "[PointTest]")
-    {
-        const auto point = Point{"test"}
-                               .addField("v", 3)
-                               .addTag("t0", "tv0")
-                               .addTag("t1", "tv1")
-                               .addTag("t2", "tv2")
-                               .setTimestamp(ignoreTimestamp);
-        CHECK_THAT(point.toLineProtocol(), Equals(R"(test,t0=tv0,t1=tv1,t2=tv2 v=3i 1230000000)"));
-    }
-
 }

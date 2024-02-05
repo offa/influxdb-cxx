@@ -26,7 +26,6 @@
 ///
 
 #include "Point.h"
-#include "LineProtocol.h"
 #include <chrono>
 #include <memory>
 #include <sstream>
@@ -76,17 +75,6 @@ namespace influxdb
     {
         mTimestamp = timestamp;
         return std::move(*this);
-    }
-
-    auto Point::getCurrentTimestamp() -> decltype(std::chrono::system_clock::now())
-    {
-        return std::chrono::system_clock::now();
-    }
-
-    std::string Point::toLineProtocol() const
-    {
-        LineProtocol formatter;
-        return formatter.format(*this);
     }
 
     std::string Point::getName() const

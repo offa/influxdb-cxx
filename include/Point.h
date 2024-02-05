@@ -62,14 +62,6 @@ namespace influxdb
             return this->addField(name, std::string{value});
         }
 
-        /// Generates current timestamp
-        /// \deprecated Will be removed in v0.8.0
-        [[deprecated("getCurrentTimestamp() will be removed in v0.8.0")]] static auto getCurrentTimestamp() -> decltype(std::chrono::system_clock::now());
-
-        /// Converts point to Influx Line Protocol
-        /// \deprecated Will be removed in v0.8.0
-        [[deprecated("toLineProtocol() will be removed in v0.8.0")]] std::string toLineProtocol() const;
-
         /// Sets custom timestamp
         Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
 
