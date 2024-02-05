@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "SystemTest.h"
+#include "InfluxDBBuilder.h"
 
 namespace influxdb::test
 {
@@ -35,6 +36,27 @@ namespace influxdb::test
         std::size_t querySize(influxdb::InfluxDB& db, const std::string& tag)
         {
             return querySize(db, "x", tag);
+        }
+    }
+
+    TEST_CASE("Connection configuration", "[InfluxDBST]")
+    {
+        using namespace Catch::Matchers;
+
+        SECTION("Connect through factory")
+        {
+            auto db = InfluxDBFactory::Get("http://" + getHostFromEnv() + ":8086?db=ignore");
+            const auto response = db->execute("show databases");
+            CHECK(response.empty() == false);
+        }
+
+        SECTION("Connect through builder")
+        {
+            auto db = InfluxDBBuilder::http("http://" + getHostFromEnv() + ":8086?db=ignore")
+                          .setTimeout(std::chrono::seconds{5})
+                          .connect();
+            const auto response = db->execute("show databases");
+            CHECK(response.empty() == false);
         }
     }
 

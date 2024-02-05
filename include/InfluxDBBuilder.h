@@ -20,33 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma once
+#ifndef INFLUXDATA_INFLUXDBBUILDER_H
+#define INFLUXDATA_INFLUXDBBUILDER_H
 
-#include <cpr/cpr.h>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/trompeloeil.hpp>
-#include <map>
+#include "InfluxDB.h"
+#include "Transport.h"
+#include "Proxy.h"
+#include "influxdb_export.h"
+#include <chrono>
 
-namespace influxdb::test
+namespace influxdb
 {
-
-    class SessionMock
+    class INFLUXDB_EXPORT InfluxDBBuilder
     {
     public:
-        MAKE_MOCK1(SetTimeout, void(const cpr::Timeout&));
-        MAKE_MOCK1(SetConnectTimeout, void(const cpr::ConnectTimeout&));
-        MAKE_MOCK0(Get, cpr::Response());
-        MAKE_MOCK0(Post, cpr::Response());
-        MAKE_MOCK1(SetUrl, void(const cpr::Url&));
-        MAKE_MOCK1(SetHeader, void(const cpr::Header&));
-        MAKE_MOCK1(UpdateHeader, void(const cpr::Header&));
-        MAKE_MOCK1(SetBody, void(cpr::Body&&));
-        MAKE_MOCK1(SetParameters, void(std::map<std::string, std::string>));
-        MAKE_MOCK1(SetAuth, void(const cpr::Authentication&));
-        MAKE_MOCK1(SetProxies, void(cpr::Proxies&&));
-        MAKE_MOCK1(SetProxyAuth, void(cpr::ProxyAuthentication&&));
-        MAKE_MOCK1(SetVerifySsl, void(const cpr::VerifySsl&));
-    };
+        std::unique_ptr<InfluxDB> connect();
 
-    extern SessionMock sessionMock;
+        InfluxDBBuilder&& setBasicAuthentication(const std::string& user, const std::string& pass);
+        InfluxDBBuilder&& setAuthToken(const std::string& token);
+        InfluxDBBuilder&& setProxy(const Proxy& proxy);
+        InfluxDBBuilder&& setTimeout(std::chrono::milliseconds timeout);
+        InfluxDBBuilder&& setVerifyCertificate(bool verify);
+
+        static InfluxDBBuilder http(const std::string& url);
+
+    private:
+        explicit InfluxDBBuilder(std::unique_ptr<Transport> impl);
+
+        std::unique_ptr<Transport> transport;
+    };
 }
+
+#endif // INFLUXDATA_INFLUXDBBUILDER_H

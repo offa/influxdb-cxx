@@ -120,15 +120,7 @@ const auto response = influxdb->execute("SHOW DATABASES");
 
 ## Transports
 
-An underlying transport is fully configurable by passing an URI:
-```
-[protocol]://[username:password@]host:port[?db=database]
-
-# Auth token:
-[protocol]://[token@]host:port[?db=database]
-```
-<br>
-List of supported transport is following:
+Supported transports:
 
 | Name        | Dependency  | URI protocol   | Sample URI                            |
 | ----------- |:-----------:|:--------------:| -------------------------------------:|
@@ -137,8 +129,35 @@ List of supported transport is following:
 | UDP         | boost       | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
 
-
 <sup>i)</sup> boost is needed to support queries.
+
+### Configuration by URI
+
+An underlying transport is configurable by passing an URI. `[protocol]` determines the actual transport type:
+
+```cpp
+auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
+```
+
+URI Format:
+
+```
+[protocol]://[username:password@]host:port[?db=database]
+
+# Auth token:
+[protocol]://[token@]host:port[?db=database]
+```
+
+### Additional transport configuration *(HTTP only)*
+
+The HTTP transport supports additional configurations beyond the limited URI parameters:
+
+```cpp
+auto influxdb = InfluxDBBuilder::http("http://localhost:8086?db=test")
+                    .setTimeout(std::chrono::seconds{20})
+                    .setAuthToken("<token>")
+                    .connect();
+```
 
 
 ## InfluxDB v2.x compatibility

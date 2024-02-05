@@ -251,6 +251,27 @@ namespace influxdb::test
         http.setProxy(Proxy{"https://auth-proxy-server:1234", Proxy::Auth{"abc", "def"}});
     }
 
+    TEST_CASE("Set certificate verification", "[HttpTest]")
+    {
+        auto http = createHttp();
+
+        REQUIRE_CALL(sessionMock, SetVerifySsl(_)).WITH(bool{_1} == false);
+        http.setVerifyCertificate(false);
+
+        REQUIRE_CALL(sessionMock, SetVerifySsl(_)).WITH(bool{_1} == true);
+        http.setVerifyCertificate(true);
+    }
+
+    TEST_CASE("Set timeout sets timeouts", "[HttpTest]")
+    {
+        constexpr std::chrono::seconds timeout{3};
+        auto http = createHttp();
+
+        REQUIRE_CALL(sessionMock, SetTimeout(_)).WITH(_1.ms == timeout);
+        REQUIRE_CALL(sessionMock, SetConnectTimeout(_)).WITH(_1.ms == timeout);
+        http.setTimeout(timeout);
+    }
+
     TEST_CASE("Execute sets parameters", "[HttpTest]")
     {
         auto http = createHttp();

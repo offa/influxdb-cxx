@@ -31,6 +31,7 @@ add_library(InfluxDB-Core OBJECT
   InfluxDB.cxx
   Point.cxx
   InfluxDBFactory.cxx
+  InfluxDBBuilder.cxx
   Proxy.cxx
   )
 target_include_directories(InfluxDB-Core PUBLIC
