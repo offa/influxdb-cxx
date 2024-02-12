@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/offa/influxdb-cxx.svg)](https://github.com/offa/influxdb-cxx/releases)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 ![C++](https://img.shields.io/badge/c++-17-green.svg)
-
+[![Conan Center](https://img.shields.io/conan/v/influxdb-cxx)](https://conan.io/center/recipes/influxdb-cxx)
 
 InfluxDB C++ client library
  - Batch write
