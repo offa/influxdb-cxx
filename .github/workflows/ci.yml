@@ -100,7 +100,7 @@ jobs:
           conan profile detect
           echo "tools.cmake.cmaketoolchain:generator=Ninja" >> ~/.conan2/global.conf
           mkdir build
-          conan install -o "influxdb_cxx/*":boost=${{ matrix.boost }} -o "influxdb_cxx/*":tests=True -s compiler.cppstd=17 --build=missing . -of build
+          conan install -o "influxdb_cxx/*":boost=${{ matrix.boost }} -o "influxdb_cxx/*":tests=True -s compiler.cppstd=20 --build=missing . -of build
           conan install --build=missing -of build --requires "libcurl/7.87.0" --deployer full_deploy
       - name: Build
         run: |
@@ -128,7 +128,7 @@ jobs:
           brew install boost
           conan profile detect
           mkdir build
-          conan install -o "influxdb_cxx/*":system=True -o "influxdb_cxx/*":tests=True -s compiler.cppstd=17 --build=missing . -of build
+          conan install -o "influxdb_cxx/*":system=True -o "influxdb_cxx/*":tests=True -s compiler.cppstd=20 --build=missing . -of build
       - name: Build
         run: script/ci_build.sh
       - name: Install

@@ -87,5 +87,4 @@ target_link_libraries(InfluxDB
     Threads::Threads
 )
 
-# Use C++17
 target_compile_features(InfluxDB PUBLIC cxx_std_${CMAKE_CXX_STANDARD})

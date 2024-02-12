@@ -20,7 +20,7 @@ conan install \
     -g CMakeDeps \
     --build=missing \
     -s build_type=${BUILD_TYPE} \
-    -s compiler.cppstd=17 \
+    -s compiler.cppstd=20 \
     --requires=cpr/1.10.0
 
 cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" "$@" ..

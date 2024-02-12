@@ -3,7 +3,7 @@
 [![ci](https://github.com/offa/influxdb-cxx/actions/workflows/ci.yml/badge.svg)](https://github.com/offa/influxdb-cxx/actions/workflows/ci.yml)
 [![GitHub release](https://img.shields.io/github/release/offa/influxdb-cxx.svg)](https://github.com/offa/influxdb-cxx/releases)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-![C++](https://img.shields.io/badge/c++-17-green.svg)
+![C++](https://img.shields.io/badge/c++-20-green.svg)
 
 
 InfluxDB C++ client library
@@ -21,7 +21,7 @@ InfluxDB C++ client library
 
 ### Build requirements
  - CMake 3.12+
- - C++17 compiler
+ - C++20 compiler
 
 ### Dependencies
  - [**cpr**](https://github.com/libcpr/cpr) (required)<sup>i)</sup>
