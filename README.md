@@ -25,7 +25,7 @@ InfluxDB C++ client library
 
 ### Dependencies
  - [**cpr**](https://github.com/libcpr/cpr) (required)<sup>i)</sup>
- - **boost 1.66+** (optional – see [Transports](#transports))
+ - **boost 1.78+** (optional – see [Transports](#transports))
 
  <sup>i)</sup> *cpr* needs to provide [CMake support](https://github.com/libcpr/cpr#find_package); some systems need to call `ldconfig` after *.so* installation.
 
