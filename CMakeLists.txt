@@ -44,7 +44,7 @@ if(NOT MSVC AND NOT INCLUDED_AS_SUBPROJECT)
       )
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 # We explicitly export the public interface
