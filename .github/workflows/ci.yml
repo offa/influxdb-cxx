@@ -38,7 +38,7 @@ jobs:
       - name: Check deployment as cmake subdirectory
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=ON -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Install
-        run: cmake --build build --target install
+        run: cmake --install build
       - name: Check installed library
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=OFF
 
@@ -97,15 +97,15 @@ jobs:
         run: |
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
-          pip3 install -U conan
           brew install boost
+          pipx install conan
           conan profile detect
           mkdir build
           conan install -o "influxdb_cxx/*":system=True -o "influxdb_cxx/*":tests=True -s compiler.cppstd=20 --build=missing . -of build
       - name: Build
         run: script/ci_build.sh
       - name: Install
-        run: cmake --build build --target install
+        run: cmake --install ./build --prefix /tmp/ci_ifdb
 
 
   formatting-check:
