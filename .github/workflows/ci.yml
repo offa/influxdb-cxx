@@ -116,5 +116,5 @@ jobs:
     - uses: DoozyX/clang-format-lint-action@master
       name: "Verify formatting"
       with:
-        clangFormatVersion: 16
+        clangFormatVersion: 17
 
