@@ -8,8 +8,8 @@ jobs:
     strategy:
       matrix:
         compiler:
+          - gcc:14
           - gcc:13
-          - gcc:12
           - clang:18
           - clang:17
         boost:
