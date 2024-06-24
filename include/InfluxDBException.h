@@ -39,13 +39,6 @@ namespace influxdb
     class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error
     {
     public:
-        /// \deprecated Use InfluxDBException(const std::string&) instead - will be removed in v0.8.0
-        [[deprecated("Use InfluxDBException(const std::string&) instead - will be removed in v0.8.0")]] InfluxDBException(const std::string& source, const std::string& message)
-            : std::runtime_error::runtime_error(
-                  "influx-cxx [" + source + "]: " + message)
-        {
-        }
-
         explicit InfluxDBException(const std::string& message)
             : std::runtime_error::runtime_error(message)
         {
