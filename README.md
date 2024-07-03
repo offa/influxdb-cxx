@@ -171,3 +171,8 @@ To create a v1.x compatible user (as described [here](https://docs.influxdata.co
 ```sh
 influx v1 auth create --read-bucket ${BUCKET_ID} --write-bucket ${BUCKET_ID} --username ${USERNAME} --password ${PASSWORD}
 ```
+
+
+## Thread safety
+
+This library is not thread-safe. Using it in a multi-threaded environment without proper synchronization mechanisms may lead to unexpected behavior and data corruption.
