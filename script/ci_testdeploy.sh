@@ -5,6 +5,7 @@ set -ex
 PID=$$
 BASEPATH=/tmp/influx-test-${PID}
 BUILD_TYPE="Release"
+export PATH=$HOME/.local/bin:$PATH
 
 echo "perform deployment test in ${BASEPATH}"
 mkdir -p ${BASEPATH}/influxdb-cxx
