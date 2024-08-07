@@ -30,9 +30,9 @@ jobs:
       - name: Install Boost
         if: ${{ matrix.boost == true }}
         run: |
-          add-apt-repository ppa:nicola-onorata/toolchain
+          add-apt-repository ppa:mhier/libboost-latest
           apt-get update
-          apt-get install -y boost1.81
+          apt-get install -y boost1.83
       - name: Build
         run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
