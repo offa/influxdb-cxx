@@ -16,9 +16,9 @@ jobs:
       - name: Install dependencies
         run: |
           script/ci_setup.sh
-          add-apt-repository ppa:nicola-onorata/toolchain
+          add-apt-repository ppa:mhier/libboost-latest
           apt-get update
-          apt-get install -y boost1.81
+          apt-get install -y boost1.83
       - name: CodeQL Initialization
         uses: github/codeql-action/init@v3
         with:
