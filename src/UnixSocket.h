@@ -28,7 +28,7 @@
 #ifndef INFLUXDATA_TRANSPORTS_UNIX_H
 #define INFLUXDATA_TRANSPORTS_UNIX_H
 
-#include "Transport.h"
+#include "InfluxDBTransport.h"
 
 #include <boost/asio.hpp>
 #include <string>

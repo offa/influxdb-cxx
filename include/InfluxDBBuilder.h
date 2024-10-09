@@ -24,8 +24,8 @@
 #define INFLUXDATA_INFLUXDBBUILDER_H
 
 #include "InfluxDB.h"
-#include "Transport.h"
-#include "Proxy.h"
+#include "InfluxDBTransport.h"
+#include "InfluxDBProxy.h"
 #include "influxdb_export.h"
 #include <chrono>
 

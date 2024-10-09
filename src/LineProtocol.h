@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Point.h"
+#include "InfluxDBPoint.h"
 
 #include <string>
 
