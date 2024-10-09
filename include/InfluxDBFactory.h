@@ -29,7 +29,7 @@
 #define INFLUXDATA_INFLUXDB_FACTORY_H
 
 #include "InfluxDB.h"
-#include "Transport.h"
+#include "InfluxDBTransport.h"
 #include "influxdb_export.h"
 
 namespace influxdb

@@ -28,7 +28,7 @@
 #ifndef INFLUXDATA_TRANSPORTS_HTTP_H
 #define INFLUXDATA_TRANSPORTS_HTTP_H
 
-#include "Transport.h"
+#include "InfluxDBTransport.h"
 #include <memory>
 #include <string>
 #include <chrono>

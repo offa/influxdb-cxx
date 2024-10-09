@@ -30,7 +30,7 @@
 
 #include "InfluxDBException.h"
 #include "influxdb_export.h"
-#include "Proxy.h"
+#include "InfluxDBProxy.h"
 
 namespace influxdb
 {
