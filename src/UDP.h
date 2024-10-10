@@ -28,7 +28,7 @@
 #ifndef INFLUXDATA_TRANSPORTS_UDP_H
 #define INFLUXDATA_TRANSPORTS_UDP_H
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
 #include <chrono>

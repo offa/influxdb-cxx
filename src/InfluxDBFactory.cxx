@@ -25,14 +25,14 @@
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
 ///
 
-#include "InfluxDBFactory.h"
+#include "InfluxDB/InfluxDBFactory.h"
 #include <functional>
 #include <string>
 #include <memory>
 #include <map>
+#include "InfluxDB/InfluxDBException.h"
 #include "UriParser.h"
 #include "HTTP.h"
-#include "InfluxDBException.h"
 #include "BoostSupport.h"
 
 namespace influxdb

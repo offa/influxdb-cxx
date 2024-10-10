@@ -28,9 +28,9 @@
 #ifndef INFLUXDATA_TRANSPORTINTERFACE_H
 #define INFLUXDATA_TRANSPORTINTERFACE_H
 
-#include "InfluxDBException.h"
-#include "influxdb_export.h"
-#include "Proxy.h"
+#include "InfluxDB/InfluxDBException.h"
+#include "InfluxDB/influxdb_export.h"
+#include "InfluxDB/Proxy.h"
 
 namespace influxdb
 {

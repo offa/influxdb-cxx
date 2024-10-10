@@ -23,10 +23,10 @@
 #ifndef INFLUXDATA_INFLUXDBBUILDER_H
 #define INFLUXDATA_INFLUXDBBUILDER_H
 
-#include "InfluxDB.h"
-#include "Transport.h"
-#include "Proxy.h"
-#include "influxdb_export.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Proxy.h"
+#include "InfluxDB/influxdb_export.h"
 #include <chrono>
 
 namespace influxdb

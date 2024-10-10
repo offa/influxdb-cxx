@@ -1,4 +1,4 @@
-#include <InfluxDBFactory.h>
+#include <InfluxDB/InfluxDBFactory.h>
 
 int main()
 {

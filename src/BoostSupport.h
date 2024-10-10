@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Transport.h"
-#include "Point.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Point.h"
 #include "UriParser.h"
 #include <memory>
 #include <string>

@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #include "BoostSupport.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace influxdb::test

@@ -25,7 +25,7 @@
 ///
 
 #include "TCP.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <string>
 
 namespace influxdb::transports

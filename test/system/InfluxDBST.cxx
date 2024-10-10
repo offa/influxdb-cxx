@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #include "SystemTest.h"
-#include "InfluxDBBuilder.h"
+#include "InfluxDB/InfluxDBBuilder.h"
 
 namespace influxdb::test
 {

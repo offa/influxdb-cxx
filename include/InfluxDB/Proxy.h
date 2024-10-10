@@ -23,7 +23,7 @@
 #ifndef INFLUXDATA_PROXY_H
 #define INFLUXDATA_PROXY_H
 
-#include "influxdb_export.h"
+#include "InfluxDB/influxdb_export.h"
 #include <string>
 #include <optional>
 

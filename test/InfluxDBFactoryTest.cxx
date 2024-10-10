@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDBFactory.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBFactory.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace influxdb::test

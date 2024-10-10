@@ -27,7 +27,7 @@
 #ifndef INFLUXDATA_TRANSPORTS_TCP_H
 #define INFLUXDATA_TRANSPORTS_TCP_H
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
 #include <chrono>
