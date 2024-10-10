@@ -34,7 +34,7 @@
 #include <variant>
 #include <deque>
 
-#include "influxdb_export.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {

@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDB.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/InfluxDBException.h"
 #include "mock/TransportMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>

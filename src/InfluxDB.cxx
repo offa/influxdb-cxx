@@ -25,8 +25,8 @@
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
 ///
 
-#include "InfluxDB.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/InfluxDBException.h"
 #include "LineProtocol.h"
 #include "BoostSupport.h"
 #include <iostream>

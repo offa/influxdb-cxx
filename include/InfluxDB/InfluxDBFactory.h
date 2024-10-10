@@ -28,9 +28,9 @@
 #ifndef INFLUXDATA_INFLUXDB_FACTORY_H
 #define INFLUXDATA_INFLUXDB_FACTORY_H
 
-#include "InfluxDB.h"
-#include "Transport.h"
-#include "influxdb_export.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {

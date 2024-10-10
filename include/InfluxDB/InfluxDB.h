@@ -34,9 +34,9 @@
 #include <vector>
 #include <deque>
 
-#include "Transport.h"
-#include "Point.h"
-#include "influxdb_export.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Point.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {

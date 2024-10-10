@@ -31,7 +31,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "influxdb_export.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {

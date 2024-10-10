@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "Proxy.h"
+#include "InfluxDB/Proxy.h"
 
 namespace influxdb
 {

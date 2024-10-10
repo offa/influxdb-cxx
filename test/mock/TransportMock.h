@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 

@@ -25,7 +25,7 @@
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
 ///
 
-#include "Point.h"
+#include "InfluxDB/Point.h"
 #include <chrono>
 #include <memory>
 #include <sstream>
