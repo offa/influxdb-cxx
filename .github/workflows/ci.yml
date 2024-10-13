@@ -30,9 +30,9 @@ jobs:
       - name: Install Boost
         if: ${{ matrix.boost == true }}
         run: |
-          add-apt-repository ppa:nicola-onorata/toolchain
+          add-apt-repository ppa:mhier/libboost-latest
           apt-get update
-          apt-get install -y boost1.81
+          apt-get install -y boost1.83
       - name: Build
         run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
@@ -41,32 +41,6 @@ jobs:
         run: cmake --install build
       - name: Check installed library
         run: script/ci_testdeploy.sh -DINFLUXCXX_AS_SUBDIR=OFF
-
-
-  build_conan:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        boost:
-          - "True"
-          - "False"
-    name: "conan (Boost: ${{ matrix.boost }})"
-    steps:
-      - uses: actions/checkout@main
-      - name: Cache Conan Packages
-        uses: actions/cache@main
-        with:
-          path: ~/.conan2/p/
-          key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
-      - name: Setup
-        run: |
-          pip install -U conan
-          sudo apt-get install -y libcurl4-openssl-dev
-          echo "~/.local/bin" >> $GITHUB_PATH
-      - name: Setup Conan
-        run: conan profile detect
-      - name: Build
-        run: conan create -o "influxdb-cxx/*":boost=${{ matrix.boost }} -o "influxdb-cxx/*":tests=True --build=missing .
 
 
   build_windows:
