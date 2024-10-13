@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDBBuilder.h"
+#include "InfluxDB/InfluxDBBuilder.h"
 #include "HTTP.h"
 
 namespace influxdb

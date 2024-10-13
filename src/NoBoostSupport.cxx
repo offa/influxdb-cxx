@@ -22,7 +22,7 @@
 // SOFTWARE.
 
 #include "BoostSupport.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
 
 namespace influxdb::internal
 {

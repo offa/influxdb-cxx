@@ -68,7 +68,7 @@ set_target_properties(InfluxDB PROPERTIES
   SOVERSION ${SO_VERSION_MAJOR}
 )
 
-generate_export_header(InfluxDB)
+generate_export_header(InfluxDB EXPORT_FILE_NAME "${PROJECT_BINARY_DIR}/src/InfluxDB/influxdb_export.h")
 
 target_include_directories(InfluxDB
   PUBLIC
