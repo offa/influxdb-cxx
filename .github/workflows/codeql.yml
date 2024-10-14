@@ -20,11 +20,11 @@ jobs:
           apt-get update
           apt-get install -y boost1.83
       - name: CodeQL Initialization
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: cpp
           queries: +security-and-quality
       - name: Build
         run: script/ci_build.sh
       - name: CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
