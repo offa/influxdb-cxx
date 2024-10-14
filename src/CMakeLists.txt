@@ -71,7 +71,7 @@ generate_export_header(InfluxDB)
 
 target_include_directories(InfluxDB
   PUBLIC
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:include/InfluxDB>
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     # for export header
     $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/src>
