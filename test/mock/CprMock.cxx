@@ -115,35 +115,14 @@ namespace cpr
         influxdb::test::sessionMock.UpdateHeader(header);
     }
 
-    Parameters::Parameters(const std::initializer_list<Parameter>& parameters)
-        : CurlContainer<Parameter>(parameters)
-    {
-    }
-
     Proxies::Proxies(const std::initializer_list<std::pair<const std::string, std::string>>& hosts)
         : hosts_{hosts}
     {
     }
 
-    Authentication::~Authentication() noexcept = default;
-
-
     bool CaseInsensitiveCompare::operator()([[maybe_unused]] const std::string& a, [[maybe_unused]] const std::string& b) const noexcept
     {
         return false;
-    }
-
-    std::string util::urlEncode(const std::string& s)
-    {
-        return s;
-    }
-
-    CurlHolder::CurlHolder() = default;
-    CurlHolder::~CurlHolder() = default;
-
-    const char* Authentication::GetAuthString() const noexcept
-    {
-        return auth_string_.c_str();
     }
 
     const std::string& Proxies::operator[](const std::string& protocol)
@@ -153,22 +132,6 @@ namespace cpr
             FAIL("Proxies: No entry '" << protocol << "' available");
         }
         return hosts_[protocol];
-    }
-
-    const char* ProxyAuthentication::operator[](const std::string& protocol)
-    {
-        if (proxyAuth_.count(protocol) == 0)
-        {
-            FAIL("ProxyAuthentication: No entry '" << protocol << "' available");
-        }
-        return proxyAuth_[protocol].GetAuthString();
-    }
-
-    EncodedAuthentication::~EncodedAuthentication() noexcept = default;
-
-    const char* EncodedAuthentication::GetAuthString() const noexcept
-    {
-        return auth_string_.c_str();
     }
 
 }
