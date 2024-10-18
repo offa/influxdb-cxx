@@ -93,7 +93,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::SEND_ERROR, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
@@ -144,7 +144,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::COULDNT_CONNECT, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -188,7 +188,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::UNKNOWN_ERROR, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -243,10 +243,11 @@ namespace influxdb::test
 
     TEST_CASE("Set proxy with authentication", "[HttpTest]")
     {
+        using namespace std::string_literals;
         auto http = createHttp();
 
         REQUIRE_CALL(sessionMock, SetProxies(_)).WITH(_1["http"] == std::string{"https://auth-proxy-server:1234"} && _1["https"] == std::string{"https://auth-proxy-server:1234"});
-        REQUIRE_CALL(sessionMock, SetProxyAuth(_)).WITH(_1["http"] == std::string{"abc:def"} && _1["https"] == std::string{"abc:def"});
+        REQUIRE_CALL(sessionMock, SetProxyAuth(_)).WITH(_1.GetUsername("http") == "abc"s && _1.GetPassword("http") == "def"s && _1.GetUsername("https") == "abc"s && _1.GetPassword("https") == "def"s);
 
         http.setProxy(Proxy{"https://auth-proxy-server:1234", Proxy::Auth{"abc", "def"}});
     }
@@ -288,7 +289,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::COULDNT_CONNECT, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
