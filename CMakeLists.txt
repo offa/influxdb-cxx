@@ -18,6 +18,7 @@ option(INFLUXCXX_WITH_BOOST "Build with Boost support enabled" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 option(INFLUXCXX_SYSTEMTEST "Enable system tests" ON)
 option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)
+option(INFLUXCXX_INSTALL_HEADER_TO_SUBDIR "Install header to InfluxDB/ subdir - will be default in 0.8.0" OFF)
 
 # Define project
 project(influxdb-cxx
@@ -69,6 +70,11 @@ message(STATUS "Boost support : ${INFLUXCXX_WITH_BOOST}")
 message(STATUS "Unit Tests : ${INFLUXCXX_TESTING}")
 message(STATUS "System Tests : ${INFLUXCXX_SYSTEMTEST}")
 
+set(HEADER_INSTALL_SUBDIR "")
+
+if (INFLUXCXX_INSTALL_HEADER_TO_SUBDIR)
+  set(HEADER_INSTALL_SUBDIR "InfluxDB")
+endif()
 
 # Add coverage flags
 if(INFLUXCXX_COVERAGE)
@@ -149,8 +155,8 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/cmake/InfluxDBConf
 )
 
 # Install headers
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/InfluxDB")
-install(FILES ${PROJECT_BINARY_DIR}/src/influxdb_export.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/InfluxDB")
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${HEADER_INSTALL_SUBDIR}")
+install(FILES ${PROJECT_BINARY_DIR}/src/influxdb_export.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${HEADER_INSTALL_SUBDIR}")
 
 # Export targets
 install(EXPORT InfluxDBTargets
