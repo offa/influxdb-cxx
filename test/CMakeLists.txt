@@ -2,9 +2,13 @@
 find_package(Catch2 REQUIRED)
 find_package(trompeloeil REQUIRED)
 
-if( NOT TARGET trompeloeil::trompeloeil )
+if (NOT TARGET trompeloeil::trompeloeil)
     add_library(trompeloeil::trompeloeil INTERFACE IMPORTED)
     target_link_libraries(trompeloeil::trompeloeil INTERFACE trompeloeil)
+endif()
+
+if (MSVC)
+    target_compile_definitions(trompeloeil::trompeloeil INTERFACE NOMINMAX)
 endif()
 
 add_subdirectory("mock")
