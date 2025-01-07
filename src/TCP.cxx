@@ -30,16 +30,16 @@
 
 namespace influxdb::transports
 {
-    namespace ba = boost::asio;
-
     TCP::TCP(const std::string& hostname, int port)
-        : mSocket(mIoService)
+        : mSocket(mIoContext)
     {
-        ba::ip::tcp::resolver resolver(mIoService);
-        ba::ip::tcp::resolver::query query(hostname, std::to_string(port));
-        ba::ip::tcp::resolver::iterator resolverIterator = resolver.resolve(query);
-        ba::ip::tcp::resolver::iterator end;
-        mEndpoint = *resolverIterator;
+        boost::asio::ip::tcp::resolver resolver(mIoContext);
+        mEndpoint = *(resolver
+                          .resolve(boost::asio::ip::tcp::v4(),
+                                   hostname,
+                                   std::to_string(port),
+                                   boost::asio::ip::resolver_query_base::passive)
+                          .cbegin());
         mSocket.open(mEndpoint.protocol());
         reconnect();
     }
@@ -52,7 +52,7 @@ namespace influxdb::transports
     void TCP::reconnect()
     {
         mSocket.connect(mEndpoint);
-        mSocket.wait(ba::ip::tcp::socket::wait_write);
+        mSocket.wait(boost::asio::ip::tcp::socket::wait_write);
     }
 
     void TCP::send(std::string&& message)
@@ -60,7 +60,7 @@ namespace influxdb::transports
         try
         {
             message.append("\n");
-            const size_t written = mSocket.write_some(ba::buffer(message, message.size()));
+            const size_t written = mSocket.write_some(boost::asio::buffer(message, message.size()));
             if (written != message.size())
             {
                 throw InfluxDBException("Error while transmitting data");

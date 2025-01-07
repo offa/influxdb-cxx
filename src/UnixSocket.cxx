@@ -34,7 +34,7 @@ namespace influxdb::transports
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
 
     UnixSocket::UnixSocket(const std::string& socketPath)
-        : mSocket(mIoService), mEndpoint(socketPath)
+        : mSocket(mIoContext), mEndpoint(socketPath)
     {
         mSocket.open();
     }
