@@ -47,7 +47,7 @@ namespace influxdb::transports
 
     private:
         /// Boost Asio I/O functionality
-        boost::asio::io_service mIoService;
+        boost::asio::io_context mIoContext;
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
         /// Unix socket
         boost::asio::local::datagram_protocol::socket mSocket;
