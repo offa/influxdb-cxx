@@ -33,12 +33,15 @@ namespace influxdb::transports
 {
 
     UDP::UDP(const std::string& hostname, int port)
-        : mSocket(mIoService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
+        : mSocket(mIoContext, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
     {
-        boost::asio::ip::udp::resolver resolver(mIoService);
-        boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), hostname, std::to_string(port));
-        boost::asio::ip::udp::resolver::iterator resolverInerator = resolver.resolve(query);
-        mEndpoint = *resolverInerator;
+        boost::asio::ip::udp::resolver resolver(mIoContext);
+        mEndpoint = *(resolver
+                          .resolve(boost::asio::ip::udp::v4(),
+                                   hostname,
+                                   std::to_string(port),
+                                   boost::asio::ip::resolver_query_base::passive)
+                          .cbegin());
     }
 
     void UDP::send(std::string&& message)
