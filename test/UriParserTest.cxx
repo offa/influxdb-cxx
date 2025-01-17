@@ -80,4 +80,13 @@ namespace influxdb::test
         CHECK(parse("http://token@xyz.com").password == "token");
     }
 
+    TEST_CASE("#280 repro", "[UriParserTest]")
+    {
+        const auto url = parse("http://virtualmachineIPaddr:8086?db=plc_data_db");
+        CHECK(url.protocol == "http");
+        CHECK(url.host == "virtualmachineIPaddr");
+        CHECK(url.port == 8086);
+        CHECK(url.search == "db=plc_data_db");
+    }
+
 }
