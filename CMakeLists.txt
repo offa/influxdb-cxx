@@ -18,6 +18,7 @@ option(INFLUXCXX_WITH_BOOST "Build with Boost support enabled" ON)
 option(INFLUXCXX_TESTING "Enable testing for this component" ON)
 option(INFLUXCXX_SYSTEMTEST "Enable system tests" ON)
 option(INFLUXCXX_COVERAGE "Enable Coverage" OFF)
+option(INFLUXCXX_WERROR "Build with -Werror enabled (if supported)" ON)
 
 # Define project
 project(influxdb-cxx
@@ -35,7 +36,7 @@ if(NOT MSVC AND NOT INCLUDED_AS_SUBPROJECT)
       -Wextra
       -pedantic
       -pedantic-errors
-      -Werror
+      $<$<BOOL:${INFLUXCXX_WERROR}>:-Werror>
       -Wshadow
       -Wold-style-cast
       -Wnull-dereference
@@ -68,6 +69,7 @@ message(STATUS "Build Type : ${CMAKE_BUILD_TYPE}")
 message(STATUS "Boost support : ${INFLUXCXX_WITH_BOOST}")
 message(STATUS "Unit Tests : ${INFLUXCXX_TESTING}")
 message(STATUS "System Tests : ${INFLUXCXX_SYSTEMTEST}")
+message(STATUS "Werror : ${INFLUXCXX_WERROR}")
 
 
 # Add coverage flags
