@@ -22,7 +22,7 @@ option(INFLUXCXX_INSTALL_HEADER_TO_SUBDIR "Install header to InfluxDB/ subdir - 
 
 # Define project
 project(influxdb-cxx
-  VERSION 0.7.3
+  VERSION 0.7.4
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
 )
