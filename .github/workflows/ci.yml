@@ -113,8 +113,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - uses: DoozyX/clang-format-lint-action@master
+    - uses: jidicula/clang-format-action@main
       name: "Verify formatting"
       with:
-        clangFormatVersion: 17
+        clang-format-version: 19
+        exclude-regex: "/3rd-party/"
 
