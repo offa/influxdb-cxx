@@ -81,7 +81,7 @@ namespace influxdb
     {
     public:
         ConnectionError(const std::string& source, const std::string& message)
-            : InfluxDBException("influx-cxx [" + source + "]: " + message){};
+            : InfluxDBException("influx-cxx [" + source + "]: " + message) {};
     };
 
 
