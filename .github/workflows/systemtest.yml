@@ -13,7 +13,7 @@ jobs:
           - true
           - false
     container:
-      image: "registry.gitlab.com/offa/docker-images/gcc:14"
+      image: "registry.gitlab.com/offa/docker-images/gcc:15"
     services:
       influxdb:
         image: influxdb:${{ matrix.influx_version }}
