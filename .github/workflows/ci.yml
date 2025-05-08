@@ -68,9 +68,9 @@ jobs:
           path: ~/.conan2/p/
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
-        uses: turtlesec-no/get-ninja@main
+        uses: turtlesec-no/get-ninja@3e85fb0044ada1440765803dd87c838edf79def8
       - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
       - name: Install dependencies
         run: |
           pip3 install -U conan
@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - uses: jidicula/clang-format-action@main
+    - uses: jidicula/clang-format-action@cd22ed667fc160ec21ab482160adf16cc79274af
       name: "Verify formatting"
       with:
         clang-format-version: 19
