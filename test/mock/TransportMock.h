@@ -34,6 +34,7 @@ namespace influxdb::test
         MAKE_MOCK1(query, std::string(const std::string&), override);
         MAKE_MOCK0(createDatabase, void(), override);
         MAKE_MOCK1(execute, std::string(const std::string&), override);
+        MAKE_MOCK1(setTimePrecision, void(TimePrecision), override);
     };
 
 
@@ -63,6 +64,11 @@ namespace influxdb::test
         void createDatabase() override
         {
             mockImpl->createDatabase();
+        }
+
+        void setTimePrecision(TimePrecision precision) override
+        {
+            mockImpl->setTimePrecision(precision);
         }
 
     private:

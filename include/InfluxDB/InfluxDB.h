@@ -28,7 +28,6 @@
 #ifndef INFLUXDATA_INFLUXDB_H
 #define INFLUXDATA_INFLUXDB_H
 
-#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,11 +35,11 @@
 
 #include "InfluxDB/Transport.h"
 #include "InfluxDB/Point.h"
+#include "InfluxDB/TimePrecision.h"
 #include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {
-
     class INFLUXDB_EXPORT InfluxDB
     {
     public:
@@ -89,8 +88,13 @@ namespace influxdb
         /// \param cmd
         std::string execute(const std::string& cmd);
 
+        /// Sets the timestamp precision
+        /// \param precision
+        void setTimePrecision(TimePrecision precision);
+
     private:
         void addPointToBatch(Point&& point);
+        std::string joinLineProtocolBatch() const;
 
         /// line protocol batch to be written
         std::deque<Point> mPointBatch;
@@ -110,7 +114,7 @@ namespace influxdb
         /// List of global tags
         std::string mGlobalTags;
 
-        std::string joinLineProtocolBatch() const;
+        TimePrecision timePrecision;
     };
 
 } // namespace influxdb

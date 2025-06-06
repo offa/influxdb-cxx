@@ -22,37 +22,17 @@
 
 #pragma once
 
-#include "InfluxDB/Point.h"
-#include "InfluxDB/TimePrecision.h"
-
-#include <string>
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {
-    class LineProtocol
+    enum class INFLUXDB_EXPORT TimePrecision
     {
-    public:
-        // Caller must ensure that the tags string is correctly escaped
-        LineProtocol(const std::string& tags, TimePrecision precision);
-
-        std::string format(const Point& point) const;
-
-        enum class ElementType
-        {
-            Measurement,
-            TagKey,
-            TagValue,
-            FieldKey,
-            FieldValue
-        };
-
-        // Escapes special characters in a string element according to the
-        // InfluxDB line protocol specification.
-        // https://docs.influxdata.com/influxdb/cloud/reference/syntax/line-protocol/#special-characters
-        static std::string EscapeStringElement(ElementType type, std::string_view stringElement);
-
-    private:
-        std::string globalTags;
-        TimePrecision timePrecision;
+        Hours,
+        Minutes,
+        Seconds,
+        MilliSeconds,
+        MicroSeconds,
+        NanoSeconds
     };
 }
