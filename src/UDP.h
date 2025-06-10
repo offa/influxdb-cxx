@@ -47,6 +47,8 @@ namespace influxdb::transports
         /// Sends blob via UDP
         void send(std::string&& message) override;
 
+        void setTimePrecision(TimePrecision precision) override;
+
     private:
         /// Boost Asio I/O functionality
         boost::asio::io_context mIoContext;
