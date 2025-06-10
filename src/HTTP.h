@@ -29,7 +29,7 @@
 #define INFLUXDATA_TRANSPORTS_HTTP_H
 
 #include "InfluxDB/Transport.h"
-#include <memory>
+#include "InfluxDB/TimePrecision.h"
 #include <string>
 #include <chrono>
 #include <cpr/cpr.h>
@@ -74,10 +74,12 @@ namespace influxdb::transports
 
         void setVerifyCertificate(bool verify);
         void setTimeout(std::chrono::milliseconds timeout);
+        void setTimePrecision(TimePrecision precision) override;
 
     private:
         std::string endpointUrl;
         std::string databaseName;
+        std::string timePrecision;
         cpr::Session session;
     };
 

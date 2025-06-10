@@ -125,14 +125,30 @@ namespace influxdb
 
             return convert.str();
         }
-    }
-    LineProtocol::LineProtocol()
-        : LineProtocol(std::string{})
-    {
+
+        std::string toPrecision(TimePrecision precision, std::chrono::time_point<std::chrono::system_clock> timestamp)
+        {
+            switch (precision)
+            {
+                case TimePrecision::Hours:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::hours>(timestamp.time_since_epoch()).count());
+                case TimePrecision::Minutes:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::minutes>(timestamp.time_since_epoch()).count());
+                case TimePrecision::Seconds:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count());
+                case TimePrecision::MilliSeconds:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch()).count());
+                case TimePrecision::MicroSeconds:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(timestamp.time_since_epoch()).count());
+                case TimePrecision::NanoSeconds:
+                default:
+                    return std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count());
+            }
+        }
     }
 
-    LineProtocol::LineProtocol(const std::string& tags)
-        : globalTags(tags)
+    LineProtocol::LineProtocol(const std::string& tags, TimePrecision precision)
+        : globalTags(tags), timePrecision(precision)
     {
     }
 
@@ -143,8 +159,7 @@ namespace influxdb
         appendIfNotEmpty(line, formatTags(point.getTagSet()), ',');
         appendIfNotEmpty(line, formatFields(point.getFieldSet()), ' ');
 
-        return line.append(" ")
-            .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
+        return line.append(" ").append(toPrecision(timePrecision, point.getTimestamp()));
     }
 
     std::string LineProtocol::EscapeStringElement(LineProtocol::ElementType type, std::string_view element)

@@ -82,7 +82,14 @@ namespace influxdb::transports
     std::string HTTP::query(const std::string& query)
     {
         session.SetUrl(cpr::Url{endpointUrl + "/query"});
-        session.SetParameters(cpr::Parameters{{"db", databaseName}, {"q", query}});
+
+        cpr::Parameters params{{"db", databaseName}, {"q", query}};
+
+        if (!timePrecision.empty())
+        {
+            params.Add({"precision", timePrecision});
+        }
+        session.SetParameters(std::move(params));
 
         const auto response = session.Get();
         checkResponse(response);
@@ -104,7 +111,14 @@ namespace influxdb::transports
     {
         session.SetUrl(cpr::Url{endpointUrl + "/write"});
         session.UpdateHeader(cpr::Header{{"Content-Type", "application/json"}});
-        session.SetParameters(cpr::Parameters{{"db", databaseName}});
+
+        cpr::Parameters params{{"db", databaseName}};
+
+        if (!timePrecision.empty())
+        {
+            params.Add({"precision", timePrecision});
+        }
+        session.SetParameters(std::move(params));
         session.SetBody(cpr::Body{lineprotocol});
 
         const auto response = session.Post();
@@ -131,6 +145,32 @@ namespace influxdb::transports
     {
         session.SetTimeout(timeout);
         session.SetConnectTimeout(timeout);
+    }
+
+    void HTTP::setTimePrecision(TimePrecision precision)
+    {
+        switch (precision)
+        {
+            case TimePrecision::Hours:
+                timePrecision = "h";
+                break;
+            case TimePrecision::Minutes:
+                timePrecision = "m";
+                break;
+            case TimePrecision::Seconds:
+                timePrecision = "s";
+                break;
+            case TimePrecision::MilliSeconds:
+                timePrecision = "ms";
+                break;
+            case TimePrecision::MicroSeconds:
+                timePrecision = "u";
+                break;
+            case TimePrecision::NanoSeconds:
+            default:
+                timePrecision = "ns";
+                break;
+        }
     }
 
     std::string HTTP::execute(const std::string& cmd)

@@ -196,4 +196,16 @@ namespace influxdb::test
         const auto result = db.execute("show databases");
         CHECK(result == response);
     }
+
+    TEST_CASE("Set time precision", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, send("p f=1i 67000"));
+        REQUIRE_CALL(*mock, setTimePrecision(TimePrecision::MicroSeconds));
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.setTimePrecision(TimePrecision::MicroSeconds);
+        db.write(Point{"p"}.addField("f", 1).setTimestamp(std::chrono::time_point<std::chrono::system_clock>{std::chrono::milliseconds{67}}));
+    }
+
 }

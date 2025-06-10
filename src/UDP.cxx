@@ -56,4 +56,8 @@ namespace influxdb::transports
         }
     }
 
+    void UDP::setTimePrecision([[maybe_unused]] TimePrecision precision)
+    {
+    }
+
 } // namespace influxdb::transports

@@ -29,6 +29,7 @@
 #define INFLUXDATA_TRANSPORTINTERFACE_H
 
 #include "InfluxDB/InfluxDBException.h"
+#include "InfluxDB/TimePrecision.h"
 #include "InfluxDB/influxdb_export.h"
 #include "InfluxDB/Proxy.h"
 
@@ -68,6 +69,11 @@ namespace influxdb
         virtual void setProxy([[maybe_unused]] const Proxy& proxy)
         {
             throw InfluxDBException{"Proxy is not supported by the selected transport"};
+        }
+
+        virtual void setTimePrecision([[maybe_unused]] TimePrecision precision)
+        {
+            throw InfluxDBException{"Time precision is not supported by the selected transport"};
         }
     };
 

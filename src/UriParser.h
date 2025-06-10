@@ -20,7 +20,6 @@
 #ifndef INFLUXDATA_HTTPPARSER_H
 #define INFLUXDATA_HTTPPARSER_H
 
-#include <iostream>
 #include <string>
 #include <stdlib.h>
 
