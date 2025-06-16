@@ -1,7 +1,6 @@
 // MIT License
 //
 // Copyright (c) 2020-2025 offa
-// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,45 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///
-/// \author Adam Wegrzynek
-///
+#pragma once
 
-#ifndef INFLUXDATA_TRANSPORTS_UDP_H
-#define INFLUXDATA_TRANSPORTS_UDP_H
+#include "InfluxDB/influxdb_export.h"
 
-#include "InfluxDB/Transport.h"
-
-#include <boost/asio.hpp>
-#include <chrono>
-#include <string>
-
-namespace influxdb::transports
+namespace influxdb
 {
-
-    /// \brief UDP transport
-    class UDP : public Transport
+    enum class INFLUXDB_EXPORT TimePrecision
     {
-    public:
-        /// Constructor
-        UDP(const std::string& hostname, int port);
-
-        /// Sends blob via UDP
-        void send(std::string&& message) override;
-
-        void setTimePrecision(TimePrecision precision) override;
-
-    private:
-        /// Boost Asio I/O functionality
-        boost::asio::io_context mIoContext;
-
-        /// UDP socket
-        boost::asio::ip::udp::socket mSocket;
-
-        /// UDP endpoint
-        boost::asio::ip::udp::endpoint mEndpoint;
+        Hours,
+        Minutes,
+        Seconds,
+        MilliSeconds,
+        MicroSeconds,
+        NanoSeconds
     };
-
-} // namespace influxdb::transports
-
-#endif // INFLUXDATA_TRANSPORTS_UDP_H
+}

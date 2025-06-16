@@ -23,6 +23,7 @@
 #pragma once
 
 #include "InfluxDB/Point.h"
+#include "InfluxDB/TimePrecision.h"
 
 #include <string>
 
@@ -31,9 +32,8 @@ namespace influxdb
     class LineProtocol
     {
     public:
-        LineProtocol();
         // Caller must ensure that the tags string is correctly escaped
-        explicit LineProtocol(const std::string& tags);
+        LineProtocol(const std::string& tags, TimePrecision precision);
 
         std::string format(const Point& point) const;
 
@@ -53,5 +53,6 @@ namespace influxdb
 
     private:
         std::string globalTags;
+        TimePrecision timePrecision;
     };
 }

@@ -22,6 +22,7 @@
 
 #include "HTTP.h"
 #include "InfluxDB/InfluxDBException.h"
+#include "InfluxDB/TimePrecision.h"
 #include "mock/CprMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
@@ -271,6 +272,86 @@ namespace influxdb::test
         REQUIRE_CALL(sessionMock, SetTimeout(_)).WITH(_1.ms == timeout);
         REQUIRE_CALL(sessionMock, SetConnectTimeout(_)).WITH(_1.ms == timeout);
         http.setTimeout(timeout);
+    }
+
+    TEST_CASE("Set time precision sets precision on send", "[HttpTest]")
+    {
+        auto http = createHttp();
+        const std::string data{"content-to-send"};
+        auto params = [](std::string prec)
+        {
+            ParamMap p{{"db", "test"}};
+            if (!prec.empty())
+            {
+                p.insert({"precision", prec});
+            }
+            return p;
+        };
+
+        ALLOW_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, UpdateHeader(_));
+        ALLOW_CALL(sessionMock, SetBody(_));
+        REQUIRE_CALL(sessionMock, SetParameters(params("")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
+
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Hours);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Minutes);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Seconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::MilliSeconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::MicroSeconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::NanoSeconds);
+        http.send(std::string{data});
+    }
+
+    TEST_CASE("Set time precision sets precision on query", "[HttpTest]")
+    {
+        auto http = createHttp();
+        const std::string query = "/12?ab=cd";
+        auto params = [&query](std::string prec)
+        {
+            ParamMap p{{"db", "test"}, {"q", query}};
+            if (!prec.empty())
+            {
+                p.insert({"precision", prec});
+            }
+            return p;
+        };
+
+        ALLOW_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        REQUIRE_CALL(sessionMock, SetParameters(params("")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
+
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Hours);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Minutes);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Seconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::MilliSeconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::MicroSeconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::NanoSeconds);
+        http.query(query);
     }
 
     TEST_CASE("Execute sets parameters", "[HttpTest]")
