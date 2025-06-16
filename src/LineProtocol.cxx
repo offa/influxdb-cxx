@@ -126,23 +126,29 @@ namespace influxdb
             return convert.str();
         }
 
-        std::string toPrecision(TimePrecision precision, std::chrono::time_point<std::chrono::system_clock> timestamp)
+        template <class TimeUnit>
+        std::string toPrecision(std::chrono::time_point<std::chrono::system_clock> timestamp)
+        {
+            return std::to_string(std::chrono::duration_cast<TimeUnit>(timestamp.time_since_epoch()).count());
+        }
+
+        std::string toTimestampString(TimePrecision precision, std::chrono::time_point<std::chrono::system_clock> timestamp)
         {
             switch (precision)
             {
                 case TimePrecision::Hours:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::hours>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::hours>(timestamp);
                 case TimePrecision::Minutes:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::minutes>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::minutes>(timestamp);
                 case TimePrecision::Seconds:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::seconds>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::seconds>(timestamp);
                 case TimePrecision::MilliSeconds:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::milliseconds>(timestamp);
                 case TimePrecision::MicroSeconds:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::microseconds>(timestamp);
                 case TimePrecision::NanoSeconds:
                 default:
-                    return std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(timestamp.time_since_epoch()).count());
+                    return toPrecision<std::chrono::nanoseconds>(timestamp);
             }
         }
     }
@@ -159,7 +165,7 @@ namespace influxdb
         appendIfNotEmpty(line, formatTags(point.getTagSet()), ',');
         appendIfNotEmpty(line, formatFields(point.getFieldSet()), ' ');
 
-        return line.append(" ").append(toPrecision(timePrecision, point.getTimestamp()));
+        return line.append(" ").append(toTimestampString(timePrecision, point.getTimestamp()));
     }
 
     std::string LineProtocol::EscapeStringElement(LineProtocol::ElementType type, std::string_view element)
