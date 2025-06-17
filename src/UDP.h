@@ -31,7 +31,6 @@
 #include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
-#include <chrono>
 #include <string>
 
 namespace influxdb::transports

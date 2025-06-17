@@ -27,7 +27,6 @@
 
 #include "InfluxDB/Point.h"
 #include <chrono>
-#include <memory>
 #include <sstream>
 #include <iomanip>
 

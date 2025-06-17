@@ -29,8 +29,6 @@
 #include "InfluxDB/InfluxDBException.h"
 #include "LineProtocol.h"
 #include "BoostSupport.h"
-#include <memory>
-#include <string>
 
 namespace influxdb
 {
