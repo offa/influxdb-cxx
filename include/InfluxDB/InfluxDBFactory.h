@@ -31,6 +31,7 @@
 #include "InfluxDB/InfluxDB.h"
 #include "InfluxDB/Transport.h"
 #include "InfluxDB/influxdb_export.h"
+#include <string>
 
 namespace influxdb
 {
