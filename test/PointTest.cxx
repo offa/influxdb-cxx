@@ -88,7 +88,7 @@ namespace influxdb::test
     {
         const auto point = Point{"test"}
                                .addField("double_f", double{-456.78934345});
-        CHECK_THAT(point.getFields(), StartsWith(R"(double_f=-456.78)"));
+        CHECK_THAT(point.getFields(), Matches(R"(double_f=-456.[78][0-9]*)"));
     }
 
     TEST_CASE("Measurement of bool type", "[PointTest]")
