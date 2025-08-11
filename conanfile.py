@@ -17,7 +17,7 @@ class InfluxdbCxxConan(ConanFile):
     }
 
     def requirements(self):
-        self.requires("cpr/1.11.2")
+        self.requires("cpr/1.12.0")
         if not self.options.system and self.options.boost:
             self.requires("boost/1.88.0")
         if self.options.tests:
