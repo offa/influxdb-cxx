@@ -46,7 +46,7 @@ target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSuppo
 target_link_libraries(NoBoostSupportTest PRIVATE InfluxDB)
 
 if (INFLUXCXX_WITH_BOOST)
-    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::system date::date)
+    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::boost date::date)
 endif()
 
 

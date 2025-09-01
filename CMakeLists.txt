@@ -90,7 +90,7 @@ if (INFLUXCXX_WITH_BOOST)
     # Fixes warning when using boost from brew
     set(Boost_USE_MULTITHREADED TRUE)
 
-    find_package(Boost REQUIRED COMPONENTS system)
+    find_package(Boost REQUIRED)
 endif()
 
 add_subdirectory(3rd-party)
