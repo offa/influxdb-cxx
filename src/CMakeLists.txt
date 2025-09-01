@@ -14,7 +14,7 @@ target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS
 target_link_libraries(InfluxDB-BoostSupport PRIVATE date::date)
 
 if (INFLUXCXX_WITH_BOOST)
-    target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::boost Boost::system)
+    target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::boost)
 endif()
 
 # #117: Workaround for Boost ASIO null-dereference
