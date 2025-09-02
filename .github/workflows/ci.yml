@@ -14,8 +14,8 @@ jobs:
         compiler:
           - gcc:15
           - gcc:14
+          - clang:21
           - clang:20
-          - clang:19
         boost:
           - true
           - false
