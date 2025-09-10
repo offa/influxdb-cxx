@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDB.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/InfluxDBException.h"
 #include "mock/TransportMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
@@ -196,4 +196,16 @@ namespace influxdb::test
         const auto result = db.execute("show databases");
         CHECK(result == response);
     }
+
+    TEST_CASE("Set time precision", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, send("p f=1i 67000"));
+        REQUIRE_CALL(*mock, setTimePrecision(TimePrecision::MicroSeconds));
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.setTimePrecision(TimePrecision::MicroSeconds);
+        db.write(Point{"p"}.addField("f", 1).setTimestamp(std::chrono::time_point<std::chrono::system_clock>{std::chrono::milliseconds{67}}));
+    }
+
 }

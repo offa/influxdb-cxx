@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,8 @@
 // SOFTWARE.
 
 #include "HTTP.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
+#include "InfluxDB/TimePrecision.h"
 #include "mock/CprMock.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
@@ -93,7 +94,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::SEND_ERROR, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
@@ -144,7 +145,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::COULDNT_CONNECT, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -188,7 +189,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::INTERNAL_ERROR, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::UNKNOWN_ERROR, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 
@@ -243,10 +244,11 @@ namespace influxdb::test
 
     TEST_CASE("Set proxy with authentication", "[HttpTest]")
     {
+        using namespace std::string_literals;
         auto http = createHttp();
 
         REQUIRE_CALL(sessionMock, SetProxies(_)).WITH(_1["http"] == std::string{"https://auth-proxy-server:1234"} && _1["https"] == std::string{"https://auth-proxy-server:1234"});
-        REQUIRE_CALL(sessionMock, SetProxyAuth(_)).WITH(_1["http"] == std::string{"abc:def"} && _1["https"] == std::string{"abc:def"});
+        REQUIRE_CALL(sessionMock, SetProxyAuth(_)).WITH(_1.GetUsername("http") == "abc"s && _1.GetPassword("http") == "def"s && _1.GetUsername("https") == "abc"s && _1.GetPassword("https") == "def"s);
 
         http.setProxy(Proxy{"https://auth-proxy-server:1234", Proxy::Auth{"abc", "def"}});
     }
@@ -272,6 +274,86 @@ namespace influxdb::test
         http.setTimeout(timeout);
     }
 
+    TEST_CASE("Set time precision sets precision on send", "[HttpTest]")
+    {
+        auto http = createHttp();
+        const std::string data{"content-to-send"};
+        auto params = [](std::string prec)
+        {
+            ParamMap p{{"db", "test"}};
+            if (!prec.empty())
+            {
+                p.insert({"precision", prec});
+            }
+            return p;
+        };
+
+        ALLOW_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        ALLOW_CALL(sessionMock, UpdateHeader(_));
+        ALLOW_CALL(sessionMock, SetBody(_));
+        REQUIRE_CALL(sessionMock, SetParameters(params("")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
+
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Hours);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Minutes);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::Seconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::MilliSeconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::MicroSeconds);
+        http.send(std::string{data});
+        http.setTimePrecision(TimePrecision::NanoSeconds);
+        http.send(std::string{data});
+    }
+
+    TEST_CASE("Set time precision sets precision on query", "[HttpTest]")
+    {
+        auto http = createHttp();
+        const std::string query = "/12?ab=cd";
+        auto params = [&query](std::string prec)
+        {
+            ParamMap p{{"db", "test"}, {"q", query}};
+            if (!prec.empty())
+            {
+                p.insert({"precision", prec});
+            }
+            return p;
+        };
+
+        ALLOW_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+        REQUIRE_CALL(sessionMock, SetParameters(params("")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
+        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
+
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Hours);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Minutes);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::Seconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::MilliSeconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::MicroSeconds);
+        http.query(query);
+        http.setTimePrecision(TimePrecision::NanoSeconds);
+        http.query(query);
+    }
+
     TEST_CASE("Execute sets parameters", "[HttpTest]")
     {
         auto http = createHttp();
@@ -288,7 +370,7 @@ namespace influxdb::test
     {
         auto http = createHttp();
 
-        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::CONNECTION_FAILURE, cpr::status::HTTP_OK));
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::COULDNT_CONNECT, cpr::status::HTTP_OK));
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, SetParameters(_));
 

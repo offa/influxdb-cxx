@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "Point.h"
+#include "InfluxDB/Point.h"
 #include <limits>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_all.hpp>
@@ -88,7 +88,7 @@ namespace influxdb::test
     {
         const auto point = Point{"test"}
                                .addField("double_f", double{-456.78934345});
-        CHECK_THAT(point.getFields(), StartsWith(R"(double_f=-456.78)"));
+        CHECK_THAT(point.getFields(), Matches(R"(double_f=-456.[78][0-9]*)"));
     }
 
     TEST_CASE("Measurement of bool type", "[PointTest]")

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,8 @@
 
 #pragma once
 
-#include "Point.h"
+#include "InfluxDB/Point.h"
+#include "InfluxDB/TimePrecision.h"
 
 #include <string>
 
@@ -31,9 +32,8 @@ namespace influxdb
     class LineProtocol
     {
     public:
-        LineProtocol();
         // Caller must ensure that the tags string is correctly escaped
-        explicit LineProtocol(const std::string& tags);
+        LineProtocol(const std::string& tags, TimePrecision precision);
 
         std::string format(const Point& point) const;
 
@@ -53,5 +53,6 @@ namespace influxdb
 
     private:
         std::string globalTags;
+        TimePrecision timePrecision;
     };
 }

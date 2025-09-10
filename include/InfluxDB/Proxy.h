@@ -20,38 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "BoostSupport.h"
-#include "InfluxDB/InfluxDBException.h"
-#include <catch2/catch_test_macros.hpp>
+#ifndef INFLUXDATA_PROXY_H
+#define INFLUXDATA_PROXY_H
 
-namespace influxdb::test
+#include "InfluxDB/influxdb_export.h"
+#include <string>
+#include <optional>
+
+namespace influxdb
 {
-    namespace
+    class INFLUXDB_EXPORT Proxy
     {
-        struct TransportDummy : public Transport
+    public:
+        struct Auth
         {
-            void send([[maybe_unused]] std::string&& message) override
-            {
-            }
+            std::string user;
+            std::string password;
         };
 
-        TransportDummy dummy;
-    }
 
+        Proxy(const std::string& proxy, Auth auth);
+        explicit Proxy(const std::string& proxy);
 
-    TEST_CASE("Query impl throws unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::queryImpl(&dummy, "-ignore-"), InfluxDBException);
-    }
+        const std::string& getProxy() const;
+        std::optional<Auth> getAuthentication() const;
 
-    TEST_CASE("With UDP throws transport unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::withUdpTransport(http::url{}), InfluxDBException);
-    }
-
-    TEST_CASE("With Unix socket transport throws unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::withUnixSocketTransport(http::url{}), InfluxDBException);
-    }
-
+    private:
+        std::string proxy_;
+        std::optional<Auth> auth_;
+    };
 }
+#endif /* INFLUXDATA_PROXY_H */

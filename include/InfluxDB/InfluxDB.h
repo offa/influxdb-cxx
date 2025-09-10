@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,19 +28,18 @@
 #ifndef INFLUXDATA_INFLUXDB_H
 #define INFLUXDATA_INFLUXDB_H
 
-#include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
 #include <deque>
 
-#include "Transport.h"
-#include "Point.h"
-#include "influxdb_export.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Point.h"
+#include "InfluxDB/TimePrecision.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {
-
     class INFLUXDB_EXPORT InfluxDB
     {
     public:
@@ -70,12 +69,6 @@ namespace influxdb
         /// Flushes points batched (this can also happens when buffer is full)
         void flushBatch();
 
-        /// \deprecated use \ref flushBatch() instead - will be removed in v0.8.0
-        [[deprecated("Use flushBatch() instead - will be removed in v0.8.0")]] inline void flushBuffer()
-        {
-            flushBatch();
-        }
-
         /// Enables points batching
         /// \param size
         void batchOf(std::size_t size = 32);
@@ -95,8 +88,13 @@ namespace influxdb
         /// \param cmd
         std::string execute(const std::string& cmd);
 
+        /// Sets the timestamp precision
+        /// \param precision
+        void setTimePrecision(TimePrecision precision);
+
     private:
         void addPointToBatch(Point&& point);
+        std::string joinLineProtocolBatch() const;
 
         /// line protocol batch to be written
         std::deque<Point> mPointBatch;
@@ -116,7 +114,7 @@ namespace influxdb
         /// List of global tags
         std::string mGlobalTags;
 
-        std::string joinLineProtocolBatch() const;
+        TimePrecision timePrecision;
     };
 
 } // namespace influxdb

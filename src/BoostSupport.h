@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include "Transport.h"
-#include "Point.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Point.h"
 #include "UriParser.h"
 #include <memory>
 #include <string>

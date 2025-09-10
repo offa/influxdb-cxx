@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,10 +28,9 @@
 #ifndef INFLUXDATA_TRANSPORTS_UDP_H
 #define INFLUXDATA_TRANSPORTS_UDP_H
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
-#include <chrono>
 #include <string>
 
 namespace influxdb::transports
@@ -47,9 +46,11 @@ namespace influxdb::transports
         /// Sends blob via UDP
         void send(std::string&& message) override;
 
+        void setTimePrecision(TimePrecision precision) override;
+
     private:
         /// Boost Asio I/O functionality
-        boost::asio::io_service mIoService;
+        boost::asio::io_context mIoContext;
 
         /// UDP socket
         boost::asio::ip::udp::socket mSocket;

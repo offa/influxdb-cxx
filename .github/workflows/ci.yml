@@ -2,16 +2,20 @@ name: ci
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   build_linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         compiler:
+          - gcc:15
           - gcc:14
-          - gcc:13
-          - clang:18
-          - clang:17
+          - clang:21
+          - clang:20
         boost:
           - true
           - false
@@ -30,9 +34,9 @@ jobs:
       - name: Install Boost
         if: ${{ matrix.boost == true }}
         run: |
-          add-apt-repository ppa:nicola-onorata/toolchain
+          add-apt-repository ppa:mhier/libboost-latest
           apt-get update
-          apt-get install -y boost1.81
+          apt-get install -y boost1.83
       - name: Build
         run: script/ci_build.sh -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Check deployment as cmake subdirectory
@@ -64,21 +68,21 @@ jobs:
           path: ~/.conan2/p/
           key: conan-${{ runner.os }}-${{ matrix.compiler }}-boost_${{ matrix.boost }}-${{ hashFiles('conanfile.py') }}
       - name: Setup Ninja
-        uses: turtlesec-no/get-ninja@main
+        uses: turtlesec-no/get-ninja@3e85fb0044ada1440765803dd87c838edf79def8
       - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
       - name: Install dependencies
         run: |
           pip3 install -U conan
           conan profile detect
           echo "tools.cmake.cmaketoolchain:generator=Ninja" >> ~/.conan2/global.conf
           mkdir build
-          conan install -o "influxdb_cxx/*":boost=${{ matrix.boost }} -o "influxdb_cxx/*":tests=True -s compiler.cppstd=20 --build=missing . -of build
-          conan install --build=missing -of build --requires "libcurl/7.87.0" --deployer full_deploy
+          conan install -o "&":boost=${{ matrix.boost }} -s compiler.cppstd=20 --build=missing . -of build
+          conan install --build=missing -of build --requires "libcurl/8.12.1" --deployer full_deploy
       - name: Build
         run: |
-          export CL="/ID:\a\influxdb-cxx\influxdb-cxx\build\host\libcurl\7.87.0\Release\x86_64\include"
-          script/ci_build.sh -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00
+          export CL="/ID:\a\influxdb-cxx\influxdb-cxx\build\host\libcurl\8.12.1\Release\x86_64\include"
+          script/ci_build.sh -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_INIT=-D_WIN32_WINNT=0x0A00 -DINFLUXCXX_WITH_BOOST=${{ matrix.boost }}
       - name: Install
         run: cmake --build --preset conan-release --target install
 
@@ -101,7 +105,7 @@ jobs:
           pipx install conan
           conan profile detect
           mkdir build
-          conan install -o "influxdb_cxx/*":system=True -o "influxdb_cxx/*":tests=True -s compiler.cppstd=20 --build=missing . -of build
+          conan install -o "&":system=True -s compiler.cppstd=20 --build=missing . -of build
       - name: Build
         run: script/ci_build.sh
       - name: Install
@@ -113,8 +117,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - uses: DoozyX/clang-format-lint-action@master
+    - uses: jidicula/clang-format-action@2255e8e23d2da4503bb0a9fe4facf80f978e8a72
       name: "Verify formatting"
       with:
-        clangFormatVersion: 17
+        clang-format-version: 19
+        exclude-regex: "/3rd-party/"
 

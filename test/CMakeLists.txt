@@ -2,9 +2,13 @@
 find_package(Catch2 REQUIRED)
 find_package(trompeloeil REQUIRED)
 
-if( NOT TARGET trompeloeil::trompeloeil )
+if (NOT TARGET trompeloeil::trompeloeil)
     add_library(trompeloeil::trompeloeil INTERFACE IMPORTED)
     target_link_libraries(trompeloeil::trompeloeil INTERFACE trompeloeil)
+endif()
+
+if (MSVC)
+    target_compile_definitions(trompeloeil::trompeloeil INTERFACE NOMINMAX)
 endif()
 
 add_subdirectory("mock")
@@ -42,7 +46,7 @@ target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSuppo
 target_link_libraries(NoBoostSupportTest PRIVATE InfluxDB)
 
 if (INFLUXCXX_WITH_BOOST)
-    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::system date::date)
+    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::boost date::date)
 endif()
 
 

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #include "SystemTest.h"
-#include "InfluxDBBuilder.h"
+#include "InfluxDB/InfluxDBBuilder.h"
 
 namespace influxdb::test
 {
@@ -196,6 +196,27 @@ namespace influxdb::test
             CHECK(querySize(*db, "bpf") == 0);
             db->flushBatch();
             CHECK(querySize(*db, "bpf") == 3);
+        }
+
+        SECTION("Write with precision")
+        {
+            CHECK(querySize(*db, "t", "prec") == 0);
+            db->write(Point{"t"}.addField("unit", "ns").addTag("type", "prec").setTimestamp(std::chrono::time_point<std::chrono::system_clock>{std::chrono::microseconds{12345}}));
+            db->setTimePrecision(TimePrecision::MilliSeconds);
+            db->write(Point{"t"}.addField("unit", "ms").addTag("type", "prec").setTimestamp(std::chrono::time_point<std::chrono::system_clock>{std::chrono::milliseconds{67345}}));
+            CHECK(querySize(*db, "t", "prec") == 2);
+        }
+
+        SECTION("Query with precision")
+        {
+            db->setTimePrecision(TimePrecision::MilliSeconds);
+            const auto response = db->query(R"(select * from t where type='prec' order by time asc)");
+            constexpr std::chrono::time_point<std::chrono::system_clock> t0{std::chrono::microseconds{12345}};
+            constexpr std::chrono::time_point<std::chrono::system_clock> t1{std::chrono::milliseconds{67345}};
+
+            CHECK(response.size() <= 2);
+            CHECK(response[0].getTimestamp().time_since_epoch() == t0.time_since_epoch());
+            CHECK(response[1].getTimestamp().time_since_epoch() == t1.time_since_epoch());
         }
 
         SECTION("Write of invalid line protocol throws")

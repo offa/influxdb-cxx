@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 #include "BoostSupport.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
 #include "mock/TransportMock.h"
 #include <boost/property_tree/exceptions.hpp>
 #include <catch2/catch_test_macros.hpp>

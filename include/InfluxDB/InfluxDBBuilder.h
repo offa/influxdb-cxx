@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef INFLUXDATA_PROXY_H
-#define INFLUXDATA_PROXY_H
+#ifndef INFLUXDATA_INFLUXDBBUILDER_H
+#define INFLUXDATA_INFLUXDBBUILDER_H
 
-#include "influxdb_export.h"
-#include <string>
-#include <optional>
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/Proxy.h"
+#include "InfluxDB/influxdb_export.h"
+#include <chrono>
 
 namespace influxdb
 {
-    class INFLUXDB_EXPORT Proxy
+    class INFLUXDB_EXPORT InfluxDBBuilder
     {
     public:
-        struct Auth
-        {
-            std::string user;
-            std::string password;
-        };
+        std::unique_ptr<InfluxDB> connect();
 
+        InfluxDBBuilder&& setBasicAuthentication(const std::string& user, const std::string& pass);
+        InfluxDBBuilder&& setAuthToken(const std::string& token);
+        InfluxDBBuilder&& setProxy(const Proxy& proxy);
+        InfluxDBBuilder&& setTimeout(std::chrono::milliseconds timeout);
+        InfluxDBBuilder&& setVerifyCertificate(bool verify);
 
-        Proxy(const std::string& proxy, Auth auth);
-        explicit Proxy(const std::string& proxy);
-
-        const std::string& getProxy() const;
-        std::optional<Auth> getAuthentication() const;
+        static InfluxDBBuilder http(const std::string& url);
 
     private:
-        std::string proxy_;
-        std::optional<Auth> auth_;
+        explicit InfluxDBBuilder(std::unique_ptr<Transport> impl);
+
+        std::unique_ptr<Transport> transport;
     };
 }
-#endif /* INFLUXDATA_PROXY_H */
+
+#endif // INFLUXDATA_INFLUXDBBUILDER_H

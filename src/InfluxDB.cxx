@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,13 +25,10 @@
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
 ///
 
-#include "InfluxDB.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDB.h"
+#include "InfluxDB/InfluxDBException.h"
 #include "LineProtocol.h"
 #include "BoostSupport.h"
-#include <iostream>
-#include <memory>
-#include <string>
 
 namespace influxdb
 {
@@ -41,7 +38,8 @@ namespace influxdb
           mIsBatchingActivated{false},
           mBatchSize{0},
           mTransport(std::move(transport)),
-          mGlobalTags{}
+          mGlobalTags{},
+          timePrecision{TimePrecision::NanoSeconds}
     {
         if (mTransport == nullptr)
         {
@@ -78,7 +76,7 @@ namespace influxdb
     {
         std::string joinedBatch;
 
-        LineProtocol formatter{mGlobalTags};
+        LineProtocol formatter{mGlobalTags, timePrecision};
         for (const auto& point : mPointBatch)
         {
             joinedBatch += formatter.format(point) + "\n";
@@ -113,7 +111,7 @@ namespace influxdb
         }
         else
         {
-            LineProtocol formatter{mGlobalTags};
+            LineProtocol formatter{mGlobalTags, timePrecision};
             transmit(formatter.format(point));
         }
     }
@@ -130,7 +128,7 @@ namespace influxdb
         else
         {
             std::string lineProtocol;
-            LineProtocol formatter{mGlobalTags};
+            LineProtocol formatter{mGlobalTags, timePrecision};
 
             for (const auto& point : points)
             {
@@ -145,6 +143,12 @@ namespace influxdb
     std::string InfluxDB::execute(const std::string& cmd)
     {
         return mTransport->execute(cmd);
+    }
+
+    void InfluxDB::setTimePrecision(TimePrecision precision)
+    {
+        timePrecision = precision;
+        mTransport->setTimePrecision(precision);
     }
 
     void InfluxDB::addPointToBatch(Point&& point)

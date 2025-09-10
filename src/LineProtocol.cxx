@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -125,14 +125,36 @@ namespace influxdb
 
             return convert.str();
         }
-    }
-    LineProtocol::LineProtocol()
-        : LineProtocol(std::string{})
-    {
+
+        template <class TimeUnit>
+        std::string toPrecision(std::chrono::time_point<std::chrono::system_clock> timestamp)
+        {
+            return std::to_string(std::chrono::duration_cast<TimeUnit>(timestamp.time_since_epoch()).count());
+        }
+
+        std::string toTimestampString(TimePrecision precision, std::chrono::time_point<std::chrono::system_clock> timestamp)
+        {
+            switch (precision)
+            {
+                case TimePrecision::Hours:
+                    return toPrecision<std::chrono::hours>(timestamp);
+                case TimePrecision::Minutes:
+                    return toPrecision<std::chrono::minutes>(timestamp);
+                case TimePrecision::Seconds:
+                    return toPrecision<std::chrono::seconds>(timestamp);
+                case TimePrecision::MilliSeconds:
+                    return toPrecision<std::chrono::milliseconds>(timestamp);
+                case TimePrecision::MicroSeconds:
+                    return toPrecision<std::chrono::microseconds>(timestamp);
+                case TimePrecision::NanoSeconds:
+                default:
+                    return toPrecision<std::chrono::nanoseconds>(timestamp);
+            }
+        }
     }
 
-    LineProtocol::LineProtocol(const std::string& tags)
-        : globalTags(tags)
+    LineProtocol::LineProtocol(const std::string& tags, TimePrecision precision)
+        : globalTags(tags), timePrecision(precision)
     {
     }
 
@@ -143,8 +165,7 @@ namespace influxdb
         appendIfNotEmpty(line, formatTags(point.getTagSet()), ',');
         appendIfNotEmpty(line, formatFields(point.getFieldSet()), ' ');
 
-        return line.append(" ")
-            .append(std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(point.getTimestamp().time_since_epoch()).count()));
+        return line.append(" ").append(toTimestampString(timePrecision, point.getTimestamp()));
     }
 
     std::string LineProtocol::EscapeStringElement(LineProtocol::ElementType type, std::string_view element)

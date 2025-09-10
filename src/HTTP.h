@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,8 +28,8 @@
 #ifndef INFLUXDATA_TRANSPORTS_HTTP_H
 #define INFLUXDATA_TRANSPORTS_HTTP_H
 
-#include "Transport.h"
-#include <memory>
+#include "InfluxDB/Transport.h"
+#include "InfluxDB/TimePrecision.h"
 #include <string>
 #include <chrono>
 #include <cpr/cpr.h>
@@ -74,10 +74,12 @@ namespace influxdb::transports
 
         void setVerifyCertificate(bool verify);
         void setTimeout(std::chrono::milliseconds timeout);
+        void setTimePrecision(TimePrecision precision) override;
 
     private:
         std::string endpointUrl;
         std::string databaseName;
+        std::string timePrecision;
         cpr::Session session;
     };
 

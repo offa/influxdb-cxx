@@ -20,38 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "BoostSupport.h"
-#include "InfluxDB/InfluxDBException.h"
-#include <catch2/catch_test_macros.hpp>
+#pragma once
 
-namespace influxdb::test
+#include "InfluxDB/influxdb_export.h"
+
+namespace influxdb
 {
-    namespace
+    enum class INFLUXDB_EXPORT TimePrecision
     {
-        struct TransportDummy : public Transport
-        {
-            void send([[maybe_unused]] std::string&& message) override
-            {
-            }
-        };
-
-        TransportDummy dummy;
-    }
-
-
-    TEST_CASE("Query impl throws unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::queryImpl(&dummy, "-ignore-"), InfluxDBException);
-    }
-
-    TEST_CASE("With UDP throws transport unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::withUdpTransport(http::url{}), InfluxDBException);
-    }
-
-    TEST_CASE("With Unix socket transport throws unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::withUnixSocketTransport(http::url{}), InfluxDBException);
-    }
-
+        Hours,
+        Minutes,
+        Seconds,
+        MilliSeconds,
+        MicroSeconds,
+        NanoSeconds
+    };
 }

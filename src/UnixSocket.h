@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,7 @@
 #ifndef INFLUXDATA_TRANSPORTS_UNIX_H
 #define INFLUXDATA_TRANSPORTS_UNIX_H
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
 #include <string>
@@ -47,7 +47,7 @@ namespace influxdb::transports
 
     private:
         /// Boost Asio I/O functionality
-        boost::asio::io_service mIoService;
+        boost::asio::io_context mIoContext;
 #if defined(BOOST_ASIO_HAS_LOCAL_SOCKETS)
         /// Unix socket
         boost::asio::local::datagram_protocol::socket mSocket;

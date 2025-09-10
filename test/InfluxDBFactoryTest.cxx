@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "InfluxDBFactory.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBFactory.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <catch2/catch_test_macros.hpp>
 
 namespace influxdb::test

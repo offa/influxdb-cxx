@@ -1,6 +1,7 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
+// Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +21,30 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef INFLUXDATA_INFLUXDBBUILDER_H
-#define INFLUXDATA_INFLUXDBBUILDER_H
+///
+/// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
+///
 
-#include "InfluxDB.h"
-#include "Transport.h"
-#include "Proxy.h"
-#include "influxdb_export.h"
-#include <chrono>
+#ifndef INFLUXDATA_EXCEPTION_H
+#define INFLUXDATA_EXCEPTION_H
+
+#include <stdexcept>
+#include <string>
+
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {
-    class INFLUXDB_EXPORT InfluxDBBuilder
+
+    class INFLUXDB_EXPORT InfluxDBException : public std::runtime_error
     {
     public:
-        std::unique_ptr<InfluxDB> connect();
-
-        InfluxDBBuilder&& setBasicAuthentication(const std::string& user, const std::string& pass);
-        InfluxDBBuilder&& setAuthToken(const std::string& token);
-        InfluxDBBuilder&& setProxy(const Proxy& proxy);
-        InfluxDBBuilder&& setTimeout(std::chrono::milliseconds timeout);
-        InfluxDBBuilder&& setVerifyCertificate(bool verify);
-
-        static InfluxDBBuilder http(const std::string& url);
-
-    private:
-        explicit InfluxDBBuilder(std::unique_ptr<Transport> impl);
-
-        std::unique_ptr<Transport> transport;
+        explicit InfluxDBException(const std::string& message)
+            : std::runtime_error::runtime_error(message)
+        {
+        }
     };
-}
 
-#endif // INFLUXDATA_INFLUXDBBUILDER_H
+} // namespace influxdb
+
+#endif // INFLUXDATA_EXCEPTION_H

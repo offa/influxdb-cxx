@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,19 +26,22 @@
 ///
 
 #include "UDP.h"
-#include "InfluxDBException.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <string>
 
 namespace influxdb::transports
 {
 
     UDP::UDP(const std::string& hostname, int port)
-        : mSocket(mIoService, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
+        : mSocket(mIoContext, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), 0))
     {
-        boost::asio::ip::udp::resolver resolver(mIoService);
-        boost::asio::ip::udp::resolver::query query(boost::asio::ip::udp::v4(), hostname, std::to_string(port));
-        boost::asio::ip::udp::resolver::iterator resolverInerator = resolver.resolve(query);
-        mEndpoint = *resolverInerator;
+        boost::asio::ip::udp::resolver resolver(mIoContext);
+        mEndpoint = *(resolver
+                          .resolve(boost::asio::ip::udp::v4(),
+                                   hostname,
+                                   std::to_string(port),
+                                   boost::asio::ip::resolver_query_base::passive)
+                          .cbegin());
     }
 
     void UDP::send(std::string&& message)
@@ -51,6 +54,10 @@ namespace influxdb::transports
         {
             throw InfluxDBException(e.what());
         }
+    }
+
+    void UDP::setTimePrecision([[maybe_unused]] TimePrecision precision)
+    {
     }
 
 } // namespace influxdb::transports

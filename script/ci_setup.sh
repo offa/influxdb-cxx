@@ -2,13 +2,14 @@
 
 set -ex
 
+export DEBIAN_FRONTEND=noninteractive
+export PATH=$HOME/.local/bin:$PATH
 apt-get update
-apt-get install -y python3-pip libssl-dev libcurl4-openssl-dev
-pip3 install -U conan
+apt-get install -y pipx
+pipx install conan
+conan profile detect
 
 mkdir -p build && cd build
-
-conan profile detect
 
 if [[ "${CXX}" == clang* ]]
 then
@@ -20,8 +21,8 @@ fi
 
 conan install \
     -of . \
-    -o "influxdb_cxx/*":system=True \
-    -o "influxdb_cxx/*":tests=True \
+    -o "&:system=True" \
+    -o "&:tests=True" \
     -s compiler.cppstd=20 \
     --build=missing \
     ..

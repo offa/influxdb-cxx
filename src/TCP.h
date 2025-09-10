@@ -27,10 +27,9 @@
 #ifndef INFLUXDATA_TRANSPORTS_TCP_H
 #define INFLUXDATA_TRANSPORTS_TCP_H
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 
 #include <boost/asio.hpp>
-#include <chrono>
 #include <string>
 
 namespace influxdb::transports
@@ -54,7 +53,7 @@ namespace influxdb::transports
 
     private:
         /// Boost Asio I/O functionality
-        boost::asio::io_service mIoService;
+        boost::asio::io_context mIoContext;
 
         /// TCP socket
         boost::asio::ip::tcp::socket mSocket;

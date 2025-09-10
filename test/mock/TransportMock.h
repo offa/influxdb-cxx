@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "Transport.h"
+#include "InfluxDB/Transport.h"
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 
@@ -34,6 +34,7 @@ namespace influxdb::test
         MAKE_MOCK1(query, std::string(const std::string&), override);
         MAKE_MOCK0(createDatabase, void(), override);
         MAKE_MOCK1(execute, std::string(const std::string&), override);
+        MAKE_MOCK1(setTimePrecision, void(TimePrecision), override);
     };
 
 
@@ -63,6 +64,11 @@ namespace influxdb::test
         void createDatabase() override
         {
             mockImpl->createDatabase();
+        }
+
+        void setTimePrecision(TimePrecision precision) override
+        {
+            mockImpl->setTimePrecision(precision);
         }
 
     private:

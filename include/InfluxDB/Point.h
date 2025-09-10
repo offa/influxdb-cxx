@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -34,7 +34,7 @@
 #include <variant>
 #include <deque>
 
-#include "influxdb_export.h"
+#include "InfluxDB/influxdb_export.h"
 
 namespace influxdb
 {

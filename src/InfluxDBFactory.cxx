@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2020-2024 offa
+// Copyright (c) 2020-2025 offa
 // Copyright (c) 2019 Adam Wegrzynek
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,14 +25,14 @@
 /// \author Adam Wegrzynek <adam.wegrzynek@cern.ch>
 ///
 
-#include "InfluxDBFactory.h"
+#include "InfluxDB/InfluxDBFactory.h"
 #include <functional>
 #include <string>
 #include <memory>
 #include <map>
+#include "InfluxDB/InfluxDBException.h"
 #include "UriParser.h"
 #include "HTTP.h"
-#include "InfluxDBException.h"
 #include "BoostSupport.h"
 
 namespace influxdb
