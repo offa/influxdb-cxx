@@ -27,25 +27,16 @@ target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
 target_link_libraries(InfluxDB-Internal PRIVATE cpr::cpr)
 
 
-add_library(InfluxDB-Core OBJECT
-  InfluxDB.cxx
-  Point.cxx
-  InfluxDBFactory.cxx
-  InfluxDBBuilder.cxx
-  Proxy.cxx
-  )
-target_include_directories(InfluxDB-Core PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_BINARY_DIR}/src
-)
-target_link_libraries(InfluxDB-Core PRIVATE cpr::cpr)
-
-
 add_library(InfluxDB
-    $<TARGET_OBJECTS:InfluxDB-Core>
+    InfluxDB.cxx
+    Point.cxx
+    InfluxDBFactory.cxx
+    InfluxDBBuilder.cxx
+    Proxy.cxx
     $<TARGET_OBJECTS:InfluxDB-Internal>
     $<TARGET_OBJECTS:InfluxDB-BoostSupport>
     )
+target_link_libraries(InfluxDB PRIVATE cpr::cpr)
 add_library(InfluxData::InfluxDB ALIAS InfluxDB)
 
 #
