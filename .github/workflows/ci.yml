@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
-    - uses: jidicula/clang-format-action@c14d7abd6da6ba0aeed48797a5784d9468cbb806
+    - uses: jidicula/clang-format-action@bea9eaa8d410adcbb81b5a7a4d459b7bf4f83247
       name: "Verify formatting"
       with:
         clang-format-version: 19
