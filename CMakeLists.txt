@@ -22,7 +22,7 @@ option(INFLUXCXX_WERROR "Build with -Werror enabled (if supported)" ON)
 
 # Define project
 project(influxdb-cxx
-  VERSION 0.8.0
+  VERSION 0.8.1
   DESCRIPTION "InfluxDB C++ client library"
   LANGUAGES CXX
 )
