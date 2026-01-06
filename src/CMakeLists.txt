@@ -62,7 +62,7 @@ add_library(InfluxData::InfluxDB ALIAS InfluxDB)
 #
 # set_target_properties(InfluxDB PROPERTIES VERSION c.r.a SOVERSION c)
 #
-set(SO_VERSION_MAJOR 1)
+set(SO_VERSION_MAJOR 2)
 set_target_properties(InfluxDB PROPERTIES
   VERSION ${SO_VERSION_MAJOR}.0.0
   SOVERSION ${SO_VERSION_MAJOR}
