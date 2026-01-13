@@ -173,6 +173,14 @@ namespace influxdb::transports
         }
     }
 
+    bool HTTP::ping()
+    {
+        session.SetUrl(cpr::Url{endpointUrl + "/ping"});
+
+        const auto response = session.Get();
+        return response.status_code == cpr::status::HTTP_NO_CONTENT;
+    }
+
     std::string HTTP::execute(const std::string& cmd)
     {
         session.SetUrl(cpr::Url{endpointUrl + "/query"});
