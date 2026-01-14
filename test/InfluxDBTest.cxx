@@ -208,4 +208,13 @@ namespace influxdb::test
         db.write(Point{"p"}.addField("f", 1).setTimestamp(std::chrono::time_point<std::chrono::system_clock>{std::chrono::milliseconds{67}}));
     }
 
+    TEST_CASE("Ping instance", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, ping()).RETURN(true);
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        CHECK(db.ping());
+    }
+
 }

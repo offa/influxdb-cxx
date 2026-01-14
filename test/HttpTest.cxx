@@ -399,4 +399,21 @@ namespace influxdb::test
         REQUIRE_THROWS_AS(http.execute("fail-execution"), InfluxDBException);
     }
 
+    TEST_CASE("Ping returns true if successful", "[HttpTest]")
+    {
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_NO_CONTENT, "response-content"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+
+        auto http = createHttp();
+        CHECK(http.ping());
+    }
+
+    TEST_CASE("Ping returns false if unsuccessful", "[HttpTest]")
+    {
+        REQUIRE_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::COULDNT_CONNECT, cpr::status::HTTP_NOT_FOUND, "response-content"));
+        ALLOW_CALL(sessionMock, SetUrl(_));
+
+        auto http = createHttp();
+        CHECK_FALSE(http.ping());
+    }
 }

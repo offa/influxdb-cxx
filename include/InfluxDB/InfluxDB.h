@@ -92,6 +92,9 @@ namespace influxdb
         /// \param precision
         void setTimePrecision(TimePrecision precision);
 
+        /// Check instance is up and running
+        bool ping();
+
     private:
         void addPointToBatch(Point&& point);
         std::string joinLineProtocolBatch() const;

@@ -75,6 +75,7 @@ namespace influxdb::transports
         void setVerifyCertificate(bool verify);
         void setTimeout(std::chrono::milliseconds timeout);
         void setTimePrecision(TimePrecision precision) override;
+        bool ping() override;
 
     private:
         std::string endpointUrl;

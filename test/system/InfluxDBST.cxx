@@ -66,6 +66,18 @@ namespace influxdb::test
 
         auto db = configure("st_db");
 
+        SECTION("Ping up and running instance")
+        {
+            CHECK(db->ping());
+        }
+
+        SECTION("Ping nonexistent instance")
+        {
+            auto nonexistent = InfluxDBBuilder::http("http://not-existing-instance:8086?db=ignore")
+                                   .setTimeout(std::chrono::seconds{2})
+                                   .connect();
+            CHECK_FALSE(nonexistent->ping());
+        }
 
         SECTION("Database does not exist")
         {

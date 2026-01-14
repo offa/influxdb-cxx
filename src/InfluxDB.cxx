@@ -151,6 +151,11 @@ namespace influxdb
         mTransport->setTimePrecision(precision);
     }
 
+    bool InfluxDB::ping()
+    {
+        return mTransport->ping();
+    }
+
     void InfluxDB::addPointToBatch(Point&& point)
     {
         mPointBatch.emplace_back(std::move(point));

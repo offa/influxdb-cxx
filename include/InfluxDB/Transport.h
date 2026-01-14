@@ -75,6 +75,11 @@ namespace influxdb
         {
             throw InfluxDBException{"Time precision is not supported by the selected transport"};
         }
+
+        virtual bool ping()
+        {
+            throw InfluxDBException{"Ping is not supported by the selected transport"};
+        }
     };
 
 } // namespace influxdb
