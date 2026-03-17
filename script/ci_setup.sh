@@ -2,13 +2,6 @@
 
 set -ex
 
-export DEBIAN_FRONTEND=noninteractive
-export PATH=$HOME/.local/bin:$PATH
-apt-get update
-apt-get install -y pipx
-pipx install conan
-conan profile detect
-
 mkdir -p build && cd build
 
 if [[ "${CXX}" == clang* ]]
