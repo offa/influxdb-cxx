@@ -24,7 +24,7 @@ jobs:
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
-      - uses: offa/conan-action@690284d6da644690b6864b9e7885a52141bb944b
+      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
@@ -63,6 +63,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@main
+      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
@@ -74,8 +75,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756
       - name: Install dependencies
         run: |
-          pip3 install -U conan
-          conan profile detect
           echo "tools.cmake.cmaketoolchain:generator=Ninja" >> ~/.conan2/global.conf
           mkdir build
           conan install -o "&":boost=${{ matrix.boost }} -s compiler.cppstd=20 --build=missing . -of build
