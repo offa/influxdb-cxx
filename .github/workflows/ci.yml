@@ -92,6 +92,7 @@ jobs:
     name: "mac os x"
     steps:
       - uses: actions/checkout@main
+      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
@@ -102,8 +103,6 @@ jobs:
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew install boost
-          pipx install conan
-          conan profile detect
           mkdir build
           conan install -o "&":system=True -s compiler.cppstd=20 --build=missing . -of build
       - name: Build
