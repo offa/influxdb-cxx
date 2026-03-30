@@ -24,7 +24,7 @@ jobs:
     name: "${{ matrix.compiler }} (Boost: ${{ matrix.boost }})"
     steps:
       - uses: actions/checkout@main
-      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
+      - uses: offa/conan-action@c53f2e20ee76d70775862fdc7d52f7f53e60062d
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
@@ -63,7 +63,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@main
-      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
+      - uses: offa/conan-action@c53f2e20ee76d70775862fdc7d52f7f53e60062d
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
@@ -94,7 +94,7 @@ jobs:
     name: "mac os x"
     steps:
       - uses: actions/checkout@main
-      - uses: offa/conan-action@e9d361b93acd968d992b3bbb15b02b0beefb6b37
+      - uses: offa/conan-action@c53f2e20ee76d70775862fdc7d52f7f53e60062d
       - name: Cache Conan Packages
         uses: actions/cache@main
         with:
