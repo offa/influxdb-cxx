@@ -14,8 +14,6 @@ endif()
 add_subdirectory("mock")
 
 
-include(clang22_workaround)
-
 function(add_unittest name)
     set(multiValueArgs DEPENDS)
     cmake_parse_arguments(TEST_OPTION "" "" ${multiValueArgs} ${ARGN})
