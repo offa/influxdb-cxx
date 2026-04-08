@@ -14,8 +14,6 @@ endif()
 add_subdirectory("mock")
 
 
-include(clang22_workaround)
-
 function(add_unittest name)
     set(multiValueArgs DEPENDS)
     cmake_parse_arguments(TEST_OPTION "" "" ${multiValueArgs} ${ARGN})
@@ -33,8 +31,6 @@ function(add_unittest name)
             ${CMAKE_CURRENT_SOURCE_DIR}/mock
             )
     add_test(NAME ${name} COMMAND ${name})
-
-    clang22_workaround_target(${name})
 endfunction()
 
 add_unittest(PointTest DEPENDS InfluxDB)

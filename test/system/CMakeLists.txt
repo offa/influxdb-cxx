@@ -1,10 +1,8 @@
 add_executable(InfluxDBST InfluxDBST.cxx)
 target_link_libraries(InfluxDBST PRIVATE InfluxDB Catch2::Catch2WithMain)
-clang22_workaround_target(InfluxDBST)
 
 add_executable(HttpAuthST HttpAuthST.cxx)
 target_link_libraries(HttpAuthST PRIVATE InfluxDB Catch2::Catch2WithMain)
-clang22_workaround_target(HttpAuthST)
 
 
 add_custom_target(systemtest InfluxDBST
