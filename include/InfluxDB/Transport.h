@@ -59,7 +59,7 @@ namespace influxdb
             throw InfluxDBException{"Execution is not supported by the selected transport"};
         }
 
-        /// Sends request
+        /// Creates database
         virtual void createDatabase()
         {
             throw InfluxDBException{"Creation of database is not supported by the selected transport"};
