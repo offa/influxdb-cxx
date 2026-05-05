@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         compiler:
+          - gcc:16
           - gcc:15
-          - gcc:14
           - clang:22
           - clang:21
         boost:
