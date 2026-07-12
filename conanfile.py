@@ -1,14 +1,11 @@
 from conan import ConanFile
 
+
 class InfluxdbCxxConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "CMakeDeps", "CMakeToolchain"
 
-    options = {
-        "tests": [True, False],
-        "system": [True, False],
-        "boost": [True, False]
-    }
+    options = {"tests": [True, False], "system": [True, False], "boost": [True, False]}
     default_options = {
         "tests": True,
         "system": False,
@@ -21,5 +18,5 @@ class InfluxdbCxxConan(ConanFile):
         if not self.options.system and self.options.boost:
             self.requires("boost/1.88.0")
         if self.options.tests:
-            self.requires("catch2/3.15.1")
+            self.requires("catch2/3.15.2")
             self.requires("trompeloeil/49")
