@@ -72,7 +72,7 @@ jobs:
       - name: Setup Ninja
         uses: turtlesec-no/get-ninja@3e85fb0044ada1440765803dd87c838edf79def8
       - name: Setup MSVC
-        uses: TheMrMilchmann/setup-msvc-dev@79dac248aac9d0059f86eae9d8b5bfab4e95e97c
+        uses: TheMrMilchmann/setup-msvc-dev@368ef7d1ee4d1171b31d4a7f67f4d954f903f5a9
         with:
           arch: x64
       - name: Install dependencies
