@@ -35,10 +35,10 @@ namespace influxdb::internal
 {
     namespace
     {
-        std::chrono::system_clock::time_point parseTimeStamp(const std::string& value)
+        std::chrono::sys_time<std::chrono::nanoseconds> parseTimeStamp(const std::string& value)
         {
             std::istringstream timeString{value};
-            std::chrono::system_clock::time_point timeStamp;
+            date::sys_time<std::chrono::nanoseconds> timeStamp{};
             timeString >> date::parse("%FT%T%Z", timeStamp);
             return timeStamp;
         }

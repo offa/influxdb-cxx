@@ -56,13 +56,13 @@ namespace influxdb
         Point&& addField(std::string_view name, const FieldValue& value);
 
         /// Sets custom timestamp
-        Point&& setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp);
+        Point&& setTimestamp(std::chrono::sys_time<std::chrono::nanoseconds> timestamp);
 
         /// Name getter
         std::string getName() const;
 
         /// Timestamp getter
-        std::chrono::time_point<std::chrono::system_clock> getTimestamp() const;
+        std::chrono::sys_time<std::chrono::nanoseconds> getTimestamp() const;
 
         /// Fields getter
         std::string getFields() const;
@@ -86,7 +86,7 @@ namespace influxdb
         std::string mMeasurement;
 
         /// A timestamp
-        std::chrono::time_point<std::chrono::system_clock> mTimestamp;
+        std::chrono::sys_time<std::chrono::nanoseconds> mTimestamp;
 
         //// Tags
         TagSet mTags;

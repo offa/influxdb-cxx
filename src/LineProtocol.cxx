@@ -127,12 +127,12 @@ namespace influxdb
         }
 
         template <class TimeUnit>
-        std::string toPrecision(std::chrono::time_point<std::chrono::system_clock> timestamp)
+        std::string toPrecision(std::chrono::sys_time<std::chrono::nanoseconds> timestamp)
         {
             return std::to_string(std::chrono::duration_cast<TimeUnit>(timestamp.time_since_epoch()).count());
         }
 
-        std::string toTimestampString(TimePrecision precision, std::chrono::time_point<std::chrono::system_clock> timestamp)
+        std::string toTimestampString(TimePrecision precision, std::chrono::sys_time<std::chrono::nanoseconds> timestamp)
         {
             switch (precision)
             {
