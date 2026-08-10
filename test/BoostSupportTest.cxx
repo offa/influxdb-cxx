@@ -26,8 +26,6 @@
 #include <boost/property_tree/exceptions.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
-#include <date/date.h>
-#include <sstream>
 
 namespace influxdb::test
 {
@@ -110,10 +108,6 @@ namespace influxdb::test
     {
         using trompeloeil::_;
 
-        std::istringstream in{"2021-01-01T00:11:22.123456789Z"};
-        std::chrono::system_clock::time_point expectedTimeStamp{};
-        in >> date::parse("%FT%T%Z", expectedTimeStamp);
-
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,)"
@@ -124,7 +118,7 @@ namespace influxdb::test
         CHECK(result.size() == 1);
         const auto point = result[0];
         CHECK(point.getName() == "unittest");
-        CHECK(point.getTimestamp() == expectedTimeStamp);
+        CHECK(std::format("{:%FT%T}Z", point.getTimestamp()) == "2021-01-01T00:11:22.123456789Z");
         CHECK(point.getTags() == "host=localhost");
         CHECK(point.getFields() == "value=112233.000000000000000000");
     }
@@ -137,7 +131,7 @@ namespace influxdb::test
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,)"
                     R"("series":[{"name":"unittest","columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01:11:22.000000000Z","host-0",100],)"
+                    R"("values":[["2021-01-01T00:11:22.000000000Z","host-0",100],)"
                     R"(["2021-01-01T00:11:23.560000000Z","host-1",30],)"
                     R"(["2021-01-01T00:11:24.780000000Z","host-2",54]]}]}]})");
 
@@ -172,7 +166,7 @@ namespace influxdb::test
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,"series":[{"columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01:11:22.000000000Z","x",8]]}]}]})");
+                    R"("values":[["2021-01-01T00:11:22.000000000Z","x",8]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 1);
@@ -187,7 +181,7 @@ namespace influxdb::test
         TransportMock transport;
         ALLOW_CALL(transport, query(_))
             .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"x","tags":{"type":"sp"},"columns":["time","value"],)"
-                    R"("values":[["2022-01-01:01:02.000000000ZZ",99]]}]}]})");
+                    R"("values":[["2022-01-01T00:01:02.000000000Z",99]]}]}]})");
 
         const auto result = internal::queryImpl(&transport, "SELECT * from test");
         CHECK(result.size() == 1);

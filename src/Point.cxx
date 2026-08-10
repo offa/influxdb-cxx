@@ -70,7 +70,7 @@ namespace influxdb
         return std::move(*this);
     }
 
-    Point&& Point::setTimestamp(std::chrono::time_point<std::chrono::system_clock> timestamp)
+    Point&& Point::setTimestamp(std::chrono::sys_time<std::chrono::nanoseconds> timestamp)
     {
         mTimestamp = timestamp;
         return std::move(*this);
@@ -81,7 +81,7 @@ namespace influxdb
         return mMeasurement;
     }
 
-    std::chrono::time_point<std::chrono::system_clock> Point::getTimestamp() const
+    std::chrono::sys_time<std::chrono::nanoseconds> Point::getTimestamp() const
     {
         return mTimestamp;
     }
