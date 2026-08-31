@@ -75,7 +75,7 @@ namespace influxdb
         const auto iterator = map.find(parsedUrl.protocol);
         if (iterator == map.end())
         {
-            throw InfluxDBException("Unrecognized backend " + parsedUrl.protocol);
+            throw InfluxDBException{std::format("Unrecognized backend {}", parsedUrl.protocol)};
         }
 
         return iterator->second(parsedUrl);
