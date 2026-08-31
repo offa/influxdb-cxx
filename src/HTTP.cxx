@@ -36,11 +36,11 @@ namespace influxdb::transports
         {
             if (resp.error)
             {
-                throw InfluxDBException{"Request error: (" + std::to_string(static_cast<int>(resp.error.code)) + ") " + resp.error.message};
+                throw InfluxDBException{std::format("Request error: ({}) {}", static_cast<int>(resp.error.code), resp.error.message)};
             }
             if (!cpr::status::is_success(resp.status_code))
             {
-                throw InfluxDBException{"Request failed: (" + std::to_string(resp.status_code) + ") " + resp.reason + " (message: '" + resp.text + "')"};
+                throw InfluxDBException{std::format("Request failed: ({}) {} (message: '{}')", resp.status_code, resp.reason, resp.text)};
             }
         }
 
