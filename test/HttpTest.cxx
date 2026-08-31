@@ -83,7 +83,7 @@ namespace influxdb::test
 
         REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
         REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/write")));
-        REQUIRE_CALL(sessionMock, UpdateHeader(_)).WITH(_1.at("Content-Type") == "application/json");
+        REQUIRE_CALL(sessionMock, UpdateHeader(_)).WITH(_1.at("Content-Type") == "text/plain");
         REQUIRE_CALL(sessionMock, SetBody(_)).WITH(_1.str() == data);
         REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}}));
 

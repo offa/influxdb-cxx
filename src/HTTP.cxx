@@ -110,7 +110,7 @@ namespace influxdb::transports
     void HTTP::send(std::string&& lineprotocol)
     {
         session.SetUrl(cpr::Url{endpointUrl + "/write"});
-        session.UpdateHeader(cpr::Header{{"Content-Type", "application/json"}});
+        session.UpdateHeader(cpr::Header{{"Content-Type", "text/plain"}});
 
         cpr::Parameters params{{"db", databaseName}};
 
