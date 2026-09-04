@@ -25,6 +25,8 @@
 #include "InfluxDB/TimePrecision.h"
 #include "mock/CprMock.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
 #include <catch2/trompeloeil.hpp>
 
 namespace influxdb::test
@@ -36,6 +38,15 @@ namespace influxdb::test
     using trompeloeil::eq;
 
     using ParamMap = std::map<std::string, std::string>;
+
+    const std::array<std::pair<TimePrecision, std::string>, 6> precisionMapping{{
+        {TimePrecision::Hours, "h"},
+        {TimePrecision::Minutes, "m"},
+        {TimePrecision::Seconds, "s"},
+        {TimePrecision::MilliSeconds, "ms"},
+        {TimePrecision::MicroSeconds, "u"},
+        {TimePrecision::NanoSeconds, "ns"},
+    }};
 
     cpr::Response createResponse(const cpr::ErrorCode& code, std::int32_t statusCode, const std::string& text = "<text placeholder>")
     {
@@ -60,12 +71,16 @@ namespace influxdb::test
 
     TEST_CASE("Construction fails on missing url part", "[HttpTest]")
     {
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086"}, InfluxDBException);
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?"}, InfluxDBException);
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086!db=test"}, InfluxDBException);
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?dc=test"}, InfluxDBException);
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?dbtest"}, InfluxDBException);
-        REQUIRE_THROWS_AS(HTTP{"http://localhost:8086?db-test"}, InfluxDBException);
+        const auto url = GENERATE(
+            std::string{"http://localhost:8086"},
+            std::string{"http://localhost:8086?"},
+            std::string{"http://localhost:8086!db=test"},
+            std::string{"http://localhost:8086?dc=test"},
+            std::string{"http://localhost:8086?dbtest"},
+            std::string{"http://localhost:8086?db-test"});
+        CAPTURE(url);
+
+        REQUIRE_THROWS_AS(HTTP{url}, InfluxDBException);
     }
 
     TEST_CASE("Construction sets session settings", "[HttpTest]")
@@ -274,84 +289,39 @@ namespace influxdb::test
         http.setTimeout(timeout);
     }
 
-    TEST_CASE("Set time precision sets precision on send", "[HttpTest]")
+    TEST_CASE("Set time precision sets precision parameter", "[HttpTest]")
     {
-        auto http = createHttp();
-        const std::string data{"content-to-send"};
-        auto params = [](std::string prec)
-        {
-            ParamMap p{{"db", "test"}};
-            if (!prec.empty())
-            {
-                p.insert({"precision", prec});
-            }
-            return p;
-        };
+        const auto& [precision, value] = GENERATE(from_range(precisionMapping));
+        CAPTURE(precision, value);
 
-        ALLOW_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+        auto http = createHttp();
+
         ALLOW_CALL(sessionMock, SetUrl(_));
         ALLOW_CALL(sessionMock, UpdateHeader(_));
         ALLOW_CALL(sessionMock, SetBody(_));
-        REQUIRE_CALL(sessionMock, SetParameters(params("")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
 
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::Hours);
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::Minutes);
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::Seconds);
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::MilliSeconds);
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::MicroSeconds);
-        http.send(std::string{data});
-        http.setTimePrecision(TimePrecision::NanoSeconds);
-        http.send(std::string{data});
-    }
-
-    TEST_CASE("Set time precision sets precision on query", "[HttpTest]")
-    {
-        auto http = createHttp();
-        const std::string query = "/12?ab=cd";
-        auto params = [&query](std::string prec)
+        SECTION("Set on send")
         {
-            ParamMap p{{"db", "test"}, {"q", query}};
-            if (!prec.empty())
-            {
-                p.insert({"precision", prec});
-            }
-            return p;
-        };
+            ALLOW_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
 
-        ALLOW_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
-        ALLOW_CALL(sessionMock, SetUrl(_));
-        REQUIRE_CALL(sessionMock, SetParameters(params("")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("h")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("m")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("s")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("ms")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("u")));
-        REQUIRE_CALL(sessionMock, SetParameters(params("ns")));
+            const ParamMap expected{{"db", "test"}, {"precision", value}};
+            REQUIRE_CALL(sessionMock, SetParameters(expected));
 
-        http.query(query);
-        http.setTimePrecision(TimePrecision::Hours);
-        http.query(query);
-        http.setTimePrecision(TimePrecision::Minutes);
-        http.query(query);
-        http.setTimePrecision(TimePrecision::Seconds);
-        http.query(query);
-        http.setTimePrecision(TimePrecision::MilliSeconds);
-        http.query(query);
-        http.setTimePrecision(TimePrecision::MicroSeconds);
-        http.query(query);
-        http.setTimePrecision(TimePrecision::NanoSeconds);
-        http.query(query);
+            http.setTimePrecision(precision);
+            http.send("content-to-send");
+        }
+
+        SECTION("Set on query")
+        {
+            const std::string query = "/12?ab=cd";
+            ALLOW_CALL(sessionMock, Get()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK, "query-result"));
+
+            const ParamMap expected{{"db", "test"}, {"q", query}, {"precision", value}};
+            REQUIRE_CALL(sessionMock, SetParameters(expected));
+
+            http.setTimePrecision(precision);
+            CHECK(http.query(query) == "query-result");
+        }
     }
 
     TEST_CASE("Execute sets parameters", "[HttpTest]")
