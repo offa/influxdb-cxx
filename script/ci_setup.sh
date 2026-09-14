@@ -6,6 +6,7 @@ mkdir -p build && cd build
 
 if [[ "${CXX}" == clang* ]]
 then
+    apt-get install -y g++-16
     STDLIB_ENV="CXXFLAGS=\"-stdlib=libc++\""
     export ${STDLIB_ENV}
     echo "${STDLIB_ENV}" >> ${GITHUB_ENV}
