@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
-      - uses: offa/conan-action@3cafebb5c0e5f620fff588bfc9706e124e1c33db
+      - uses: offa/conan-action@1132c2e396bf4af73f7196939c0d45e7359f63c8
       - name: Install dependencies
         run: |
           script/ci_setup.sh
