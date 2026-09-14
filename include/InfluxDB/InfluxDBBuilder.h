@@ -28,6 +28,8 @@
 #include "InfluxDB/Proxy.h"
 #include "InfluxDB/influxdb_export.h"
 #include <chrono>
+#include <string>
+#include <memory>
 
 namespace influxdb
 {
