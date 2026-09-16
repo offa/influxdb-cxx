@@ -22,6 +22,7 @@
 
 #include "CprMock.h"
 #include <algorithm>
+#include <iterator>
 
 namespace cpr
 {
