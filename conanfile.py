@@ -20,3 +20,7 @@ class InfluxdbCxxConan(ConanFile):
         if self.options.tests:
             self.requires("catch2/3.16.0")
             self.requires("trompeloeil/49")
+
+    # Workaround for conan-center-index #29193
+    def configure(self):
+        self.options["boost"].without_cobalt = True
