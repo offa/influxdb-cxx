@@ -45,13 +45,13 @@ namespace influxdb::test
         CHECK_THROWS_AS(udp->createDatabase(), std::runtime_error);
     }
 
-    TEST_CASE("UDP transport throws on proxy", "[BoostSupport]")
+    TEST_CASE("UDP transport throws on proxy", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
         CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), std::runtime_error);
     }
 
-    TEST_CASE("UDP transport throws on execute", "[BoostSupport]")
+    TEST_CASE("UDP transport throws on execute", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
         CHECK_THROWS_AS(udp->execute("show databases"), std::runtime_error);
