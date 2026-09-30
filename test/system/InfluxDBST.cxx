@@ -87,7 +87,7 @@ namespace influxdb::test
 
         SECTION("Query on non existing database returns empty")
         {
-            CHECK(db->query("select * from st_db").empty());
+            CHECK_THROWS_AS(db->query("select * from st_db").empty(), std::runtime_error);
         }
 
         SECTION("Create database if not existing")
@@ -118,8 +118,8 @@ namespace influxdb::test
             const auto response = db->query("select * from x");
             CHECK(response.size() == 1);
             CHECK(response[0].getName() == "x");
-            CHECK(response[0].getFields() == "value=20.000000000000000000");
-            CHECK(response[0].getTags() == "type=sp");
+            CHECK(response[0].getFields() == R"(type="sp",value=20.000000000000000000)");
+            CHECK(response[0].getTags() == "");
         }
 
         SECTION("Query point with no matches")
@@ -169,11 +169,11 @@ namespace influxdb::test
             const auto response = db->query(R"(select * from x where type='mpc')");
             CHECK(response.size() == 3);
             CHECK(response[0].getName() == "x");
-            CHECK(response[0].getFields() == "n=0.000000000000000000");
+            CHECK(response[0].getFields() == R"(n=0.000000000000000000,type="mpc")");
             CHECK(response[1].getName() == "x");
-            CHECK(response[1].getFields() == "n=1.000000000000000000");
+            CHECK(response[1].getFields() == R"(n=1.000000000000000000,type="mpc")");
             CHECK(response[2].getName() == "x");
-            CHECK(response[2].getFields() == "n=2.000000000000000000");
+            CHECK(response[2].getFields() == R"(n=2.000000000000000000,type="mpc")");
         }
 
         SECTION("Write as batch doesn't send if batch size not reached")
@@ -293,19 +293,17 @@ namespace influxdb::test
             // Measurement
             CHECK(point.getName() == unescapedMeasurementName);
 
-            // Tags
-            const Point::TagSet& tags{point.getTagSet()};
-            CHECK(tags.size() == 3);
-            // Should contain the unescaped tag key and value
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedTagKey, unescapedTagValue}));
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{"type", "escaped"}));
-            // Queried string values actually end up in the tags (see queryImpl)
-            CHECK(tags.end() != std::find(tags.begin(), tags.end(), Point::TagSet::value_type{unescapedFieldKey, unescapedFieldValue}));
-
             // Fields
-            const Point::FieldSet& fields{point.getFieldSet()};
-            // String fields are put in the tags (see above)
-            CHECK(fields.size() == 0);
+            const auto& fields{point.getFieldSet()};
+            REQUIRE(fields.size() == 3);
+            // Should contain the unescaped field key and value
+            CHECK(fields.end() != std::find(fields.begin(), fields.end(), Point::FieldSet::value_type{unescapedTagKey, unescapedTagValue}));
+            CHECK(fields.end() != std::find(fields.begin(), fields.end(), Point::FieldSet::value_type{"type", "escaped"}));
+            // Queried string values actually end up in the fields (see queryImpl)
+            CHECK(fields.end() != std::find(fields.begin(), fields.end(), Point::FieldSet::value_type{unescapedFieldKey, unescapedFieldValue}));
+
+            // String tags are put in the fields (see above)
+            CHECK(point.getTagSet().size() == 0);
         }
 
         SECTION("Cleanup")
