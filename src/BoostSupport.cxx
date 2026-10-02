@@ -48,23 +48,14 @@ namespace influxdb::internal
 
         std::string valueToString(const nlohmann::json& value)
         {
-            if (value.is_string())
-            {
-                return value.get<std::string>();
-            }
-            if (value.is_number())
-            {
-                return std::to_string(value.get<double>());
-            }
-
             if (value.is_null())
             {
                 return {};
             }
 
-            if (value.is_boolean())
+            if (value.is_string())
             {
-                return value.get<bool>() ? "true" : "false";
+                return value.get<std::string>();
             }
 
             return value.dump();
