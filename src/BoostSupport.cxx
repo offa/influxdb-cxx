@@ -38,7 +38,7 @@ namespace influxdb::internal
         std::chrono::sys_time<std::chrono::nanoseconds> parseTimeStamp(const std::string& value)
         {
             std::istringstream timeString{value};
-            date::sys_time<std::chrono::nanoseconds> timeStamp{};
+            std::chrono::sys_time<std::chrono::nanoseconds> timeStamp{};
             date::from_stream(timeString, "%FT%T%Z", timeStamp);
 
             return timeStamp;
