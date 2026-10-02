@@ -25,6 +25,7 @@
 #include "UDP.h"
 #include "TCP.h"
 #include "UnixSocket.h"
+#include "InfluxDB/InfluxDBException.h"
 #include <chrono>
 #include <format>
 #include <iterator>
@@ -135,7 +136,7 @@ namespace influxdb::internal
         {
             if (!series.is_object())
             {
-                throw std::runtime_error("InfluxDB query error: 'series' element is not an object");
+                throw InfluxDBException{"InfluxDB query error: 'series' element is not an object"};
             }
 
             const auto columnsItr = series.find("columns");
@@ -165,7 +166,7 @@ namespace influxdb::internal
         {
             if (const auto err = obj.find("error"); err != obj.end())
             {
-                throw std::runtime_error(std::format("InfluxDB query error: {}", valueToString(*err)));
+                throw InfluxDBException{std::format("InfluxDB query error: {}", valueToString(*err))};
             }
         }
 
@@ -181,7 +182,7 @@ namespace influxdb::internal
 
             if (const auto errorItr = document.find("error"); errorItr != document.end())
             {
-                throw std::runtime_error(std::format("InfluxDB query error: {}", valueToString(*errorItr)));
+                throw InfluxDBException{std::format("InfluxDB query error: {}", valueToString(*errorItr))};
             }
 
             const auto resultsItr = document.find("results");
@@ -219,7 +220,7 @@ namespace influxdb::internal
         }
         catch (const nlohmann::json::exception& e)
         {
-            throw std::runtime_error(std::format("InfluxDB query: JSON parsing failed: {}", e.what()));
+            throw InfluxDBException{std::format("InfluxDB query: JSON parsing failed: {}", e.what())};
         }
     }
 

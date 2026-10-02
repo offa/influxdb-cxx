@@ -42,37 +42,37 @@ namespace influxdb::test
     TEST_CASE("UDP transport throws on create database", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->createDatabase(), std::runtime_error);
+        CHECK_THROWS_AS(udp->createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("UDP transport throws on set proxy", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), std::runtime_error);
+        CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), InfluxDBException);
     }
 
     TEST_CASE("UDP transport throws on execute query", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->execute("show databases"), std::runtime_error);
+        CHECK_THROWS_AS(udp->execute("show databases"), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on create database", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->createDatabase(), std::runtime_error);
+        CHECK_THROWS_AS(unix->createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on set proxy", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), std::runtime_error);
+        CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on execute query", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->execute("show databases"), std::runtime_error);
+        CHECK_THROWS_AS(unix->execute("show databases"), InfluxDBException);
     }
 
     TEST_CASE("Query passes to transport and returns result", "[BoostSupportTest]")
@@ -569,7 +569,7 @@ invalid-results ":x"]})");
 }
 )");
 
-        CHECK_THROWS_AS(influxdb::internal::queryImpl(&transport, "SELECT * FROM nonexistent"), std::runtime_error);
+        CHECK_THROWS_AS(influxdb::internal::queryImpl(&transport, "SELECT * FROM nonexistent"), InfluxDBException);
     }
 
     TEST_CASE("Query returns empty result for response with empty series array", "[BoostSupportTest]")
@@ -610,6 +610,6 @@ invalid-results ":x"]})");
 }
 )");
 
-        CHECK_THROWS_AS(influxdb::internal::queryImpl(&transport, "SELECT * FROM test"), std::runtime_error);
+        CHECK_THROWS_AS(influxdb::internal::queryImpl(&transport, "SELECT * FROM test"), InfluxDBException);
     }
 }

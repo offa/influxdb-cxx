@@ -22,6 +22,7 @@
 
 #include "SystemTest.h"
 #include "InfluxDB/InfluxDBBuilder.h"
+#include "InfluxDB/InfluxDBException.h"
 
 namespace influxdb::test
 {
@@ -87,7 +88,7 @@ namespace influxdb::test
 
         SECTION("Query on non existing database returns empty")
         {
-            CHECK_THROWS_AS(db->query("select * from st_db").empty(), std::runtime_error);
+            CHECK_THROWS_AS(db->query("select * from st_db").empty(), InfluxDBException);
         }
 
         SECTION("Create database if not existing")
