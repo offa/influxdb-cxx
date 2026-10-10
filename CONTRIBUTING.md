@@ -3,14 +3,14 @@
 
 ## Issues
 
-**Issues** are used to report bugs, problems, feature requests, ask questions or other kind of suggestions. An issue ***should include***:
+**Issues** are used to report bugs, problems, feature requests, ask questions, or other suggestions. An issue ***should include***:
 
 - Good and meaningful title
 - Detailed description
 
 ### Problems and Bugs
 
-Problem and bug reports ***need also***:
+Problem and bug reports ***should also include***:
 
 - Expected and actual behaviour
 - Used version, compiler and platform
@@ -34,7 +34,7 @@ The contributed code should match these criteria:
 - Pass all Unit Tests and CI Builds
 - Proper Test Cases
 - Merge cleanly, without conflicts
-- Follow the projects code style
+- Follow the project's code style
 - Does not introduce external dependencies
 - 4 Spaces – no Tabs
 - UTF-8 encoding
@@ -44,4 +44,3 @@ The contributed code should match these criteria:
 ## Further readings
 
 - [Github Guide: How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
-

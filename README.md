@@ -114,7 +114,7 @@ std::vector<influxdb::Point> points = influxdb->query("SELECT * FROM test");
 ```cpp
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 
-// Execute a command and receive it's response
+// Execute a command and receive its response
 const auto response = influxdb->execute("SHOW DATABASES");
 ```
 
@@ -162,7 +162,7 @@ auto influxdb = InfluxDBBuilder::http("http://localhost:8086?db=test")
 
 ## InfluxDB v2.x compatibility
 
-The support for InfluxDB v2.x is limited at the moment. It's possible to use the v1.x compatibility backend though.
+The support for InfluxDB v2.x is limited at the moment. However, it is possible to use the v1.x compatibility backend.
 
 Please visit [*InfluxDB 1.x compatibility API* docs](https://docs.influxdata.com/influxdb/v2.6/reference/api/influxdb-1x/) for more information.
 
