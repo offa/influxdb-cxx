@@ -26,23 +26,6 @@
 
 namespace influxdb::test
 {
-    namespace
-    {
-        struct TransportDummy : public Transport
-        {
-            void send([[maybe_unused]] std::string&& message) override
-            {
-            }
-        };
-
-        TransportDummy dummy;
-    }
-
-
-    TEST_CASE("Query impl throws unconditionally", "[NoBoostSupportTest]")
-    {
-        CHECK_THROWS_AS(internal::queryImpl(&dummy, "-ignore-"), InfluxDBException);
-    }
 
     TEST_CASE("With UDP throws transport unconditionally", "[NoBoostSupportTest]")
     {

@@ -197,6 +197,43 @@ namespace influxdb::test
         CHECK(result == response);
     }
 
+    TEST_CASE("Query passes to transport and returns result", "[InfluxDBTest]")
+    {
+        auto mock = std::make_shared<TransportMock>();
+        REQUIRE_CALL(*mock, query("SELECT * from test WHERE host = 'localhost'")).RETURN(R"(
+{
+  "results": [
+    {
+      "statement_id": 0,
+      "series": [
+        {
+          "name": "unittest",
+          "tags": {"host": "localhost"},
+          "columns": ["time", "value"],
+          "values": [["2021-01-01T00:11:22.123456789Z", 112233]]
+        }
+      ]
+    }
+  ]
+}
+)");
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+
+        const auto result = db.query("SELECT * from test WHERE host = 'localhost'");
+        CHECK(result.size() == 1);
+    }
+
+    TEST_CASE("Query throws InfluxDBException when transport throws", "[InfluxDBTest]")
+    {
+        using trompeloeil::_;
+
+        auto mock = std::make_shared<TransportMock>();
+        ALLOW_CALL(*mock, query(_)).THROW(InfluxDBException{"Intentional"});
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        CHECK_THROWS_AS(db.query("select should throw"), InfluxDBException);
+    }
+
     TEST_CASE("Set time precision", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();
