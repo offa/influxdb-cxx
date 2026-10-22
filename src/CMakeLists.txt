@@ -11,8 +11,6 @@ add_library(InfluxDB-BoostSupport OBJECT
     )
 target_include_directories(InfluxDB-BoostSupport PRIVATE ${INTERNAL_INCLUDE_DIRS})
 
-target_link_libraries(InfluxDB-BoostSupport PRIVATE date::date)
-
 if (INFLUXCXX_WITH_BOOST)
     target_link_libraries(InfluxDB-BoostSupport PRIVATE Boost::boost)
 endif()
@@ -22,9 +20,9 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_
     set_source_files_properties(UDP.cxx TCP.cxx UnixSocket.cxx PROPERTIES COMPILE_OPTIONS "-Wno-null-dereference")
 endif()
 
-add_library(InfluxDB-Internal OBJECT LineProtocol.cxx HTTP.cxx)
+add_library(InfluxDB-Internal OBJECT LineProtocol.cxx HTTP.cxx QueryParser.cxx)
 target_include_directories(InfluxDB-Internal PRIVATE ${INTERNAL_INCLUDE_DIRS})
-target_link_libraries(InfluxDB-Internal PRIVATE cpr::cpr)
+target_link_libraries(InfluxDB-Internal PRIVATE cpr::cpr date::date nlohmann_json::nlohmann_json)
 
 
 add_library(InfluxDB-Core OBJECT

@@ -28,7 +28,7 @@
 #include "InfluxDB/InfluxDB.h"
 #include "InfluxDB/InfluxDBException.h"
 #include "LineProtocol.h"
-#include "BoostSupport.h"
+#include "QueryParser.h"
 
 namespace influxdb
 {
@@ -168,7 +168,7 @@ namespace influxdb
 
     std::vector<Point> InfluxDB::query(const std::string& query)
     {
-        return internal::queryImpl(mTransport.get(), query);
+        return internal::queryImpl(mTransport->query(query));
     }
 
     void InfluxDB::createDatabaseIfNotExists()

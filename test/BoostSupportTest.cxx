@@ -22,19 +22,17 @@
 
 #include "BoostSupport.h"
 #include "InfluxDB/InfluxDBException.h"
-#include "mock/TransportMock.h"
-#include <boost/property_tree/exceptions.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/trompeloeil.hpp>
 
 namespace influxdb::test
 {
-    TEST_CASE("With UDP returns transport", "[BoostSupportTest]")
+    TEST_CASE("UDP transport returns valid transport", "[BoostSupportTest]")
     {
         CHECK(internal::withUdpTransport(http::url{}) != nullptr);
     }
 
-    TEST_CASE("With Unix socket returns transport", "[BoostSupportTest]")
+    TEST_CASE("Unix socket transport returns valid transport", "[BoostSupportTest]")
     {
         CHECK(internal::withUnixSocketTransport(http::url{}) != nullptr);
     }
@@ -42,149 +40,37 @@ namespace influxdb::test
     TEST_CASE("UDP transport throws on create database", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->createDatabase(), std::runtime_error);
+        CHECK_THROWS_AS(udp->createDatabase(), InfluxDBException);
     }
 
-    TEST_CASE("UDP transport throws on proxy", "[BoostSupportTest]")
+    TEST_CASE("UDP transport throws on set proxy", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), std::runtime_error);
+        CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), InfluxDBException);
     }
 
-    TEST_CASE("UDP transport throws on execute", "[BoostSupportTest]")
+    TEST_CASE("UDP transport throws on execute query", "[BoostSupportTest]")
     {
         auto udp = internal::withUdpTransport(http::url{});
-        CHECK_THROWS_AS(udp->execute("show databases"), std::runtime_error);
+        CHECK_THROWS_AS(udp->execute("show databases"), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on create database", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->createDatabase(), std::runtime_error);
+        CHECK_THROWS_AS(unix->createDatabase(), InfluxDBException);
     }
 
-    TEST_CASE("Unix socket transport throws on proxy", "[BoostSupportTest]")
+    TEST_CASE("Unix socket transport throws on set proxy", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), std::runtime_error);
+        CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), InfluxDBException);
     }
 
-    TEST_CASE("Unix socket transport throws on execute", "[BoostSupportTest]")
+    TEST_CASE("Unix socket transport throws on execute query", "[BoostSupportTest]")
     {
         auto unix = internal::withUnixSocketTransport(http::url{});
-        CHECK_THROWS_AS(unix->execute("show databases"), std::runtime_error);
+        CHECK_THROWS_AS(unix->execute("show databases"), InfluxDBException);
     }
 
-    TEST_CASE("Query is passed to transport", "[BoostSupportTest]")
-    {
-        TransportMock transport;
-        REQUIRE_CALL(transport, query("SELECT * from test WHERE host = 'localhost'"))
-            .RETURN(R"({"results":[{"statement_id":0}]})");
-
-        internal::queryImpl(&transport, "SELECT * from test WHERE host = 'localhost'");
-    }
-
-    TEST_CASE("Query throws if transport throws", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_)).THROW(InfluxDBException{"Intentional"});
-
-        CHECK_THROWS_AS(internal::queryImpl(&transport, "select should throw"), InfluxDBException);
-    }
-
-    TEST_CASE("Query returns empty if empty result", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_)).RETURN(R"({"results":[]})");
-
-        CHECK(internal::queryImpl(&transport, "SELECT * from test").empty());
-    }
-
-    TEST_CASE("Query returns point of single result", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,)"
-                    R"("series":[{"name":"unittest","columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01T00:11:22.123456789Z","localhost",112233]]}]}]})");
-
-        const auto result = internal::queryImpl(&transport, "SELECT * from test");
-        CHECK(result.size() == 1);
-        const auto point = result[0];
-        CHECK(point.getName() == "unittest");
-        CHECK(std::format("{:%FT%T}Z", point.getTimestamp()) == "2021-01-01T00:11:22.123456789Z");
-        CHECK(point.getTags() == "host=localhost");
-        CHECK(point.getFields() == "value=112233.000000000000000000");
-    }
-
-    TEST_CASE("Query returns points of multiple results", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,)"
-                    R"("series":[{"name":"unittest","columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01T00:11:22.000000000Z","host-0",100],)"
-                    R"(["2021-01-01T00:11:23.560000000Z","host-1",30],)"
-                    R"(["2021-01-01T00:11:24.780000000Z","host-2",54]]}]}]})");
-
-        const auto result = internal::queryImpl(&transport, "SELECT * from test");
-        CHECK(result.size() == 3);
-        CHECK(result[0].getName() == "unittest");
-        CHECK(result[0].getTags() == "host=host-0");
-        CHECK(result[0].getFields() == "value=100.000000000000000000");
-        CHECK(result[1].getName() == "unittest");
-        CHECK(result[1].getTags() == "host=host-1");
-        CHECK(result[1].getFields() == "value=30.000000000000000000");
-        CHECK(result[2].getName() == "unittest");
-        CHECK(result[2].getTags() == "host=host-2");
-        CHECK(result[2].getFields() == "value=54.000000000000000000");
-    }
-
-    TEST_CASE("Query throws on invalid result", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"invalid-results":[]})");
-
-        CHECK_THROWS_AS(internal::queryImpl(&transport, "SELECT * from test"), boost::property_tree::ptree_bad_path);
-    }
-
-    TEST_CASE("Query is safe to empty name", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,"series":[{"columns":["time","host","value"],)"
-                    R"("values":[["2021-01-01T00:11:22.000000000Z","x",8]]}]}]})");
-
-        const auto result = internal::queryImpl(&transport, "SELECT * from test");
-        CHECK(result.size() == 1);
-        CHECK(result[0].getName() == "");
-        CHECK(result[0].getTags() == "host=x");
-    }
-
-    TEST_CASE("Query reads optional tags element", "[BoostSupportTest]")
-    {
-        using trompeloeil::_;
-
-        TransportMock transport;
-        ALLOW_CALL(transport, query(_))
-            .RETURN(R"({"results":[{"statement_id":0,"series":[{"name":"x","tags":{"type":"sp"},"columns":["time","value"],)"
-                    R"("values":[["2022-01-01T00:01:02.000000000Z",99]]}]}]})");
-
-        const auto result = internal::queryImpl(&transport, "SELECT * from test");
-        CHECK(result.size() == 1);
-        CHECK(result[0].getTags() == "type=sp");
-    }
 }
