@@ -24,7 +24,7 @@ InfluxDB C++ client library
  - C++20 compiler
 
 ### Dependencies
- - [**cpr**](https://github.com/libcpr/cpr) (required)<sup>i)</sup>
+ - [**cpr**](https://github.com/libcpr/cpr)<sup>i)</sup>
  - [**nlohmann json**](https://github.com/nlohmann/json)
  - **boost 1.90+** (optional – see [Transports](#transports))
 
