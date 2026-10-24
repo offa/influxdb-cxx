@@ -25,6 +25,7 @@ InfluxDB C++ client library
 
 ### Dependencies
  - [**cpr**](https://github.com/libcpr/cpr) (required)<sup>i)</sup>
+ - [**nlohmann json**](https://github.com/nlohmann/json)
  - **boost 1.90+** (optional – see [Transports](#transports))
 
  <sup>i)</sup> *cpr* needs to provide [CMake support](https://github.com/libcpr/cpr#find_package); some systems need to call `ldconfig` after *.so* installation.
@@ -122,14 +123,13 @@ const auto response = influxdb->execute("SHOW DATABASES");
 
 Supported transports:
 
-| Name        | Dependency  | URI protocol   | Sample URI                            |
-| ----------- |:-----------:|:--------------:| -------------------------------------:|
-| HTTP        | cpr<sup>i)</sup> | `http`/`https` | `http://localhost:8086?db=<db>`  |
-| TCP         | boost       | `tcp`          | `tcp://localhost:8094`                |
-| UDP         | boost       | `udp`          | `udp://localhost:8094`                |
-| Unix socket | boost       | `unix`         | `unix:///tmp/telegraf.sock`           |
+| Name        | Dependency | URI protocol   | Sample URI                            |
+| ----------- |:----------:|:--------------:| -------------------------------------:|
+| HTTP        |            | `http`/`https` | `http://localhost:8086?db=<db>`       |
+| TCP         | boost      | `tcp`          | `tcp://localhost:8094`                |
+| UDP         | boost      | `udp`          | `udp://localhost:8094`                |
+| Unix socket | boost      | `unix`         | `unix:///tmp/telegraf.sock`           |
 
-<sup>i)</sup> boost is needed to support queries.
 
 ### Configuration by URI
 
