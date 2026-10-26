@@ -40,13 +40,14 @@ add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
 add_unittest(ProxyTest DEPENDS InfluxDB)
 add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock Threads::Threads)
 add_unittest(UriParserTest)
+add_unittest(QueryParserTest DEPENDS InfluxDB InfluxDB-Internal)
 
 add_unittest(NoBoostSupportTest)
 target_sources(NoBoostSupportTest PRIVATE ${PROJECT_SOURCE_DIR}/src/NoBoostSupport.cxx)
 target_link_libraries(NoBoostSupportTest PRIVATE InfluxDB)
 
 if (INFLUXCXX_WITH_BOOST)
-    add_unittest(BoostSupportTest DEPENDS InfluxDB-BoostSupport InfluxDB Boost::boost date::date)
+    add_unittest(BoostSupportTest DEPENDS InfluxDB InfluxDB-BoostSupport Boost::boost)
 endif()
 
 
@@ -57,6 +58,7 @@ add_custom_target(unittest PointTest
     COMMAND ProxyTest
     COMMAND HttpTest
     COMMAND UriParserTest
+    COMMAND QueryParserTest
     COMMAND NoBoostSupportTest
     COMMAND $<$<AND:$<BOOL:${INFLUXCXX_WITH_BOOST}>,$<NOT:$<PLATFORM_ID:Windows>>>:BoostSupportTest>
 
