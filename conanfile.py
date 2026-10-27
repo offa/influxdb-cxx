@@ -19,7 +19,7 @@ class InfluxdbCxxConan(ConanFile):
         if not self.options.system and self.options.boost:
             self.requires("boost/1.90.0")
         if self.options.tests:
-            self.requires("catch2/3.16.0")
+            self.requires("catch2/3.16.1")
             self.requires("trompeloeil/49")
 
     # Workaround for conan-center-index #29193
