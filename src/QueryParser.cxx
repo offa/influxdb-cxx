@@ -167,11 +167,6 @@ namespace influxdb::internal
             const auto document = nlohmann::json::parse(content);
             checkError(document);
 
-            if (const auto errorItr = document.find("error"); errorItr != document.end())
-            {
-                throw InfluxDBException{std::format("InfluxDB query error: {}", valueToString(*errorItr))};
-            }
-
             const auto resultsItr = document.find("results");
 
             if (resultsItr == document.end() || !resultsItr->is_array())
