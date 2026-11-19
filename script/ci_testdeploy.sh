@@ -22,7 +22,7 @@ conan install \
     --build=missing \
     -s build_type=${BUILD_TYPE} \
     -s compiler.cppstd=20 \
-    --requires=cpr/1.14.2 \
+    --requires=cpr/1.15.1 \
     --requires=nlohmann_json/3.12.0
 
 cmake -DCMAKE_TOOLCHAIN_FILE=./conan_toolchain.cmake -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" "$@" ..
