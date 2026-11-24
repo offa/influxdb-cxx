@@ -58,6 +58,30 @@ namespace influxdb::test
                   Point{"p2"}.addField("f2", 2).setTimestamp(ignoreTimestamp)});
     }
 
+    TEST_CASE("Write empty vector does not send", "[InfluxDBTest]")
+    {
+        using trompeloeil::_;
+
+        auto mock = std::make_shared<TransportMock>();
+        FORBID_CALL(*mock, send(_));
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.write({});
+    }
+
+    TEST_CASE("Write empty batch does not send", "[InfluxDBTest]")
+    {
+        using trompeloeil::_;
+
+        auto mock = std::make_shared<TransportMock>();
+        FORBID_CALL(*mock, send(_));
+
+        InfluxDB db{std::make_unique<TransportAdapter>(mock)};
+        db.batchOf(1);
+        db.write({});
+        db.flushBatch();
+    }
+
     TEST_CASE("Write adds global tags", "[InfluxDBTest]")
     {
         auto mock = std::make_shared<TransportMock>();

@@ -74,16 +74,8 @@ namespace influxdb
 
     std::string InfluxDB::joinLineProtocolBatch() const
     {
-        std::string joinedBatch;
-
         LineProtocol formatter{mGlobalTags, timePrecision};
-        for (const auto& point : mPointBatch)
-        {
-            joinedBatch += formatter.format(point) + "\n";
-        }
-
-        joinedBatch.erase(std::prev(joinedBatch.end()));
-        return joinedBatch;
+        return formatter.format(mPointBatch.cbegin(), mPointBatch.cend());
     }
 
 
@@ -118,6 +110,10 @@ namespace influxdb
 
     void InfluxDB::write(std::vector<Point>&& points)
     {
+        if (points.empty())
+        {
+            return;
+        }
         if (mIsBatchingActivated)
         {
             for (auto&& point : points)
@@ -127,16 +123,8 @@ namespace influxdb
         }
         else
         {
-            std::string lineProtocol;
             LineProtocol formatter{mGlobalTags, timePrecision};
-
-            for (const auto& point : points)
-            {
-                lineProtocol += formatter.format(point) + "\n";
-            }
-
-            lineProtocol.erase(std::prev(lineProtocol.end()));
-            transmit(std::move(lineProtocol));
+            transmit(formatter.format(points.cbegin(), points.cend()));
         }
     }
 
