@@ -37,6 +37,21 @@ namespace influxdb
 
         std::string format(const Point& point) const;
 
+        template <class InputItr>
+        std::string format(InputItr begin, InputItr end) const
+        {
+            std::string lineProtocol;
+            for (auto itr = begin; itr != end; ++itr)
+            {
+                lineProtocol += this->format(*itr);
+                if (std::next(itr) != end)
+                {
+                    lineProtocol += "\n";
+                }
+            }
+            return lineProtocol;
+        }
+
         enum class ElementType
         {
             Measurement,
