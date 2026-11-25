@@ -39,7 +39,7 @@ add_unittest(InfluxDBTest DEPENDS InfluxDB)
 add_unittest(InfluxDBFactoryTest DEPENDS InfluxDB)
 add_unittest(ProxyTest DEPENDS InfluxDB)
 add_unittest(HttpTest DEPENDS InfluxDB-Core InfluxDB-Internal InfluxDB-BoostSupport CprMock Threads::Threads)
-add_unittest(UriParserTest)
+add_unittest(UriParserTest DEPENDS InfluxDB)
 add_unittest(QueryParserTest DEPENDS InfluxDB InfluxDB-Internal)
 
 add_unittest(NoBoostSupportTest)

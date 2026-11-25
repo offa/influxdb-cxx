@@ -22,6 +22,8 @@
 
 #include "HTTP.h"
 #include "InfluxDB/InfluxDBException.h"
+#include "InfluxDB/InfluxDBFactory.h"
+#include "InfluxDB/Point.h"
 #include "InfluxDB/TimePrecision.h"
 #include "mock/CprMock.h"
 #include <catch2/catch_test_macros.hpp>
@@ -83,12 +85,45 @@ namespace influxdb::test
         REQUIRE_THROWS_AS(HTTP{url}, InfluxDBException);
     }
 
+    TEST_CASE("Construction rejects URL without endpoint", "[HttpTest]")
+    {
+        const auto url = GENERATE(std::string{"?db=test"}, std::string{"?"});
+        CAPTURE(url);
+
+        REQUIRE_THROWS_AS(HTTP{url}, InfluxDBException);
+    }
+
+    TEST_CASE("Construction rejects empty database name", "[HttpTest]")
+    {
+        const auto url = GENERATE(
+            std::string{"http://localhost:8086?db="},
+            std::string{"http://localhost:8086?db=&precision=s"});
+        CAPTURE(url);
+
+        REQUIRE_THROWS_AS(HTTP{url}, InfluxDBException);
+    }
+
     TEST_CASE("Construction sets session settings", "[HttpTest]")
     {
         REQUIRE_CALL(sessionMock, SetTimeout(_));
         REQUIRE_CALL(sessionMock, SetConnectTimeout(_));
 
         HTTP http{"http://localhost:8086?db=test"};
+    }
+
+    TEST_CASE("Factory builds credential-free URL with resolved port", "[HttpTest]")
+    {
+        ALLOW_CALL(sessionMock, SetTimeout(_));
+        ALLOW_CALL(sessionMock, SetConnectTimeout(_));
+        REQUIRE_CALL(sessionMock, SetAuth(_)).WITH(_1.GetAuthString() == std::string{"user:pass"});
+        REQUIRE_CALL(sessionMock, SetUrl(eq("http://localhost:8086/write")));
+        REQUIRE_CALL(sessionMock, UpdateHeader(_)).WITH(_1.at("Content-Type") == "text/plain");
+        REQUIRE_CALL(sessionMock, SetBody(_));
+        REQUIRE_CALL(sessionMock, SetParameters(ParamMap{{"db", "test"}}));
+        REQUIRE_CALL(sessionMock, Post()).RETURN(createResponse(cpr::ErrorCode::OK, cpr::status::HTTP_OK));
+
+        auto db = InfluxDBFactory::Get("http://user:pass@localhost?db=test");
+        db->write(Point{"measurement"}.addField("value", 1));
     }
 
     TEST_CASE("Send sets parameters", "[HttpTest]")

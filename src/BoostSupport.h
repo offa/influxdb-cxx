@@ -29,7 +29,7 @@
 
 namespace influxdb::internal
 {
-    std::unique_ptr<Transport> withUdpTransport(const http::url& uri);
-    std::unique_ptr<Transport> withTcpTransport(const http::url& uri);
-    std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri);
+    std::unique_ptr<Transport> withUdpTransport(const Endpoint& endpoint);
+    std::unique_ptr<Transport> withTcpTransport(const Endpoint& endpoint);
+    std::unique_ptr<Transport> withUnixSocketTransport(const Endpoint& endpoint);
 }

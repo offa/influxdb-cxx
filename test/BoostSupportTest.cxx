@@ -29,47 +29,47 @@ namespace influxdb::test
 {
     TEST_CASE("UDP transport returns valid transport", "[BoostSupportTest]")
     {
-        CHECK(internal::withUdpTransport(http::url{}) != nullptr);
+        CHECK(internal::withUdpTransport(internal::Endpoint{}) != nullptr);
     }
 
     TEST_CASE("Unix socket transport returns valid transport", "[BoostSupportTest]")
     {
-        CHECK(internal::withUnixSocketTransport(http::url{}) != nullptr);
+        CHECK(internal::withUnixSocketTransport(internal::Endpoint{}) != nullptr);
     }
 
     TEST_CASE("UDP transport throws on create database", "[BoostSupportTest]")
     {
-        auto udp = internal::withUdpTransport(http::url{});
+        auto udp = internal::withUdpTransport(internal::Endpoint{});
         CHECK_THROWS_AS(udp->createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("UDP transport throws on set proxy", "[BoostSupportTest]")
     {
-        auto udp = internal::withUdpTransport(http::url{});
+        auto udp = internal::withUdpTransport(internal::Endpoint{});
         CHECK_THROWS_AS(udp->setProxy(Proxy{"udp://should-throw"}), InfluxDBException);
     }
 
     TEST_CASE("UDP transport throws on execute query", "[BoostSupportTest]")
     {
-        auto udp = internal::withUdpTransport(http::url{});
+        auto udp = internal::withUdpTransport(internal::Endpoint{});
         CHECK_THROWS_AS(udp->execute("show databases"), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on create database", "[BoostSupportTest]")
     {
-        auto unix = internal::withUnixSocketTransport(http::url{});
+        auto unix = internal::withUnixSocketTransport(internal::Endpoint{});
         CHECK_THROWS_AS(unix->createDatabase(), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on set proxy", "[BoostSupportTest]")
     {
-        auto unix = internal::withUnixSocketTransport(http::url{});
+        auto unix = internal::withUnixSocketTransport(internal::Endpoint{});
         CHECK_THROWS_AS(unix->setProxy(Proxy{"unix:///tmp/should_throw"}), InfluxDBException);
     }
 
     TEST_CASE("Unix socket transport throws on execute query", "[BoostSupportTest]")
     {
-        auto unix = internal::withUnixSocketTransport(http::url{});
+        auto unix = internal::withUnixSocketTransport(internal::Endpoint{});
         CHECK_THROWS_AS(unix->execute("show databases"), InfluxDBException);
     }
 
