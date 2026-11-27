@@ -52,6 +52,10 @@ namespace influxdb::transports
             {
                 return url;
             }
+            if (questionMarkPosition == 0)
+            {
+                throw InfluxDBException{"Invalid URL"};
+            }
             if (url.at(questionMarkPosition - 1) == '/')
             {
                 return url.substr(0, questionMarkPosition - 1);
@@ -67,7 +71,13 @@ namespace influxdb::transports
             {
                 throw InfluxDBException{"No Database specified"};
             }
-            return url.substr(dbParameterPosition + 4);
+
+            const auto databaseName = url.substr(dbParameterPosition + 4);
+            if (databaseName.empty() || databaseName.front() == '&')
+            {
+                throw InfluxDBException{"No Database specified"};
+            }
+            return databaseName;
         }
     }
 

@@ -21,7 +21,9 @@
 // SOFTWARE.
 
 #include "InfluxDB/InfluxDBBuilder.h"
+#include "EndpointTransport.h"
 #include "HTTP.h"
+#include "UriParser.h"
 
 namespace influxdb
 {
@@ -67,8 +69,7 @@ namespace influxdb
 
     InfluxDBBuilder InfluxDBBuilder::http(const std::string& url)
     {
-        return InfluxDBBuilder{std::make_unique<transports::HTTP>(url)};
+        const auto endpoint = internal::parseEndpoint(url);
+        return InfluxDBBuilder{internal::withHttpTransport(endpoint, url)};
     }
-
-
 }

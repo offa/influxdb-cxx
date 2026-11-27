@@ -26,12 +26,12 @@
 ///
 
 #include "InfluxDB/InfluxDBFactory.h"
-#include <functional>
-#include <string>
 #include <memory>
-#include <map>
+#include <string>
+#include <string_view>
 #include "InfluxDB/InfluxDBException.h"
 #include "UriParser.h"
+#include "EndpointTransport.h"
 #include "HTTP.h"
 #include "BoostSupport.h"
 
@@ -39,46 +39,87 @@ namespace influxdb
 {
     namespace internal
     {
-        std::unique_ptr<Transport> withHttpTransport(const http::url& uri)
+        namespace
         {
-            auto transport = std::make_unique<transports::HTTP>(uri.url);
-            if (!uri.user.empty() && !uri.password.empty())
+            std::string makeHttpUrl(const Endpoint& endpoint, std::string_view originalUri)
             {
-                transport->setBasicAuthentication(uri.user, uri.password);
+                std::string url;
+                url.reserve(endpoint.host.size() + endpoint.path.size() + 32);
+
+                url += endpoint.scheme == Scheme::Https ? "https" : "http";
+                url += "://";
+
+                if (endpoint.host.find(':') != std::string::npos)
+                {
+                    url += '[';
+                    url += endpoint.host;
+                    url += ']';
+                }
+                else
+                {
+                    url += endpoint.host;
+                }
+
+                url += ':';
+                url += std::to_string(endpoint.port);
+                url += endpoint.path;
+
+                const auto queryPosition = originalUri.find('?');
+                if (queryPosition != std::string_view::npos)
+                {
+                    url.append(originalUri.substr(queryPosition));
+                }
+
+                return url;
             }
-            else if (!uri.password.empty())
+
+            void applyAuthentication(transports::HTTP& transport, const Authentication& authentication)
             {
-                transport->setAuthToken(uri.password);
+                switch (authentication.type)
+                {
+                    case AuthenticationType::Basic:
+                        transport.setBasicAuthentication(authentication.username, authentication.password);
+                        break;
+                    case AuthenticationType::ApiKey:
+                        transport.setAuthToken(authentication.apiKey);
+                        break;
+                    case AuthenticationType::None:
+                        break;
+                }
             }
-            return transport;
         }
 
+        std::unique_ptr<Transport> withHttpTransport(const Endpoint& endpoint, std::string_view originalUri)
+        {
+            if (endpoint.scheme != Scheme::Http && endpoint.scheme != Scheme::Https)
+            {
+                throw InfluxDBException{"Invalid endpoint: HTTP transport requires http or https"};
+            }
+
+            auto transport = std::make_unique<transports::HTTP>(makeHttpUrl(endpoint, originalUri));
+            applyAuthentication(*transport, endpoint.authentication);
+            return transport;
+        }
     }
 
     std::unique_ptr<Transport> InfluxDBFactory::GetTransport(const std::string& url)
     {
-        static const std::map<std::string, std::function<std::unique_ptr<Transport>(const http::url&)>> map = {
-            {"udp", internal::withUdpTransport},
-            {"tcp", internal::withTcpTransport},
-            {"http", internal::withHttpTransport},
-            {"https", internal::withHttpTransport},
-            {"unix", internal::withUnixSocketTransport},
-        };
+        const auto endpoint = internal::parseEndpoint(url);
 
-        auto urlCopy = url;
-        http::url parsedUrl = http::ParseHttpUrl(urlCopy);
-        if (parsedUrl.protocol.empty())
+        switch (endpoint.scheme)
         {
-            throw InfluxDBException("Ill-formed URI");
+            case internal::Scheme::Http:
+            case internal::Scheme::Https:
+                return internal::withHttpTransport(endpoint, url);
+            case internal::Scheme::Tcp:
+                return internal::withTcpTransport(endpoint);
+            case internal::Scheme::Udp:
+                return internal::withUdpTransport(endpoint);
+            case internal::Scheme::Unix:
+                return internal::withUnixSocketTransport(endpoint);
         }
 
-        const auto iterator = map.find(parsedUrl.protocol);
-        if (iterator == map.end())
-        {
-            throw InfluxDBException{std::format("Unrecognized backend {}", parsedUrl.protocol)};
-        }
-
-        return iterator->second(parsedUrl);
+        throw InfluxDBException{"Unrecognized backend"};
     }
 
     std::unique_ptr<InfluxDB> InfluxDBFactory::Get(const std::string& url)

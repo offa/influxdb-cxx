@@ -28,18 +28,18 @@
 
 namespace influxdb::internal
 {
-    std::unique_ptr<Transport> withUdpTransport(const http::url& uri)
+    std::unique_ptr<Transport> withUdpTransport(const Endpoint& endpoint)
     {
-        return std::make_unique<transports::UDP>(uri.host, uri.port);
+        return std::make_unique<transports::UDP>(endpoint.host, endpoint.port);
     }
 
-    std::unique_ptr<Transport> withTcpTransport(const http::url& uri)
+    std::unique_ptr<Transport> withTcpTransport(const Endpoint& endpoint)
     {
-        return std::make_unique<transports::TCP>(uri.host, uri.port);
+        return std::make_unique<transports::TCP>(endpoint.host, endpoint.port);
     }
 
-    std::unique_ptr<Transport> withUnixSocketTransport(const http::url& uri)
+    std::unique_ptr<Transport> withUnixSocketTransport(const Endpoint& endpoint)
     {
-        return std::make_unique<transports::UnixSocket>(uri.path);
+        return std::make_unique<transports::UnixSocket>(endpoint.path);
     }
 }
