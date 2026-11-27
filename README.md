@@ -30,6 +30,8 @@ InfluxDB C++ client library
 
  <sup>i)</sup> *cpr* needs to provide [CMake support](https://github.com/libcpr/cpr#find_package); some systems need to call `ldconfig` after *.so* installation.
 
+Boost support is optional and can be disabled with `-DINFLUXCXX_WITH_BOOST=OFF` when configuring CMake, or with `-o boost=False` when building with Conan. Without Boost, only the HTTP/HTTPS transport is available.
+
 
 ### Generic
  ```bash
@@ -106,7 +108,7 @@ influxdb->flushBatch();
 ```cpp
 // Available over HTTP only
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
-/// Pass an IFQL to get list of points
+// Pass an InfluxQL query to get list of points
 std::vector<influxdb::Point> points = influxdb->query("SELECT * FROM test");
 ```
 
@@ -130,6 +132,37 @@ Supported transports:
 | UDP         | boost      | `udp`          | `udp://localhost:8094`                |
 | Unix socket | boost      | `unix`         | `unix:///tmp/telegraf.sock`           |
 
+## API Overview
+
+The InfluxDB C++ client provides the following public methods. Availability depends on the underlying transport.
+
+| Method                          | HTTP/HTTPS | TCP | UDP | Unix socket |
+|---------------------------------|:----------:|:---:|:---:|:-----------:|
+| Write                           | ✅         | ✅  | ✅  | ✅          |
+| Batched Write                   | ✅         | ✅  | ✅  | ✅          |
+| Global Tags                     | ✅         | ✅  | ✅  | ✅          |
+| Query                           | ✅         | ❌  | ❌  | ❌          |
+| Execute command                 | ✅         | ❌  | ❌  | ❌          |
+| Create Database                 | ✅         | ❌  | ❌  | ❌          |
+| Ping                            | ✅         | ❌  | ❌  | ❌          |
+| Timestamp precision             | ✅         | ❌  | ❌  | ❌          |
+| Proxy                           | ✅         | ❌  | ❌  | ❌          |
+
+**Note:** Methods marked with ❌ throw `InfluxDBException` when used with non-HTTP transports.
+
+### Builder API
+
+For advanced HTTP configuration, use the builder pattern:
+
+```cpp
+auto influxdb = InfluxDBBuilder::http("http://localhost:8086?db=test")
+    .setTimeout(std::chrono::milliseconds{20})
+    .setAuthToken("<token>")
+    .setBasicAuthentication("user", "pass")
+    .setProxy(proxy)
+    .setVerifyCertificate(true)
+    .connect();
+```
 
 ### Configuration by URI
 
@@ -139,24 +172,27 @@ An underlying transport is configurable by passing an URI. `[protocol]` determin
 auto influxdb = influxdb::InfluxDBFactory::Get("http://localhost:8086?db=test");
 ```
 
-URI Format:
+URI format depends on the transport:
+
+#### HTTP/HTTPS
+
+The database is required and must be given as a query parameter:
 
 ```
-[protocol]://[username:password@]host:port[?db=database]
+[protocol]://[username:password@]host:port?db=<database>
 
 # Auth token:
-[protocol]://[token@]host:port[?db=database]
+[protocol]://[token@]host:port?db=<database>
 ```
 
-### Additional transport configuration *(HTTP only)*
+#### TCP, UDP, Unix socket
 
-The HTTP transport supports additional configurations beyond the limited URI parameters:
+No database parameter is used:
 
-```cpp
-auto influxdb = InfluxDBBuilder::http("http://localhost:8086?db=test")
-                    .setTimeout(std::chrono::seconds{20})
-                    .setAuthToken("<token>")
-                    .connect();
+```
+tcp://host:port
+udp://host:port
+unix:///path/to/socket
 ```
 
 
